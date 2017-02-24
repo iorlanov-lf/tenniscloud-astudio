@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/tenniscloud-as.iml" filepath="$PROJECT_DIR$/tenniscloud-as.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tenniscloud-astudio.iml" filepath="$PROJECT_DIR$/tenniscloud-astudio.iml" />
     </modules>
   </component>
 </project>
