@@ -56,4 +56,20 @@ public class DbUtil {
             return list;
         }
     }
+
+    static public String toString(LocalDate localDate) {
+        if(localDate == null) {
+            return null;
+        } else {
+            return localDate.toString();
+        }
+    }
+
+    static public String toString(LocalTime localTime) {
+        if(localTime == null) {
+            return null;
+        } else {
+            return localTime.toString();
+        }
+    }
 }

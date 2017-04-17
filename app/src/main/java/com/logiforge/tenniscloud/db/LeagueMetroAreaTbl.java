@@ -68,12 +68,19 @@ public class LeagueMetroAreaTbl extends DbDynamicTable {
 
     @Override
     protected ContentValues getContentForInsert(DynamicEntity dynamicEntity) {
-        return null;
+        return getContentForUpdate(dynamicEntity);
     }
 
     @Override
     protected ContentValues getContentForUpdate(DynamicEntity dynamicEntity) {
-        return null;
+        LeagueMetroArea area = (LeagueMetroArea)dynamicEntity;
+
+        ContentValues values = new ContentValues();
+        values.put(COL_PROVIDER_ID, area.getProviderId());
+        values.put(COL_STATE, area.getState());
+        values.put(COL_METRO_AREA_NAME, area.getMetroAreaName());
+
+        return values;
     }
 
     @Override

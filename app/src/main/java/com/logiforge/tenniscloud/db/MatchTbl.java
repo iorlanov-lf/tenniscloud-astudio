@@ -2,6 +2,7 @@ package com.logiforge.tenniscloud.db;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
 import com.logiforge.lavolta.android.db.DbDynamicTable;
 import com.logiforge.lavolta.android.model.DynamicEntity;
@@ -9,6 +10,7 @@ import com.logiforge.lavolta.android.model.api.sync.InventoryItem;
 import com.logiforge.tenniscloud.db.util.DbUtil;
 import com.logiforge.tenniscloud.model.Match;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -23,7 +25,7 @@ public class MatchTbl extends DbDynamicTable {
     public static final String COL_MATCH_FORMAT = "MATCH_FORMAT";
     public static final String COL_OUTCOME = "OUTCOME";
     public static final String COL_FACILITY_ID = "FACILITY_ID";
-    public static final String COL_LEAGUE_ID = "LEAGUE_ID";
+    public static final String COL_LEAGUE_FLIGHT_ID = "LEAGUE_FLIGHT_ID";
     public static final String COL_LEAGUE_WEEK = "LEAGUE_WEEK";
     public static final String COL_DEADLINE_DT = "DEADLINE_DT";
 
@@ -38,7 +40,7 @@ public class MatchTbl extends DbDynamicTable {
                     "MATCH_FORMAT INTEGER," +
                     "OUTCOME INTEGER," +
                     "FACILITY_ID TEXT," +
-                    "LEAGUE_ID TEXT," +
+                    "LEAGUE_FLIGHT_ID TEXT," +
                     "LEAGUE_WEEK INTEGER," +
                     "DEADLINE_DT TEXT" +
                     ")";
@@ -80,17 +82,57 @@ public class MatchTbl extends DbDynamicTable {
 
     @Override
     protected ContentValues getContentForInsert(DynamicEntity dynamicEntity) {
-        return null;
+        return getContentForUpdate(dynamicEntity);
     }
 
     @Override
     protected ContentValues getContentForUpdate(DynamicEntity dynamicEntity) {
-        return null;
+        Match match = (Match)dynamicEntity;
+
+        ContentValues values = new ContentValues();
+        values.put(COL_MATCH_TYPE, match.getMatchType());
+        values.put(COL_SCHEDULED_DT, DbUtil.toString(match.getScheduledDt()));
+        values.put(COL_SCHEDULED_TM, DbUtil.toString(match.getScheduledTm()));
+        values.put(COL_MATCH_FORMAT, match.getMatchFormat());
+        values.put(COL_OUTCOME, match.getOutcome());
+        values.put(COL_FACILITY_ID, match.getFacilityId());
+        values.put(COL_LEAGUE_FLIGHT_ID, match.getLeagueFlightId());
+        values.put(COL_LEAGUE_WEEK, match.getLeagueWeek());
+        values.put(COL_DEADLINE_DT, match.getOutcome());
+        values.put(COL_OUTCOME, DbUtil.toString(match.getDeadlineDt()));
+
+        return values;
     }
 
     @Override
     protected String getTableName() {
         return TABLE_NAME;
+    }
+
+    public MatchTbl() {
+        super();
+    }
+
+    public MatchTbl(SQLiteDatabase db) {
+        super(db);
+    }
+
+    public List<Match> getAll() {
+        List<Match> matches = new ArrayList<Match>();
+
+        Cursor c;
+        c = db.query(TABLE_NAME, null,
+                null, null, null, null, null);
+
+        while (c.moveToNext()) {
+            Match m = fromCursor(c);
+            matches.add(m);
+        }
+        if (c != null && !c.isClosed()) {
+            c.close();
+        }
+
+        return matches;
     }
 
     private Match fromCursor(Cursor c) {
@@ -104,7 +146,7 @@ public class MatchTbl extends DbDynamicTable {
                 getInt(COL_MATCH_TYPE, c),
                 getInt(COL_OUTCOME, c),
                 getString(COL_FACILITY_ID, c),
-                getString(COL_LEAGUE_ID, c),
+                getString(COL_LEAGUE_FLIGHT_ID, c),
                 getInt(COL_LEAGUE_WEEK, c),
                 DbUtil.getLocalDate(COL_DEADLINE_DT, c)
         );

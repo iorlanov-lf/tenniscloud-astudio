@@ -31,4 +31,28 @@ public class MatchAvailability extends DynamicEntity {
         this.dateRange = dateRange;
         this.timeRanges = timeRanges;
     }
+
+    public String getMatchPlayerId() {
+        return matchPlayerId;
+    }
+
+    public void setMatchPlayerId(String matchPlayerId) {
+        this.matchPlayerId = matchPlayerId;
+    }
+
+    public LocalDateRange getDateRange() {
+        return dateRange;
+    }
+
+    public void setDateRange(LocalDateRange dateRange) {
+        this.dateRange = dateRange;
+    }
+
+    public List<LocalTimeRange> getTimeRanges() {
+        return timeRanges;
+    }
+
+    public void setTimeRanges(List<LocalTimeRange> timeRanges) {
+        this.timeRanges = timeRanges;
+    }
 }

@@ -6,16 +6,16 @@ import com.logiforge.lavolta.android.model.DynamicEntity;
  * Created by iorlanov on 2/15/2017.
  */
 public class LeagueProfile extends DynamicEntity {
-    String userId;
+    String userName;
     String leagueMetroAreaId;
     LeagueMetroArea leagueMetroArea;
-    String firstLastName;
+    String displayName;
     String email;
     String phoneNumber;
 
     @Override
     public String getParentId() {
-        return userId;
+        return userName;
     }
 
     public LeagueProfile() {
@@ -23,13 +23,61 @@ public class LeagueProfile extends DynamicEntity {
     }
 
     public LeagueProfile(String id, Long version, Integer syncState,
-                  String userId, String leagueMetroAreaId, String firstLastName, String email, String phoneNumber) {
+                  String userName, String leagueMetroAreaId, String displayName, String email, String phoneNumber) {
         super(id, version, syncState);
 
-        this.userId = userId;
+        this.userName = userName;
         this.leagueMetroAreaId = leagueMetroAreaId;
-        this.firstLastName = firstLastName;
+        this.displayName = displayName;
         this.email = email;
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getLeagueMetroAreaId() {
+        return leagueMetroAreaId;
+    }
+
+    public void setLeagueMetroAreaId(String leagueMetroAreaId) {
+        this.leagueMetroAreaId = leagueMetroAreaId;
+    }
+
+    public LeagueMetroArea getLeagueMetroArea() {
+        return leagueMetroArea;
+    }
+
+    public void setLeagueMetroArea(LeagueMetroArea leagueMetroArea) {
+        this.leagueMetroArea = leagueMetroArea;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 }

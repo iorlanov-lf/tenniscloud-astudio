@@ -19,8 +19,10 @@ public class FacilityTbl extends DbDynamicTable {
     public static final String COL_NAME = "NAME";
     public static final String COL_STREET_ADDRESS = "STREET_ADDRESS";
     public static final String COL_CITY = "CITY";
+    public static final String COL_STATE = "STATE";
     public static final String COL_ZIP = "ZIP";
     public static final String COL_DIRECTIONS = "DIRECTIONS";
+    public static final String COL_IS_REFERENCE = "IS_REFERENCE";
 
     public static final String CREATE_STATEMENT =
             "CREATE TABLE FACILITY (" +
@@ -30,8 +32,10 @@ public class FacilityTbl extends DbDynamicTable {
                     "NAME TEXT," +
                     "STREET_ADDRESS TEXT," +
                     "CITY TEXT," +
+                    "STATE TEXT," +
                     "ZIP TEXT," +
-                    "DIRECTIONS TEXT" +
+                    "DIRECTIONS TEXT," +
+                    "IS_REFERENCE INTEGER" +
                     ")";
 
 
@@ -72,12 +76,23 @@ public class FacilityTbl extends DbDynamicTable {
 
     @Override
     protected ContentValues getContentForInsert(DynamicEntity dynamicEntity) {
-        return null;
+        return getContentForUpdate(dynamicEntity);
     }
 
     @Override
     protected ContentValues getContentForUpdate(DynamicEntity dynamicEntity) {
-        return null;
+        Facility facility = (Facility)dynamicEntity;
+
+        ContentValues values = new ContentValues();
+        values.put(COL_NAME, facility.getName());
+        values.put(COL_STREET_ADDRESS, facility.getStreetAddress());
+        values.put(COL_CITY, facility.getCity());
+        values.put(COL_STATE, facility.getState());
+        values.put(COL_ZIP, facility.getZip());
+        values.put(COL_DIRECTIONS, facility.getDirections());
+        values.put(COL_IS_REFERENCE, facility.getReferenceEntity()?1:0);
+
+        return values;
     }
 
     @Override
@@ -93,8 +108,10 @@ public class FacilityTbl extends DbDynamicTable {
                 getString(COL_NAME, c),
                 getString(COL_STREET_ADDRESS, c),
                 getString(COL_CITY, c),
+                getString(COL_STATE, c),
                 getString(COL_ZIP, c),
-                getString(COL_DIRECTIONS, c)
+                getString(COL_DIRECTIONS, c),
+                getBoolean(COL_IS_REFERENCE, c)
         );
     }
 }

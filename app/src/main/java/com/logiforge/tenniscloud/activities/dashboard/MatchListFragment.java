@@ -7,8 +7,17 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ExpandableListView;
 
 import com.logiforge.tenniscloud.R;
+import com.logiforge.tenniscloud.db.MatchTbl;
+import com.logiforge.tenniscloud.model.Match;
+
+import org.joda.time.LocalDate;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,6 +38,10 @@ public class MatchListFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+    private List<String> listDataHeader; // header titles
+    // child data in format of header title, child title
+    private HashMap<String, List<Match>> listDataChild;
 
     public MatchListFragment() {
         // Required empty public constructor
@@ -64,8 +77,21 @@ public class MatchListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.frag_match_list, container, false);
+        View rootView = inflater.inflate(R.layout.act_dashboard_frag_match_list, container, false);
+
+        ExpandableListView expListView = (ExpandableListView) rootView.findViewById(R.id.match_list);
+
+        // preparing list data
+        prepareListData();
+
+        MatchListAdapter listAdapter = new MatchListAdapter(getActivity(), listDataHeader, listDataChild);
+
+        // setting list adapter
+        expListView.setAdapter(listAdapter);
+        for(int i=0; i < listAdapter.getGroupCount(); i++)
+            expListView.expandGroup(i);
+
+        return rootView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -105,5 +131,40 @@ public class MatchListFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onMatchListInteraction(Uri uri);
+    }
+
+    protected void prepareListData() {
+        listDataHeader = new ArrayList<String>();
+        listDataChild = new HashMap<String, List<Match>>();
+
+        MatchTbl matchTbl = new MatchTbl();
+        List<Match> matches = matchTbl.getAll();
+        LocalDate today = LocalDate.now();
+        LocalDate todayPlusEight = LocalDate.now().plusDays(8);
+        for(Match match : matches) {
+            if(match.getScheduledDt().equals(today)) {
+                List<Match> todayList = listDataChild.get("Scheduled Today");
+                if(todayList == null) {
+                    todayList = new ArrayList<Match>();
+                    listDataChild.put("Scheduled Today", todayList);
+                }
+                todayList.add(match);
+            } else if(match.getScheduledDt().isAfter(today) && match.getScheduledDt().isBefore(todayPlusEight) ) {
+                List<Match> nextSevenDaysList = listDataChild.get("Scheduled Next 7 Days");
+                if(nextSevenDaysList == null) {
+                    nextSevenDaysList = new ArrayList<Match>();
+                    listDataChild.put("Scheduled Next 7 Days", nextSevenDaysList);
+                }
+                nextSevenDaysList.add(match);
+            }
+        }
+
+        if(listDataChild.containsKey("Scheduled Today")) {
+            listDataHeader.add("Scheduled Today");
+        }
+
+        if(listDataChild.containsKey("Scheduled Next 7 Days")) {
+            listDataHeader.add("Scheduled Next 7 Days");
+        }
     }
 }

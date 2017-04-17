@@ -4,10 +4,9 @@
     android:layout_height="match_parent"
     tools:context=".activities.dashboard.MatchListFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
+    <ExpandableListView
+        android:id="@+id/match_list"
         android:layout_height="match_parent"
-        android:text="Matches" />
+        android:layout_width="match_parent"/>
 
 </FrameLayout>

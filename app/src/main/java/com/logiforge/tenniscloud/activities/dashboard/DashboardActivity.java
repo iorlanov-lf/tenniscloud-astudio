@@ -1,17 +1,13 @@
 package com.logiforge.tenniscloud.activities.dashboard;
 
-import android.content.res.ColorStateList;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
+import android.support.v4.app.DialogFragment;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
-import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -22,31 +18,27 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.logiforge.tenniscloud.R;
+import com.logiforge.tenniscloud.activities.editleaguematch.EditLeagueMatchActivity;
 
 public class DashboardActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
             MatchListFragment.OnFragmentInteractionListener,
-            SeasonListFragment.OnFragmentInteractionListener {
+            LeagueListFragment.OnFragmentInteractionListener,
+            View.OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.act_dashboard);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        fab.setOnClickListener(this);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -67,13 +59,14 @@ public class DashboardActivity extends AppCompatActivity
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
 
+        /*
         tabLayout.removeAllTabs();
         tabLayout.addTab(tabLayout.newTab(), true);
         tabLayout.addTab(tabLayout.newTab(), false);
         int tabCount = tabLayout.getTabCount();
         for(int i = 0; i < tabCount; i++){
             TabLayout.Tab tab = tabLayout.getTabAt(i);
-            tab.setCustomView(R.layout.cust_tab);
+            tab.setCustomView(R.layout.act_dashboard_tab);
             View customView = tab.getCustomView();
             TextView textView = (TextView)customView.findViewById(R.id.text1);
             textView.setText(""+i*10);
@@ -81,7 +74,7 @@ public class DashboardActivity extends AppCompatActivity
             ImageView staticImgView = (ImageView)customView.findViewById(R.id.static_image);
             ColorStateList colours = getResources()
                     .getColorStateList(R.color.tab_icon_colors);
-            Drawable d = DrawableCompat.wrap(staticImgView.getDrawable());
+            Drawable d = DrawableCompat.wrap(getResources().getDrawable(R.drawable.ic_menu_camera)); // DrawableCompat.wrap(staticImgView.getDrawable());
             DrawableCompat.setTintList(d.mutate(), colours);
             staticImgView.setImageDrawable(d);
             if(i==0) {
@@ -92,8 +85,10 @@ public class DashboardActivity extends AppCompatActivity
 
             dynImgView.post(new MyRunnable(dynImgView) );
         }
+        */
     }
 
+    /*
     static class MyRunnable implements Runnable {
         ImageView dynImgView;
         public MyRunnable(ImageView dynImgView) {
@@ -115,6 +110,7 @@ public class DashboardActivity extends AppCompatActivity
             }
         }
     }
+    */
 
     @Override
     public void onBackPressed() {
@@ -181,5 +177,26 @@ public class DashboardActivity extends AppCompatActivity
     @Override
     public void onSeasonListInteraction(Uri uri) {
 
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view.getId() == R.id.fab) {
+            FragmentManager fm = getSupportFragmentManager();
+            MatchTypeDlg matchTypeDlg = MatchTypeDlg.newInstance();
+            matchTypeDlg.show(fm, "act_dashboard_dlg_add");
+        } else if(view.getId() == R.id.new_league_match) {
+            DialogFragment matchTypeDlg = (DialogFragment)getSupportFragmentManager().findFragmentByTag("act_dashboard_dlg_add");
+            if(matchTypeDlg != null) {
+                matchTypeDlg.dismiss();
+            }
+            Intent intent = new Intent(this, EditLeagueMatchActivity.class);
+            startActivity(intent);
+        } else if(view.getId() == R.id.new_friendly_match) {
+            DialogFragment matchTypeDlg = (DialogFragment)getSupportFragmentManager().findFragmentByTag("act_dashboard_dlg_add");
+            if(matchTypeDlg != null) {
+                matchTypeDlg.dismiss();
+            }
+        }
     }
 }

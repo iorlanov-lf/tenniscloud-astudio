@@ -7,7 +7,9 @@ import com.logiforge.lavolta.android.db.DbDynamicTable;
 import com.logiforge.lavolta.android.model.DynamicEntity;
 import com.logiforge.lavolta.android.model.api.sync.InventoryItem;
 import com.logiforge.tenniscloud.model.LeagueProfile;
+import com.logiforge.tenniscloud.model.TCUser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -16,9 +18,9 @@ import java.util.List;
  */
 public class LeagueProfileTbl extends DbDynamicTable {
     public static final String TABLE_NAME = "LEAGUE_PROFILE";
-    public static final String COL_USER_ID = "USER_ID";
+    public static final String COL_USER_NAME = "USER_NAME";
     public static final String COL_METRO_AREA_ID = "METRO_AREA_ID";
-    public static final String COL_FIRST_LAST_NAME = "FIRST_LAST_NAME";
+    public static final String COL_DISPLAY_NAME = "DISPLAY_NAME";
     public static final String COL_EMAIL = "EMAIL";
     public static final String COL_PHONE_NUMBER = "PHONE_NUMBER";
 
@@ -27,9 +29,9 @@ public class LeagueProfileTbl extends DbDynamicTable {
                     "ID TEXT PRIMARY KEY," +
                     "VERSION INTEGER," +
                     "SYNC_STATE INTEGER," +
-                    "USER_ID TEXT," +
+                    "USER_NAME TEXT," +
                     "METRO_AREA_ID TEXT," +
-                    "FIRST_LAST_NAME TEXT," +
+                    "DISPLAY_NAME TEXT," +
                     "EMAIL TEXT," +
                     "PHONE_NUMBER TEXT" +
                     ")";
@@ -71,12 +73,21 @@ public class LeagueProfileTbl extends DbDynamicTable {
 
     @Override
     protected ContentValues getContentForInsert(DynamicEntity dynamicEntity) {
-        return null;
+        return getContentForUpdate(dynamicEntity);
     }
 
     @Override
     protected ContentValues getContentForUpdate(DynamicEntity dynamicEntity) {
-        return null;
+        LeagueProfile profile = (LeagueProfile)dynamicEntity;
+
+        ContentValues values = new ContentValues();
+        values.put(COL_USER_NAME, profile.getUserName());
+        values.put(COL_METRO_AREA_ID, profile.getLeagueMetroAreaId());
+        values.put(COL_DISPLAY_NAME, profile.getDisplayName());
+        values.put(COL_EMAIL, profile.getEmail());
+        values.put(COL_PHONE_NUMBER, profile.getPhoneNumber());
+
+        return values;
     }
 
     @Override
@@ -84,14 +95,59 @@ public class LeagueProfileTbl extends DbDynamicTable {
         return TABLE_NAME;
     }
 
+    public LeagueProfile findByUserNameAndAreaId(String userName, String areaId) {
+        LeagueProfile profile = null;
+
+        Cursor c;
+        c = db.query(TABLE_NAME, null,
+                COL_USER_NAME+"=?"+" AND "+COL_METRO_AREA_ID+"=?",
+                new String[]{userName, areaId},
+                null, null, null);
+
+        if (c.moveToFirst()) {
+            profile = fromCursor(c);
+        }
+        if (c != null && !c.isClosed()) {
+            c.close();
+        }
+
+        return profile;
+    }
+
+    public LeagueProfile findByAreaId(String areaId) {
+        TCUserTbl userTbl = new TCUserTbl();
+        TCUser user = userTbl.getSelf();
+
+        return findByUserNameAndAreaId(user.getUserName(), areaId);
+    }
+
+    public List<LeagueProfile> getUserProfiles(String userName) {
+        List<LeagueProfile> profiles = new ArrayList<LeagueProfile>();
+
+        Cursor c;
+        c = db.query(TABLE_NAME, null,
+                COL_USER_NAME+"=?",
+                new String[]{userName},
+                null, null, null);
+
+        while (c.moveToNext()) {
+            profiles.add(fromCursor(c));
+        }
+        if (c != null && !c.isClosed()) {
+            c.close();
+        }
+
+        return profiles;
+    }
+
     private LeagueProfile fromCursor(Cursor c) {
         return new LeagueProfile(
                 getString(COL_ID, c),
                 getLong(COL_VERSION, c),
                 getInt(COL_SYNC_STATE, c),
-                getString(COL_USER_ID, c),
+                getString(COL_USER_NAME, c),
                 getString(COL_METRO_AREA_ID, c),
-                getString(COL_FIRST_LAST_NAME, c),
+                getString(COL_DISPLAY_NAME, c),
                 getString(COL_EMAIL, c),
                 getString(COL_PHONE_NUMBER, c)
         );

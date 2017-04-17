@@ -9,6 +9,7 @@ import com.logiforge.lavolta.android.model.api.sync.InventoryItem;
 import com.logiforge.tenniscloud.db.util.DbUtil;
 import com.logiforge.tenniscloud.model.League;
 
+
 import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
@@ -24,10 +25,11 @@ public class LeagueTbl extends DbDynamicTable {
     public static final String COL_YEAR = "YEAR";
     public static final String COL_SEASON = "SEASON";
     public static final String COL_CUSTOM_SEASON_NAME = "CUSTOM_SEASON_NAME";
-    public static final String COL_IS_SINGLES = "IS_SINGLES";
+    public static final String COL_TEAM_TYPE = "TEAM_TYPE";
     public static final String COL_AGE_FLIGHT = "AGE_FLIGHT";
     public static final String COL_GENDER = "GENDER";
-    public static final String COL_NTRP_LEVEL = "NTRP_LEVEL";
+    public static final String COL_SCHEDULING = "SCHEDULING";
+    public static final String COL_LEAGUE_NAME = "LEAGUE_NAME";
     public static final String COL_REGISTRATION_END_DT = "REGISTRATION_END_DT";
     public static final String COL_PLAY_START_DT = "PLAY_START_DT";
     public static final String COL_PLAY_END_DT = "PLAY_END_DT";
@@ -41,10 +43,11 @@ public class LeagueTbl extends DbDynamicTable {
                     "YEAR INTEGER," +
                     "SEASON INTEGER," +
                     "CUSTOM_SEASON_NAME TEXT," +
-                    "IS_SINGLES INTEGER," +
+                    "TEAM_TYPE INTEGER," +
                     "AGE_FLIGHT INTEGER," +
                     "GENDER INTEGER," +
-                    "NTRP_LEVEL TEXT," +
+                    "SCHEDULING TEXT," +
+                    "LEAGUE_NAME TEXT," +
                     "REGISTRATION_END_DT TEXT," +
                     "PLAY_START_DT TEXT," +
                     "PLAY_END_DT TEXT" +
@@ -87,12 +90,28 @@ public class LeagueTbl extends DbDynamicTable {
 
     @Override
     protected ContentValues getContentForInsert(DynamicEntity dynamicEntity) {
-        return null;
+        return getContentForUpdate(dynamicEntity);
     }
 
     @Override
     protected ContentValues getContentForUpdate(DynamicEntity dynamicEntity) {
-        return null;
+        League league = (League)dynamicEntity;
+
+        ContentValues values = new ContentValues();
+        values.put(COL_METRO_AREA_ID, league.getLeagueMetroAreaId());
+        values.put(COL_YEAR, league.getYear());
+        values.put(COL_SEASON, league.getSeason());
+        values.put(COL_CUSTOM_SEASON_NAME, league.getCustomSeasonName());
+        values.put(COL_TEAM_TYPE, league.getTeamType());
+        values.put(COL_AGE_FLIGHT, league.getAgeFlight());
+        values.put(COL_GENDER, league.getGender());
+        values.put(COL_SCHEDULING, league.getScheduling());
+        values.put(COL_LEAGUE_NAME, league.getLeagueName());
+        values.put(COL_REGISTRATION_END_DT, DbUtil.toString(league.getRegistrationEndDt()));
+        values.put(COL_PLAY_START_DT, DbUtil.toString(league.getPlayStartDt()));
+        values.put(COL_PLAY_END_DT, DbUtil.toString(league.getPlayEndDt()));
+
+        return values;
     }
 
     @Override
@@ -107,7 +126,7 @@ public class LeagueTbl extends DbDynamicTable {
         c = db.query(TABLE_NAME, null,
                 COL_METRO_AREA_ID+"=?",
                 new String[]{metroAreaId},
-                null, null, null);
+                null, null, COL_PLAY_START_DT + "," +COL_LEAGUE_NAME);
 
         while (c.moveToNext()) {
             League league = fromCursor(c);
@@ -116,6 +135,19 @@ public class LeagueTbl extends DbDynamicTable {
 
         if (c != null && !c.isClosed()) {
             c.close();
+        }
+
+        return leagueList;
+    }
+
+    public List<League> getActiveLeagues(String metroAreaId) {
+        List<League> allLeagues = getByMetroAreaId(metroAreaId);
+        List<League> leagueList = new ArrayList<League>();
+        LocalDate now = LocalDate.now();
+        for(League league : allLeagues) {
+            if(league.getPlayStartDt().minusDays(7).isBefore(now) && league.getPlayEndDt().plusMonths(1).isAfter(now)) {
+                leagueList.add(league);
+            }
         }
 
         return leagueList;
@@ -130,10 +162,11 @@ public class LeagueTbl extends DbDynamicTable {
                 getInt(COL_YEAR, c),
                 getInt(COL_SEASON, c),
                 getString(COL_CUSTOM_SEASON_NAME, c),
-                getBoolean(COL_IS_SINGLES, c),
+                getInt(COL_TEAM_TYPE, c),
                 getInt(COL_AGE_FLIGHT, c),
                 getInt(COL_GENDER, c),
-                getString(COL_NTRP_LEVEL, c),
+                getString(COL_SCHEDULING, c),
+                getString(COL_LEAGUE_NAME, c),
                 DbUtil.getLocalDate(COL_REGISTRATION_END_DT, c),
                 DbUtil.getLocalDate(COL_PLAY_START_DT, c),
                 DbUtil.getLocalDate(COL_PLAY_END_DT, c)

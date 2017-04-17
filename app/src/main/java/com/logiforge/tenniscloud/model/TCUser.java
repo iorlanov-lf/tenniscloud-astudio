@@ -6,10 +6,14 @@ import com.logiforge.lavolta.android.model.DynamicEntity;
  * Created by iorlanov on 2/19/2017.
  */
 public class TCUser extends DynamicEntity {
-    String userId;
-    String firstLastName;
+    public static final int GENDER_MALE = 0;
+    public static final int GENDER_FEMAIL = 1;
+
+    String userName;
+    String displayName;
     String email;
     String phoneNbr;
+    Integer gender;
 
     @Override
     public String getParentId() {
@@ -21,12 +25,53 @@ public class TCUser extends DynamicEntity {
     }
 
     public TCUser(String id, Long version, Integer syncState,
-                  String userId, String firstLastName, String email, String phoneNbr) {
+                  String userName, String displayName, String email, String phoneNbr, Integer gender) {
         super(id, version, syncState);
 
-        this.userId = userId;
-        this.firstLastName = firstLastName;
+        this.userName = userName;
+        this.displayName = displayName;
         this.email = email;
         this.phoneNbr = phoneNbr;
+        this.gender = gender;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userId) {
+        this.userName = userName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhoneNbr() {
+        return phoneNbr;
+    }
+
+    public void setPhoneNbr(String phoneNbr) {
+        this.phoneNbr = phoneNbr;
+    }
+
+    public Integer getGender() {
+        return gender;
+    }
+
+    public void setGender(Integer gender) {
+        this.gender = gender;
     }
 }

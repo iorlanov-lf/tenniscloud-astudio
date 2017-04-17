@@ -8,16 +8,29 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".activities.dashboard.DashboardActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+        <activity android:name=".activities.entrypoint.EntryPointActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activities.dashboard.DashboardActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.editleaguematch.EditLeagueMatchActivity"
+            android:label="@string/title_activity_edit_league_match"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.leagueregistration.LeagueRegistrationActivity"
+            android:label="@string/title_act_leaguereg"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.facility.FacilityActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
     </application>
 
 </manifest>

@@ -30,7 +30,7 @@ public class TennisContactTbl extends DbDynamicTable {
                     "USER_ID TEXT," +
                     "FIRST_LAST_NAME TEXT," +
                     "EMAIL TEXT," +
-                    "EMAIL PHONE_NUMBER," +
+                    "PHONE_NUMBER TEXT," +
                     "OTHER_USER_ID TEXT" +
                     ")";
 

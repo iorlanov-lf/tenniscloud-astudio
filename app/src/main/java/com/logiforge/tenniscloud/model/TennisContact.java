@@ -35,4 +35,52 @@ public class TennisContact extends DynamicEntity {
         this.phoneNbr = phoneNbr;
         this.otherUserId = otherUserId;
     }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getFirstLastName() {
+        return firstLastName;
+    }
+
+    public void setFirstLastName(String firstLastName) {
+        this.firstLastName = firstLastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhoneNbr() {
+        return phoneNbr;
+    }
+
+    public void setPhoneNbr(String phoneNbr) {
+        this.phoneNbr = phoneNbr;
+    }
+
+    public String getOtherUserId() {
+        return otherUserId;
+    }
+
+    public void setOtherUserId(String otherUserId) {
+        this.otherUserId = otherUserId;
+    }
+
+    public TCUser getOtherTcUser() {
+        return otherTcUser;
+    }
+
+    public void setOtherTcUser(TCUser otherTcUser) {
+        this.otherTcUser = otherTcUser;
+    }
 }

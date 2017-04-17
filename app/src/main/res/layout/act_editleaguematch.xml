@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.logiforge.tenniscloud.activities.editleaguematch.EditLeagueMatchActivity">
+
+    <!--
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/appbar_padding_top"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:popupTheme="@style/AppTheme.PopupOverlay">
+
+        </android.support.v7.widget.Toolbar>
+
+    </android.support.design.widget.AppBarLayout>
+-->
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/form_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/olive">
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_alignParentLeft="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="0dp" android:minWidth="0dp"
+            android:text="X"
+            android:onClick="onCancel"/>
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/l_form_header_middle"
+            android:clickable="true"
+            android:orientation="vertical"
+            android:layout_toRightOf="@+id/btn_cancel"
+            android:layout_toLeftOf="@+id/btn_save_new_league_match"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/btn_cancel"
+            android:background="@color/blue">
+
+            <TextView
+                android:id="@+id/form_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New League Match"/>
+
+            <TextView
+                android:id="@+id/league_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select League"
+                android:background="@color/red"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_save_new_league_match"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="0dp" android:minWidth="0dp"
+            android:text="Save"/>
+    </RelativeLayout>
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tab_layout"
+        android:layout_below="@+id/form_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:tabMode="fixed"
+        android:background="@color/green"/>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/container"
+        android:layout_below="@+id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+</RelativeLayout>

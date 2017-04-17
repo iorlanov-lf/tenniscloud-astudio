@@ -4,10 +4,14 @@ import android.content.ContentValues;
 import android.database.Cursor;
 
 import com.logiforge.lavolta.android.db.DbDynamicTable;
+import com.logiforge.lavolta.android.db.InstallationTable;
 import com.logiforge.lavolta.android.model.DynamicEntity;
+import com.logiforge.lavolta.android.model.Installation;
 import com.logiforge.lavolta.android.model.api.sync.InventoryItem;
+import com.logiforge.tenniscloud.model.Facility;
 import com.logiforge.tenniscloud.model.TCUserFacility;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -65,17 +69,62 @@ public class TCUserFacilityTbl extends DbDynamicTable {
 
     @Override
     protected ContentValues getContentForInsert(DynamicEntity dynamicEntity) {
-        return null;
+        return getContentForUpdate(dynamicEntity);
     }
 
     @Override
     protected ContentValues getContentForUpdate(DynamicEntity dynamicEntity) {
-        return null;
+        TCUserFacility userFacility = (TCUserFacility)dynamicEntity;
+
+        ContentValues values = new ContentValues();
+        values.put(COL_USER_ID, userFacility.getUserId());
+        values.put(COL_FACILITY_ID, userFacility.getFacilityId());
+
+        return values;
     }
 
     @Override
     protected String getTableName() {
         return TABLE_NAME;
+    }
+
+    public boolean hasFacility(String userId) {
+        boolean result = false;
+
+        Cursor c;
+        c = db.query(TABLE_NAME, null,
+                "USER_ID=?",
+                new String[]{userId},
+                null, null, null);
+
+        if (c.moveToFirst()) {
+            result = true;
+        }
+        if (c != null && !c.isClosed()) {
+            c.close();
+        }
+
+        return result;
+    }
+
+    public List<TCUserFacility> getUserFacilities(String userId) {
+        List<TCUserFacility> userFacilities = new ArrayList<TCUserFacility>();
+
+        Cursor c;
+        c = db.query(TABLE_NAME, null,
+                "USER_ID=?",
+                new String[]{userId},
+                null, null, null);
+
+        while (c.moveToNext()) {
+            TCUserFacility userFacility = fromCursor(c);
+            userFacilities.add(userFacility);
+        }
+        if (c != null && !c.isClosed()) {
+            c.close();
+        }
+
+        return userFacilities;
     }
 
     private TCUserFacility fromCursor(Cursor c) {

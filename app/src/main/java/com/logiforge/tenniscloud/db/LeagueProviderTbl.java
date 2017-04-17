@@ -63,17 +63,26 @@ public class LeagueProviderTbl extends DbDynamicTable {
 
     @Override
     protected ContentValues getContentForInsert(DynamicEntity dynamicEntity) {
-        return null;
+        return getContentForUpdate(dynamicEntity);
     }
 
     @Override
     protected ContentValues getContentForUpdate(DynamicEntity dynamicEntity) {
-        return null;
+        LeagueProvider provider = (LeagueProvider)dynamicEntity;
+
+        ContentValues values = new ContentValues();
+        values.put(COL_PROVIDER_NAME, provider.getProviderName());
+
+        return values;
     }
 
     @Override
     protected String getTableName() {
         return TABLE_NAME;
+    }
+
+    public LeagueProviderTbl() {
+        super();
     }
 
     public List<LeagueProvider> getAll() {

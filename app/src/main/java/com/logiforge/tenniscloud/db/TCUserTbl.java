@@ -4,7 +4,9 @@ import android.content.ContentValues;
 import android.database.Cursor;
 
 import com.logiforge.lavolta.android.db.DbDynamicTable;
+import com.logiforge.lavolta.android.db.InstallationTable;
 import com.logiforge.lavolta.android.model.DynamicEntity;
+import com.logiforge.lavolta.android.model.Installation;
 import com.logiforge.lavolta.android.model.api.sync.InventoryItem;
 import com.logiforge.tenniscloud.model.TCUser;
 
@@ -16,20 +18,22 @@ import java.util.List;
  */
 public class TCUserTbl extends DbDynamicTable {
     public static final String TABLE_NAME = "TCUSER";
-    public static final String COL_USER_ID = "USER_ID";
-    public static final String COL_FIRST_LAST_NAME = "FIRST_LAST_NAME";
+    public static final String COL_USER_NAME = "USER_NAME";
+    public static final String COL_DISPLAY_NAME = "DISPLAY_NAME";
     public static final String COL_EMAIL = "EMAIL";
     public static final String COL_PHONE_NUMBER = "PHONE_NUMBER";
+    public static final String COL_GENDER = "GENDER";
 
     public static final String CREATE_STATEMENT =
             "CREATE TABLE TCUSER (" +
                     "ID TEXT PRIMARY KEY," +
                     "VERSION INTEGER," +
                     "SYNC_STATE INTEGER," +
-                    "USER_ID TEXT," +
-                    "FIRST_LAST_NAME TEXT," +
+                    "USER_NAME TEXT," +
+                    "DISPLAY_NAME TEXT," +
                     "EMAIL TEXT," +
-                    "EMAIL PHONE_NUMBER" +
+                    "PHONE_NUMBER TEXT," +
+                    "GENDER INTEGER" +
                     ")";
 
     @Override
@@ -69,12 +73,21 @@ public class TCUserTbl extends DbDynamicTable {
 
     @Override
     protected ContentValues getContentForInsert(DynamicEntity dynamicEntity) {
-        return null;
+        return getContentForUpdate(dynamicEntity);
     }
 
     @Override
     protected ContentValues getContentForUpdate(DynamicEntity dynamicEntity) {
-        return null;
+        TCUser user = (TCUser)dynamicEntity;
+
+        ContentValues values = new ContentValues();
+        values.put(COL_USER_NAME, user.getUserName());
+        values.put(COL_DISPLAY_NAME, user.getDisplayName());
+        values.put(COL_EMAIL, user.getEmail());
+        values.put(COL_PHONE_NUMBER, user.getPhoneNbr());
+        values.put(COL_GENDER, user.getGender());
+
+        return values;
     }
 
     @Override
@@ -82,15 +95,38 @@ public class TCUserTbl extends DbDynamicTable {
         return TABLE_NAME;
     }
 
+    public TCUser getSelf() {
+        InstallationTable instTbl = new InstallationTable();
+        Installation inst  = instTbl.getInstallation();
+
+        TCUser u = null;
+
+        Cursor c;
+        c = db.query(TABLE_NAME, null,
+                COL_USER_NAME+"=?",
+                new String[]{inst.getUserName()},
+                null, null, null);
+
+        if (c.moveToFirst()) {
+            u = fromCursor(c);
+        }
+        if (c != null && !c.isClosed()) {
+            c.close();
+        }
+
+        return u;
+    }
+
     private TCUser fromCursor(Cursor c) {
         return new TCUser(
                 getString(COL_ID, c),
                 getLong(COL_VERSION, c),
                 getInt(COL_SYNC_STATE, c),
-                getString(COL_USER_ID, c),
-                getString(COL_FIRST_LAST_NAME, c),
+                getString(COL_USER_NAME, c),
+                getString(COL_DISPLAY_NAME, c),
                 getString(COL_EMAIL, c),
-                getString(COL_PHONE_NUMBER, c)
+                getString(COL_PHONE_NUMBER, c),
+                getInt(COL_GENDER, c)
         );
     }
 }

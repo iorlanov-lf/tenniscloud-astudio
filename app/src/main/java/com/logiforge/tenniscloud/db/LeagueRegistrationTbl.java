@@ -8,6 +8,7 @@ import com.logiforge.lavolta.android.model.DynamicEntity;
 import com.logiforge.lavolta.android.model.api.sync.InventoryItem;
 import com.logiforge.tenniscloud.model.LeagueRegistration;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -16,8 +17,9 @@ import java.util.List;
  */
 public class LeagueRegistrationTbl extends DbDynamicTable{
     public static final String TABLE_NAME = "LEAGUE_REGISTRATION";
-    public static final String COL_USER_ID = "USER_ID";
-    public static final String COL_LEAGUE_ID = "LEAGUE_ID";
+    public static final String COL_LEAGUE_PROFILE_ID = "LEAGUE_PROFILE_ID";
+    public static final String COL_LEAGUE_FLIGHT_ID = "LEAGUE_FLIGHT_ID";
+    public static final String COL_LEAGUE_DIVISION_ID = "LEAGUE_DIVISION_ID";
     public static final String COL_FACILITY_ID = "FACILITY_ID";
 
     public static final String CREATE_STATEMENT =
@@ -25,8 +27,9 @@ public class LeagueRegistrationTbl extends DbDynamicTable{
                     "ID TEXT PRIMARY KEY," +
                     "VERSION INTEGER," +
                     "SYNC_STATE INTEGER," +
-                    "USER_ID TEXT," +
-                    "LEAGUE_ID TEXT," +
+                    "LEAGUE_PROFILE_ID TEXT," +
+                    "LEAGUE_FLIGHT_ID TEXT," +
+                    "LEAGUE_DIVISION_ID TEXT," +
                     "FACILITY_ID TEXT" +
                     ")";
 
@@ -67,12 +70,20 @@ public class LeagueRegistrationTbl extends DbDynamicTable{
 
     @Override
     protected ContentValues getContentForInsert(DynamicEntity dynamicEntity) {
-        return null;
+        return getContentForUpdate(dynamicEntity);
     }
 
     @Override
     protected ContentValues getContentForUpdate(DynamicEntity dynamicEntity) {
-        return null;
+        LeagueRegistration leagueReg = (LeagueRegistration)dynamicEntity;
+
+        ContentValues values = new ContentValues();
+        values.put(COL_LEAGUE_PROFILE_ID, leagueReg.getLeagueProfileId());
+        values.put(COL_LEAGUE_FLIGHT_ID, leagueReg.getLeagueFlightId());
+        values.put(COL_LEAGUE_DIVISION_ID, leagueReg.getLeagueDivisionId());
+        values.put(COL_FACILITY_ID, leagueReg.getFacilityId());
+
+        return values;
     }
 
     @Override
@@ -80,13 +91,33 @@ public class LeagueRegistrationTbl extends DbDynamicTable{
         return TABLE_NAME;
     }
 
+    public List<LeagueRegistration> getProfileRegistrations(String profileId) {
+        List<LeagueRegistration> registrations = new ArrayList<LeagueRegistration>();
+
+        Cursor c;
+        c = db.query(TABLE_NAME, null,
+                COL_LEAGUE_PROFILE_ID + "=?",
+                new String[]{profileId},
+                null, null, null);
+
+        while (c.moveToNext()) {
+            registrations.add(fromCursor(c));
+        }
+        if (c != null && !c.isClosed()) {
+            c.close();
+        }
+
+        return registrations;
+    }
+
     private LeagueRegistration fromCursor(Cursor c) {
         return new LeagueRegistration(
                 getString(COL_ID, c),
                 getLong(COL_VERSION, c),
                 getInt(COL_SYNC_STATE, c),
-                getString(COL_USER_ID, c),
-                getString(COL_LEAGUE_ID, c),
+                getString(COL_LEAGUE_PROFILE_ID, c),
+                getString(COL_LEAGUE_FLIGHT_ID, c),
+                getString(COL_LEAGUE_DIVISION_ID, c),
                 getString(COL_FACILITY_ID, c)
         );
     }

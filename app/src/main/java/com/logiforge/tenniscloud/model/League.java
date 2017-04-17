@@ -16,6 +16,9 @@ public class League extends DynamicEntity {
     public static final int SEASON_SUMMER = 3;
     public static final int SEASON_FALL = 4;
 
+    public static final int TEAM_TYPE_SINGLES = 1;
+    public static final int TEAM_TYPE_DOUBLES = 2;
+
     public static final int AGE_FLIGHT_OPEN = 0;
     public static final int AGE_FLIGHT_JUNIOR = 1;
     public static final int AGE_FLIGHT_ADULT = 2;
@@ -26,31 +29,19 @@ public class League extends DynamicEntity {
     public static final int GENDER_WOMEN = 1;
     public static final int GENDER_MIXED = 2;
 
-    public static final String NTRP_LEVEL_OPEN = "Open";
-    public static final String NTRP_LEVEL_25 = "2.5";
-    public static final String NTRP_LEVEL_30M = "3.0-";
-    public static final String NTRP_LEVEL_30 = "3.0";
-    public static final String NTRP_LEVEL_35M = "3.5-";
-    public static final String NTRP_LEVEL_35 = "3.5";
-    public static final String NTRP_LEVEL_40M = "4.0-";
-    public static final String NTRP_LEVEL_40 = "4.0";
-    public static final String NTRP_LEVEL_45M = "4.5-";
-    public static final String NTRP_LEVEL_45 = "4.5";
-    public static final String NTRP_LEVEL_50M = "5.0-";
-    public static final String NTRP_LEVEL_50 = "5.0";
-    public static final String NTRP_LEVEL_55M = "5.5-";
-    public static final String NTRP_LEVEL_55 = "5.5";
-
+    public static final String SCHEDULING_BUSINESS = "Business";
+    public static final String SCHEDULING_WEEKDAY = "Weekday";
 
     String leagueMetroAreaId;
     LeagueMetroArea leagueMetroArea;
     Integer year;
     Integer season;
     String customSeasonName;
-    Boolean isSingles;
+    Integer teamType;
     Integer ageFlight;
     Integer gender;
-    String ntrpLevel;
+    String scheduling;
+    String leagueName;
     LocalDate registrationEndDt;
     LocalDate playStartDt;
     LocalDate playEndDt;
@@ -65,19 +56,21 @@ public class League extends DynamicEntity {
     }
 
     public League(String id, Long version, Integer syncState,
-        String leagueMetroAreaId, Integer year, Integer season, String customSeasonName,
-        Boolean isSingles, Integer ageFlight, Integer gender, String ntrpLevel,
-        LocalDate registrationEndDt, LocalDate playStartDt, LocalDate playEndDt) {
+            String leagueMetroAreaId, Integer year, Integer season, String customSeasonName,
+            Integer teamType, Integer ageFlight, Integer gender, String scheduling,
+            String leagueName,
+            LocalDate registrationEndDt, LocalDate playStartDt, LocalDate playEndDt) {
         super(id, version, syncState);
 
         this.leagueMetroAreaId = leagueMetroAreaId;
         this.year = year;
         this.season = season;
         this.customSeasonName = customSeasonName;
-        this.isSingles = isSingles;
+        this.teamType = teamType;
         this.ageFlight = ageFlight;
         this.gender = gender;
-        this.ntrpLevel = ntrpLevel;
+        this.scheduling = scheduling;
+        this.leagueName = leagueName;
         this.registrationEndDt = registrationEndDt;
         this.playStartDt = playStartDt;
         this.playEndDt = playEndDt;
@@ -123,12 +116,12 @@ public class League extends DynamicEntity {
         this.customSeasonName = customSeasonName;
     }
 
-    public Boolean getSingles() {
-        return isSingles;
+    public Integer getTeamType() {
+        return teamType;
     }
 
-    public void setSingles(Boolean singles) {
-        isSingles = singles;
+    public void setTeamType(Integer teamType) {
+        this.teamType = teamType;
     }
 
     public Integer getAgeFlight() {
@@ -147,12 +140,20 @@ public class League extends DynamicEntity {
         this.gender = gender;
     }
 
-    public String getNtrpLevel() {
-        return ntrpLevel;
+    public String getScheduling() {
+        return scheduling;
     }
 
-    public void setNtrpLevel(String ntrpLevel) {
-        this.ntrpLevel = ntrpLevel;
+    public void setScheduling(String scheduling) {
+        this.scheduling = scheduling;
+    }
+
+    public String getLeagueName() {
+        return leagueName;
+    }
+
+    public void setLeagueName(String leagueName) {
+        this.leagueName = leagueName;
     }
 
     public LocalDate getRegistrationEndDt() {
