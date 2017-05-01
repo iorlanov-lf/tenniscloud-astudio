@@ -21,16 +21,22 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.logiforge.tenniscloud.R;
 import com.logiforge.tenniscloud.activities.leagueregistration.LeagueRegistrationActivity;
 import com.logiforge.tenniscloud.activities.leagueregistration.UserLeagueRegistrationDlg;
+import com.logiforge.tenniscloud.activities.util.ItemPickerDialogFragment;
 import com.logiforge.tenniscloud.facades.LeagueRegistrationFacade;
 import com.logiforge.tenniscloud.model.LeagueRegistration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class EditLeagueMatchActivity extends AppCompatActivity
         implements View.OnClickListener,
-        UserLeagueRegistrationDlg.OnItemSelectedListener {
+        UserLeagueRegistrationDlg.OnItemSelectedListener,
+        ItemPickerDialogFragment.OnItemSelectedListener {
 
     private static final int REQUEST_NEW_REGISTRATION = 20;
 
@@ -122,6 +128,8 @@ public class EditLeagueMatchActivity extends AppCompatActivity
             Intent intent = new Intent(this, LeagueRegistrationActivity.class);
             LeagueRegistrationActivity.initState();
             startActivityForResult(intent, REQUEST_NEW_REGISTRATION);
+        } else {
+            Toast.makeText(this, "onClick of activity", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -155,39 +163,24 @@ public class EditLeagueMatchActivity extends AppCompatActivity
         }
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
+    public void onSelectHomeAway(final View view) {
 
-        public PlaceholderFragment() {
-        }
+        ArrayList<ItemPickerDialogFragment.Item> pickerItems = new ArrayList<>();
+        pickerItems.add(new ItemPickerDialogFragment.Item("Home Match", "0"));
+        pickerItems.add(new ItemPickerDialogFragment.Item("Away Match", "1"));
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
+        ItemPickerDialogFragment dialog = ItemPickerDialogFragment.newInstance(
+                "Home/Away",
+                pickerItems,
+                -1
+        );
+        dialog.show(getFragmentManager(), "HomeAwayPicker");
+    }
 
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.act_editleaguematch_frag_match, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
-        }
+    @Override
+    public void onItemSelected(ItemPickerDialogFragment fragment, ItemPickerDialogFragment.Item item, int index) {
+        TextView homeAwayTextView = (TextView)findViewById(R.id.txt_homeAway);
+        homeAwayTextView.setText(item.getTitle());
     }
 
     /**
