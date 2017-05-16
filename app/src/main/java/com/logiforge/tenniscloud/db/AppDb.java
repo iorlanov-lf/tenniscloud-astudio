@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.logiforge.tenniscloud.model.Partner;
+
 /**
  * Created by iorlanov on 2/24/2017.
  */
@@ -49,20 +51,31 @@ public class AppDb extends SQLiteOpenHelper
     public void onCreate(SQLiteDatabase db)
     {
         db.execSQL(FacilityTbl.CREATE_STATEMENT);
+
+        db.execSQL(LeagueTbl.CREATE_STATEMENT);
+        db.execSQL(LeagueFlightTbl.CREATE_STATEMENT);
         db.execSQL(LeagueMetroAreaTbl.CREATE_STATEMENT);
         db.execSQL(LeagueProfileTbl.CREATE_STATEMENT);
+        db.execSQL(LeagueProfileEmailTbl.CREATE_STATEMENT);
         db.execSQL(LeagueProviderTbl.CREATE_STATEMENT);
         db.execSQL(LeagueRegistrationTbl.CREATE_STATEMENT);
-        db.execSQL(LeagueTbl.CREATE_STATEMENT);
+
+        db.execSQL(MatchTbl.CREATE_STATEMENT);
         db.execSQL(MatchAvailabilityTbl.CREATE_STATEMENT);
         db.execSQL(MatchPlayerTbl.CREATE_STATEMENT);
-        db.execSQL(MatchTbl.CREATE_STATEMENT);
+        db.execSQL(MatchPlayerEmailTbl.CREATE_STATEMENT);
+
+        db.execSQL(PartnerTbl.CREATE_STATEMENT);
+        db.execSQL(PartnerEmailTbl.CREATE_STATEMENT);
         db.execSQL(PlayingLevelTbl.CREATE_STATEMENT);
-        db.execSQL(LeagueFlightTbl.CREATE_STATEMENT);
+
         db.execSQL(SetScoreTbl.CREATE_STATEMENT);
-        db.execSQL(TCUserFacilityTbl.CREATE_STATEMENT);
+
         db.execSQL(TCUserTbl.CREATE_STATEMENT);
+        db.execSQL(TCUserEmailTbl.CREATE_STATEMENT);
+        db.execSQL(TCUserFacilityTbl.CREATE_STATEMENT);
         db.execSQL(TennisContactTbl.CREATE_STATEMENT);
+        db.execSQL(TennisContactEmailTbl.CREATE_STATEMENT);
     }
 
     @Override

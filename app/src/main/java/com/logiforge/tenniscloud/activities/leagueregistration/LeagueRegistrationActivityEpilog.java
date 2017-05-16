@@ -1,8 +1,5 @@
 package com.logiforge.tenniscloud.activities.leagueregistration;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -40,34 +37,17 @@ import com.logiforge.tenniscloud.model.PlayingLevel;
 import com.logiforge.tenniscloud.model.TCUser;
 import com.logiforge.tenniscloud.model.TCUserEmail;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.logiforge.tenniscloud.R.id.edit_email;
 
 
-public class LeagueRegistrationActivityProlog extends AppCompatActivity
+public class LeagueRegistrationActivityEpilog extends AppCompatActivity
         implements ItemPickerDialogFragment.OnItemSelectedListener,
         UserFacilityDlg.OnItemSelectedListener,
         View.OnClickListener {
-    private static final String TAG = LeagueRegistrationActivityProlog.class.getSimpleName();
-
-    private static final int REQUEST_SELECT_FACILITY = 20;
-
-    private static LeagueProvider provider;
-    private static LeagueMetroArea metroArea;
-    private static LeagueProfile profile;
-    private static League league;
-    private static PlayingLevel level;
-    private static Facility facility;
-    public static LeagueRegistration registration;
-
-    public static void initState() {
-        provider = null;
-        metroArea = null;
-        profile = null;
-        league = null;
-        level = null;
-        facility = null;
-        registration = null;
-    }
+    private static final String TAG = LeagueRegistrationActivityEpilog.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,23 +56,7 @@ public class LeagueRegistrationActivityProlog extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // provider name
-        if(provider != null) {
-            TextView providerTextView = (TextView) findViewById(R.id.txt_provider);
-            providerTextView.setText(provider.getProviderName());
-
-            LinearLayout metroAreaLayout = (LinearLayout)findViewById(R.id.layout_metroArea);
-            metroAreaLayout.setVisibility(View.VISIBLE);
-        }
-
-        // metro area name
-        if(metroArea != null) {
-            TextView metroAreaTextView = (TextView) findViewById(R.id.txt_metroArea);
-            metroAreaTextView.setText(metroArea.getMetroAreaName());
-
-            LinearLayout leagueLayout = (LinearLayout)findViewById(R.id.layout_league);
-            leagueLayout.setVisibility(View.VISIBLE);
-        }
+        LeagueRegistrationActivityProlog.profile;
 
         // profile
         if(profile != null && profile.id == null) {
@@ -108,21 +72,6 @@ public class LeagueRegistrationActivityProlog extends AppCompatActivity
             EditText phoneEditText = (EditText) findViewById(R.id.edit_phone);
             phoneEditText.setText(profile.getPhoneNumber());
             phoneEditText.setError(null);
-        }
-
-        // league
-        if(league != null) {
-            TextView leagueTextView = (TextView) findViewById(R.id.txt_league);
-            leagueTextView.setText(league.getLeagueName());
-
-            LinearLayout levelLayout = (LinearLayout)findViewById(R.id.layout_level);
-            levelLayout.setVisibility(View.VISIBLE);
-        }
-
-        // level
-        if(level != null) {
-            TextView leagueTextView = (TextView) findViewById(R.id.txt_level);
-            leagueTextView.setText(level.getDescription());
         }
     }
 
@@ -443,7 +392,7 @@ public class LeagueRegistrationActivityProlog extends AppCompatActivity
 
     @Override
     public void onItemSelected(Facility facility) {
-        LeagueRegistrationActivityProlog.facility = facility;
+        LeagueRegistrationActivityEpilog.facility = facility;
         TextView facilityTextView = (TextView)findViewById(R.id.txt_facility);
         facilityTextView.setText(facility.getName());
     }

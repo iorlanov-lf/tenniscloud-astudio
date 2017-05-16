@@ -2,6 +2,8 @@ package com.logiforge.tenniscloud.model;
 
 import com.logiforge.lavolta.android.model.DynamicEntity;
 
+import java.util.List;
+
 /**
  * Created by iorlanov on 2/19/2017.
  */
@@ -11,9 +13,9 @@ public class TCUser extends DynamicEntity {
 
     String userName;
     String displayName;
-    String email;
     String phoneNbr;
     Integer gender;
+    List<TCUserEmail> emails;
 
     @Override
     public String getParentId() {
@@ -25,12 +27,11 @@ public class TCUser extends DynamicEntity {
     }
 
     public TCUser(String id, Long version, Integer syncState,
-                  String userName, String displayName, String email, String phoneNbr, Integer gender) {
+                  String userName, String displayName, String phoneNbr, Integer gender) {
         super(id, version, syncState);
 
         this.userName = userName;
         this.displayName = displayName;
-        this.email = email;
         this.phoneNbr = phoneNbr;
         this.gender = gender;
     }
@@ -51,14 +52,6 @@ public class TCUser extends DynamicEntity {
         this.displayName = displayName;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getPhoneNbr() {
         return phoneNbr;
     }
@@ -73,5 +66,13 @@ public class TCUser extends DynamicEntity {
 
     public void setGender(Integer gender) {
         this.gender = gender;
+    }
+
+    public List<TCUserEmail> getEmails() {
+        return emails;
+    }
+
+    public void setEmails(List<TCUserEmail> emails) {
+        this.emails = emails;
     }
 }

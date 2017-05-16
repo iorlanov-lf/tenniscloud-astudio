@@ -2,20 +2,23 @@ package com.logiforge.tenniscloud.model;
 
 import com.logiforge.lavolta.android.model.DynamicEntity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by iorlanov on 2/15/2017.
  */
 public class LeagueProfile extends DynamicEntity {
-    String userName;
+    String userId;
     String leagueMetroAreaId;
     LeagueMetroArea leagueMetroArea;
     String displayName;
-    String email;
     String phoneNumber;
+    List<LeagueProfileEmail> emails;
 
     @Override
     public String getParentId() {
-        return userName;
+        return userId;
     }
 
     public LeagueProfile() {
@@ -23,22 +26,21 @@ public class LeagueProfile extends DynamicEntity {
     }
 
     public LeagueProfile(String id, Long version, Integer syncState,
-                  String userName, String leagueMetroAreaId, String displayName, String email, String phoneNumber) {
+                  String userId, String leagueMetroAreaId, String displayName, String phoneNumber) {
         super(id, version, syncState);
 
-        this.userName = userName;
+        this.userId = userId;
         this.leagueMetroAreaId = leagueMetroAreaId;
         this.displayName = displayName;
-        this.email = email;
         this.phoneNumber = phoneNumber;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getLeagueMetroAreaId() {
@@ -65,19 +67,26 @@ public class LeagueProfile extends DynamicEntity {
         this.displayName = displayName;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getPhoneNumber() {
         return phoneNumber;
     }
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public List<LeagueProfileEmail> getEmails() {
+        return emails;
+    }
+
+    public void setEmails(List<LeagueProfileEmail> emails) {
+        this.emails = emails;
+    }
+
+    public void setEmails2(List<String> emailList) {
+        emails = new ArrayList<LeagueProfileEmail>();
+        for(String email : emailList) {
+            emails.add(new LeagueProfileEmail(null, email));
+        }
     }
 }

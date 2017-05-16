@@ -24,13 +24,19 @@
             android:label="@string/title_activity_edit_league_match"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activities.leagueregistration.LeagueRegistrationActivity"
+            android:name=".activities.leagueregistration.LeagueRegistrationActivityProlog"
+            android:label="@string/title_act_leaguereg"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.leagueregistration.LeagueRegistrationActivityEpilog"
             android:label="@string/title_act_leaguereg"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.facility.FacilityActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
-
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.editleaguematch.EditLeagueMatchPrologActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

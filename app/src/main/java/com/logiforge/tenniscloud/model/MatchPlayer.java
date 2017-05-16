@@ -1,5 +1,6 @@
 package com.logiforge.tenniscloud.model;
 
+import com.logiforge.lavolta.android.db.DbDynamicTable;
 import com.logiforge.lavolta.android.model.DynamicEntity;
 
 import java.util.List;
@@ -14,8 +15,8 @@ public class MatchPlayer extends DynamicEntity {
 
     // simple player
     String firstLastName;
-    String email;
     String phoneNbr;
+    List<MatchPlayerEmail> emails;
 
     // TCUser player
     String userId;
@@ -40,14 +41,27 @@ public class MatchPlayer extends DynamicEntity {
 
     public MatchPlayer(String id, Long version, Integer syncState,
                        String matchId, Boolean isHomeTeam,
-                       String firstLastName, String email, String phoneNbr,
+                       String firstLastName, String phoneNbr,
                        String userId, String contactId, String leagueProfileId) {
         super(id, version, syncState);
 
         this.matchId = matchId;
         this.isHomeTeam = isHomeTeam;
         this.firstLastName = firstLastName;
-        this.email = email;
+        this.phoneNbr = phoneNbr;
+        this.userId = userId;
+        this.contactId = contactId;
+        this.leagueProfileId = leagueProfileId;
+    }
+
+    public MatchPlayer(String matchId, Boolean isHomeTeam,
+                       String firstLastName, String phoneNbr,
+                       String userId, String contactId, String leagueProfileId) {
+        super(null, 0L, DbDynamicTable.SYNC_STATE_ADDED);
+
+        this.matchId = matchId;
+        this.isHomeTeam = isHomeTeam;
+        this.firstLastName = firstLastName;
         this.phoneNbr = phoneNbr;
         this.userId = userId;
         this.contactId = contactId;
@@ -84,14 +98,6 @@ public class MatchPlayer extends DynamicEntity {
 
     public void setFirstLastName(String firstLastName) {
         this.firstLastName = firstLastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getPhoneNbr() {
@@ -148,5 +154,13 @@ public class MatchPlayer extends DynamicEntity {
 
     public void setLeagueProfile(LeagueProfile leagueProfile) {
         this.leagueProfile = leagueProfile;
+    }
+
+    public List<MatchPlayerEmail> getEmails() {
+        return emails;
+    }
+
+    public void setEmails(List<MatchPlayerEmail> emails) {
+        this.emails = emails;
     }
 }

@@ -2,6 +2,8 @@ package com.logiforge.tenniscloud.model;
 
 import com.logiforge.lavolta.android.model.DynamicEntity;
 
+import java.util.List;
+
 /**
  * Created by iorlanov on 2/17/2017.
  */
@@ -10,8 +12,8 @@ public class TennisContact extends DynamicEntity {
 
     // non-TC contact
     String firstLastName;
-    String email;
     String phoneNbr;
+    List<TennisContactEmail> emails;
 
     String otherUserId;
     TCUser otherTcUser;
@@ -26,12 +28,11 @@ public class TennisContact extends DynamicEntity {
     }
 
     public TennisContact(String id, Long version, Integer syncState,
-                  String userId, String firstLastName, String email, String phoneNbr, String otherUserId) {
+                  String userId, String firstLastName, String phoneNbr, String otherUserId) {
         super(id, version, syncState);
 
         this.userId = userId;
         this.firstLastName = firstLastName;
-        this.email = email;
         this.phoneNbr = phoneNbr;
         this.otherUserId = otherUserId;
     }
@@ -50,14 +51,6 @@ public class TennisContact extends DynamicEntity {
 
     public void setFirstLastName(String firstLastName) {
         this.firstLastName = firstLastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getPhoneNbr() {
@@ -82,5 +75,13 @@ public class TennisContact extends DynamicEntity {
 
     public void setOtherTcUser(TCUser otherTcUser) {
         this.otherTcUser = otherTcUser;
+    }
+
+    public List<TennisContactEmail> getEmails() {
+        return emails;
+    }
+
+    public void setEmails(List<TennisContactEmail> emails) {
+        this.emails = emails;
     }
 }

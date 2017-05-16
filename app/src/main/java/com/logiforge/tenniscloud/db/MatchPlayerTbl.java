@@ -6,6 +6,7 @@ import android.database.Cursor;
 import com.logiforge.lavolta.android.db.DbDynamicTable;
 import com.logiforge.lavolta.android.model.DynamicEntity;
 import com.logiforge.lavolta.android.model.api.sync.InventoryItem;
+import com.logiforge.tenniscloud.db.util.DbUtil;
 import com.logiforge.tenniscloud.model.MatchPlayer;
 
 import java.util.HashMap;
@@ -19,7 +20,6 @@ public class MatchPlayerTbl extends DbDynamicTable {
     public static final String COL_MATCH_ID = "MATCH_ID";
     public static final String COL_IS_HOME_TEAM = "IS_HOME_TEAM";
     public static final String COL_FIRST_LAST_NAME = "FIRST_LAST_NAME";
-    public static final String COL_EMAIL = "EMAIL";
     public static final String COL_PHONE_NUMBER = "PHONE_NUMBER";
     public static final String COL_USER_ID = "USER_ID";
     public static final String COL_CONTACT_ID = "CONTACT_ID";
@@ -33,7 +33,6 @@ public class MatchPlayerTbl extends DbDynamicTable {
                     "MATCH_ID TEXT," +
                     "IS_HOME_TEAM INTEGER," +
                     "FIRST_LAST_NAME TEXT," +
-                    "EMAIL TEXT," +
                     "PHONE_NUMBER TEXT," +
                     "USER_ID TEXT," +
                     "CONTACT_ID TEXT," +
@@ -77,12 +76,23 @@ public class MatchPlayerTbl extends DbDynamicTable {
 
     @Override
     protected ContentValues getContentForInsert(DynamicEntity dynamicEntity) {
-        return null;
+        return getContentForUpdate(dynamicEntity);
     }
 
     @Override
     protected ContentValues getContentForUpdate(DynamicEntity dynamicEntity) {
-        return null;
+        MatchPlayer matchPlayer = (MatchPlayer)dynamicEntity;
+
+        ContentValues values = new ContentValues();
+        values.put(COL_MATCH_ID, matchPlayer.getMatchId());
+        values.put(COL_IS_HOME_TEAM, DbUtil.toInteger(matchPlayer.getHomeTeam()));
+        values.put(COL_FIRST_LAST_NAME, matchPlayer.getFirstLastName());
+        values.put(COL_PHONE_NUMBER, matchPlayer.getPhoneNbr());
+        values.put(COL_USER_ID, matchPlayer.getUserId());
+        values.put(COL_CONTACT_ID, matchPlayer.getContactId());
+        values.put(COL_LEAGUE_PROFILE_ID, matchPlayer.getLeagueProfileId());
+
+        return values;
     }
 
     @Override
@@ -98,7 +108,6 @@ public class MatchPlayerTbl extends DbDynamicTable {
                 getString(COL_MATCH_ID, c),
                 getBoolean(COL_IS_HOME_TEAM, c),
                 getString(COL_FIRST_LAST_NAME, c),
-                getString(COL_EMAIL, c),
                 getString(COL_PHONE_NUMBER, c),
                 getString(COL_USER_ID, c),
                 getString(COL_CONTACT_ID, c),

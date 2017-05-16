@@ -1,38 +1,46 @@
 package com.logiforge.tenniscloud.model;
 
+import com.logiforge.lavolta.android.db.DbDynamicTable;
 import com.logiforge.lavolta.android.model.DynamicEntity;
 
 /**
  * Created by iorlanov on 5/5/17.
  */
 
-public class LeagueProfileEmail extends DynamicEntity {
+public class MatchPlayerEmail extends DynamicEntity {
 
-    String leagueProfileId;
+    String matchPlayerId;
     String email;
 
     @Override
     public String getParentId() {
-        return leagueProfileId;
+        return matchPlayerId;
     }
 
-    public LeagueProfileEmail() {
+    public MatchPlayerEmail() {
         super();
     }
 
-    public LeagueProfileEmail(String id, Long version, Integer syncState,
-                              String leagueProfileId, String email) {
+    public MatchPlayerEmail(String id, Long version, Integer syncState,
+                            String matchPlayerId, String email) {
         super(id, version, syncState);
 
-        this.leagueProfileId = leagueProfileId;
+        this.matchPlayerId = matchPlayerId;
         this.email = email;
     }
 
-    public String getLeagueProfileId() {
-        return leagueProfileId;
+    public MatchPlayerEmail(String matchPlayerId, String email) {
+        super(null, 0L, DbDynamicTable.SYNC_STATE_ADDED);
+
+        this.matchPlayerId = matchPlayerId;
+        this.email = email;
     }
-    public void setLeagueProfileId(String leagueProfileId) {
-        this.leagueProfileId = leagueProfileId;
+
+    public String getMatchPlayerId() {
+        return matchPlayerId;
+    }
+    public void setMatchPlayerId(String matchPlayerId) {
+        this.matchPlayerId = matchPlayerId;
     }
 
     public String getEmail() {

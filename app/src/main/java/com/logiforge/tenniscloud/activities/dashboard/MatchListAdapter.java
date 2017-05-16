@@ -57,7 +57,11 @@ public class MatchListAdapter extends BaseExpandableListAdapter {
         TextView txtListChild = (TextView) convertView
                 .findViewById(R.id.lblListItem);
 
-        txtListChild.setText(match.getScheduledDt().toString());
+        if(match.getScheduledDt() == null) {
+            txtListChild.setText("Unscheduled");
+        } else {
+            txtListChild.setText(match.getScheduledDt().toString());
+        }
         return convertView;
     }
 

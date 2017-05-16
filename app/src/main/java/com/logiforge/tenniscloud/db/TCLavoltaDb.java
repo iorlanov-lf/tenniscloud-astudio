@@ -16,6 +16,7 @@ import java.util.List;
 public class TCLavoltaDb extends LavoltaDb {
     public static final Long ACTION_NEW_LEAGUE_REGISTRATION = 10L;
     public static final Long ACTION_NEW_FACILITY = 20L;
+    public static final Long ACTION_NEW_LEAGUE_MATCH = 30L;
 
     @Override
     protected List<DynEntityMeta> getDynEntityMetaData() {

@@ -18,7 +18,6 @@ public class TennisContactTbl extends DbDynamicTable {
     public static final String TABLE_NAME = "TENNIS_CONTACT";
     public static final String COL_USER_ID = "USER_ID";
     public static final String COL_FIRST_LAST_NAME = "FIRST_LAST_NAME";
-    public static final String COL_EMAIL = "EMAIL";
     public static final String COL_PHONE_NUMBER = "PHONE_NUMBER";
     public static final String COL_OTHER_USER_ID = "OTHER_USER_ID";
 
@@ -29,7 +28,6 @@ public class TennisContactTbl extends DbDynamicTable {
                     "SYNC_STATE INTEGER," +
                     "USER_ID TEXT," +
                     "FIRST_LAST_NAME TEXT," +
-                    "EMAIL TEXT," +
                     "PHONE_NUMBER TEXT," +
                     "OTHER_USER_ID TEXT" +
                     ")";
@@ -91,7 +89,6 @@ public class TennisContactTbl extends DbDynamicTable {
                 getInt(COL_SYNC_STATE, c),
                 getString(COL_USER_ID, c),
                 getString(COL_FIRST_LAST_NAME, c),
-                getString(COL_EMAIL, c),
                 getString(COL_PHONE_NUMBER, c),
                 getString(COL_OTHER_USER_ID, c)
         );

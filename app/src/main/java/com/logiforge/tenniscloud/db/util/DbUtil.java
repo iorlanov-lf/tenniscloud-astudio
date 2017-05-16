@@ -72,4 +72,12 @@ public class DbUtil {
             return localTime.toString();
         }
     }
+
+    static public Integer toInteger(Boolean val) {
+        if(val == null) {
+            return null;
+        } else {
+            return val?1:0;
+        }
+    }
 }

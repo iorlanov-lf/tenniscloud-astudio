@@ -4,27 +4,30 @@ import android.util.Log;
 
 import com.logiforge.lavolta.android.app.Lavolta;
 import com.logiforge.lavolta.android.db.DbTransaction;
-import com.logiforge.lavolta.android.db.InstallationTable;
 import com.logiforge.lavolta.android.db.LavoltaDb;
 import com.logiforge.lavolta.android.facade.LavoltaFacade;
-import com.logiforge.lavolta.android.model.Installation;
 import com.logiforge.tenniscloud.db.FacilityTbl;
 import com.logiforge.tenniscloud.db.LeagueFlightTbl;
 import com.logiforge.tenniscloud.db.LeagueMetroAreaTbl;
+import com.logiforge.tenniscloud.db.LeagueProfileEmailTbl;
 import com.logiforge.tenniscloud.db.LeagueProfileTbl;
 import com.logiforge.tenniscloud.db.LeagueProviderTbl;
 import com.logiforge.tenniscloud.db.LeagueRegistrationTbl;
 import com.logiforge.tenniscloud.db.LeagueTbl;
 import com.logiforge.tenniscloud.db.PlayingLevelTbl;
 import com.logiforge.tenniscloud.db.TCLavoltaDb;
+import com.logiforge.tenniscloud.db.TCUserEmailTbl;
 import com.logiforge.tenniscloud.model.Facility;
 import com.logiforge.tenniscloud.model.League;
 import com.logiforge.tenniscloud.model.LeagueFlight;
 import com.logiforge.tenniscloud.model.LeagueMetroArea;
 import com.logiforge.tenniscloud.model.LeagueProfile;
+import com.logiforge.tenniscloud.model.LeagueProfileEmail;
 import com.logiforge.tenniscloud.model.LeagueProvider;
 import com.logiforge.tenniscloud.model.LeagueRegistration;
 import com.logiforge.tenniscloud.model.PlayingLevel;
+import com.logiforge.tenniscloud.model.TCUser;
+import com.logiforge.tenniscloud.model.TCUserEmail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,8 +54,8 @@ public class LeagueRegistrationFacade {
 
     public List<LeagueProfile> getProfiles() {
         LeagueProfileTbl profileTbl = new LeagueProfileTbl();
-        LavoltaFacade lavoltaFacade = new LavoltaFacade();
-        return profileTbl.getUserProfiles(lavoltaFacade.getUserName());
+        TCUserFacade userFacade = new TCUserFacade();
+        return profileTbl.getByUserId(userFacade.getSelf().id);
     }
 
     public List<LeagueRegistration> getRegistrations(boolean resolveReferences) {
@@ -124,11 +127,33 @@ public class LeagueRegistrationFacade {
             }
 
             if(profile.id == null) {
-                LavoltaFacade lavoltaFacade = new LavoltaFacade();
-                LeagueProfileTbl profileTbl = new LeagueProfileTbl();
-                profile.setUserName(lavoltaFacade.getUserName());
+                TCUser self = TCUserFacade.builder().resolveEmails().build();
+                profile.setUserId(self.id);
                 profile.setLeagueMetroAreaId(area.id);
+                LeagueProfileTbl profileTbl = new LeagueProfileTbl();
                 profileTbl.uiAdd(txn, profile, null);
+
+                LeagueProfileEmailTbl profileEmailTbl = new LeagueProfileEmailTbl();
+                TCUserEmailTbl userEmailTbl = new TCUserEmailTbl();
+                for(LeagueProfileEmail email : profile.getEmails()) {
+                    email.setLeagueProfileId(profile.id);
+                    profileEmailTbl.uiAdd(txn, email, null);
+
+                    // see if there are new emails
+                    boolean found = false;
+                    for (TCUserEmail userEmail : self.getEmails())
+                    {
+                        if(userEmail.getEmail().equalsIgnoreCase(email.getEmail())) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if(!found) {
+                        TCUserEmail newUserEmail = new TCUserEmail(self.id, email.getEmail(), false);
+                        userEmailTbl.uiAdd(txn, newUserEmail, null);
+                    }
+                }
             }
 
             registration = new LeagueRegistration();
@@ -149,6 +174,19 @@ public class LeagueRegistrationFacade {
             league.setLeagueMetroArea(area);
 
             db.commitTxn(txn);
+
+            // build object graph
+            registration.setProfile(profile);
+            registration.setLeagueFlight(flight);
+            registration.setFacility(facility);
+
+            profile.setLeagueMetroArea(area);
+            area.setProvider(provider);
+
+            flight.setLeague(league);
+            flight.setPlayingLevel(level);
+            league.setLeagueMetroArea(area);
+
         } catch(Exception e) {
             Log.e(TAG, e.getMessage() == null ? e.getClass().getSimpleName():e.getMessage());
         } finally {

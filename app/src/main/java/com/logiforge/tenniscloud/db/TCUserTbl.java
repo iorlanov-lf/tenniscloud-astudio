@@ -20,7 +20,6 @@ public class TCUserTbl extends DbDynamicTable {
     public static final String TABLE_NAME = "TCUSER";
     public static final String COL_USER_NAME = "USER_NAME";
     public static final String COL_DISPLAY_NAME = "DISPLAY_NAME";
-    public static final String COL_EMAIL = "EMAIL";
     public static final String COL_PHONE_NUMBER = "PHONE_NUMBER";
     public static final String COL_GENDER = "GENDER";
 
@@ -31,7 +30,6 @@ public class TCUserTbl extends DbDynamicTable {
                     "SYNC_STATE INTEGER," +
                     "USER_NAME TEXT," +
                     "DISPLAY_NAME TEXT," +
-                    "EMAIL TEXT," +
                     "PHONE_NUMBER TEXT," +
                     "GENDER INTEGER" +
                     ")";
@@ -83,7 +81,6 @@ public class TCUserTbl extends DbDynamicTable {
         ContentValues values = new ContentValues();
         values.put(COL_USER_NAME, user.getUserName());
         values.put(COL_DISPLAY_NAME, user.getDisplayName());
-        values.put(COL_EMAIL, user.getEmail());
         values.put(COL_PHONE_NUMBER, user.getPhoneNbr());
         values.put(COL_GENDER, user.getGender());
 
@@ -95,16 +92,13 @@ public class TCUserTbl extends DbDynamicTable {
         return TABLE_NAME;
     }
 
-    public TCUser getSelf() {
-        InstallationTable instTbl = new InstallationTable();
-        Installation inst  = instTbl.getInstallation();
-
+    public TCUser getByUserName(String userName) {
         TCUser u = null;
 
         Cursor c;
         c = db.query(TABLE_NAME, null,
                 COL_USER_NAME+"=?",
-                new String[]{inst.getUserName()},
+                new String[]{userName},
                 null, null, null);
 
         if (c.moveToFirst()) {
@@ -124,7 +118,6 @@ public class TCUserTbl extends DbDynamicTable {
                 getInt(COL_SYNC_STATE, c),
                 getString(COL_USER_NAME, c),
                 getString(COL_DISPLAY_NAME, c),
-                getString(COL_EMAIL, c),
                 getString(COL_PHONE_NUMBER, c),
                 getInt(COL_GENDER, c)
         );

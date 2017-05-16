@@ -11,61 +11,41 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.util.Patterns;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ListView;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.logiforge.lavolta.android.app.Lavolta;
-import com.logiforge.lavolta.android.db.DbTransaction;
-import com.logiforge.lavolta.android.db.InstallationTable;
-import com.logiforge.lavolta.android.db.LavoltaDb;
-import com.logiforge.lavolta.android.model.Installation;
 import com.logiforge.tenniscloud.R;
 import com.logiforge.tenniscloud.activities.facility.FacilityActivity;
 import com.logiforge.tenniscloud.activities.facility.UserFacilityDlg;
-import com.logiforge.tenniscloud.activities.util.EmailListView;
 import com.logiforge.tenniscloud.activities.util.ItemPickerDialogFragment;
-import com.logiforge.tenniscloud.db.FacilityTbl;
-import com.logiforge.tenniscloud.db.LeagueFlightTbl;
 import com.logiforge.tenniscloud.db.LeagueMetroAreaTbl;
 import com.logiforge.tenniscloud.db.LeagueProfileTbl;
 import com.logiforge.tenniscloud.db.LeagueProviderTbl;
-import com.logiforge.tenniscloud.db.LeagueRegistrationTbl;
 import com.logiforge.tenniscloud.db.LeagueTbl;
 import com.logiforge.tenniscloud.db.PlayingLevelTbl;
-import com.logiforge.tenniscloud.db.TCLavoltaDb;
-import com.logiforge.tenniscloud.db.TCUserFacilityTbl;
-import com.logiforge.tenniscloud.db.TCUserTbl;
 import com.logiforge.tenniscloud.facades.FacilityFacade;
 import com.logiforge.tenniscloud.facades.LeagueRegistrationFacade;
 import com.logiforge.tenniscloud.facades.TCUserFacade;
 import com.logiforge.tenniscloud.model.Facility;
 import com.logiforge.tenniscloud.model.League;
-import com.logiforge.tenniscloud.model.LeagueFlight;
 import com.logiforge.tenniscloud.model.LeagueMetroArea;
 import com.logiforge.tenniscloud.model.LeagueProfile;
-import com.logiforge.tenniscloud.model.LeagueProfileEmail;
 import com.logiforge.tenniscloud.model.LeagueProvider;
 import com.logiforge.tenniscloud.model.LeagueRegistration;
 import com.logiforge.tenniscloud.model.PlayingLevel;
 import com.logiforge.tenniscloud.model.TCUser;
-import com.logiforge.tenniscloud.model.TCUserEmail;
-
-import static com.logiforge.tenniscloud.R.id.edit_email;
 
 
-public class LeagueRegistrationActivity extends AppCompatActivity
+public class LeagueRegistrationActivityProlog extends AppCompatActivity
         implements ItemPickerDialogFragment.OnItemSelectedListener,
         UserFacilityDlg.OnItemSelectedListener,
         View.OnClickListener {
-    private static final String TAG = LeagueRegistrationActivity.class.getSimpleName();
+    private static final String TAG = LeagueRegistrationActivityProlog.class.getSimpleName();
 
     private static final int REQUEST_SELECT_FACILITY = 20;
+    private static final int REQUEST_REGISTRATION_EPILOG = 30;
 
     private static LeagueProvider provider;
     private static LeagueMetroArea metroArea;
@@ -74,6 +54,12 @@ public class LeagueRegistrationActivity extends AppCompatActivity
     private static PlayingLevel level;
     private static Facility facility;
     public static LeagueRegistration registration;
+
+    TextView providerTextView;
+    TextView metroAreaTextView;
+    TextView leagueTextView;
+    TextView levelTextView;
+    TextView facilityTextView;
 
     public static void initState() {
         provider = null;
@@ -88,78 +74,43 @@ public class LeagueRegistrationActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.act_leaguereg);
+        setContentView(R.layout.act_leaguereg_prolog);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // provider name
+        providerTextView = (TextView)findViewById(R.id.txt_provider);
+        metroAreaTextView = (TextView) findViewById(R.id.txt_metroArea);
+        leagueTextView = (TextView) findViewById(R.id.txt_league);
+        levelTextView = (TextView) findViewById(R.id.txt_level);
+        facilityTextView = (TextView) findViewById(R.id.txt_facility);
+
         if(provider != null) {
-            TextView providerTextView = (TextView) findViewById(R.id.txt_provider);
             providerTextView.setText(provider.getProviderName());
-
-            LinearLayout metroAreaLayout = (LinearLayout)findViewById(R.id.layout_metroArea);
-            metroAreaLayout.setVisibility(View.VISIBLE);
         }
 
-        // metro area name
         if(metroArea != null) {
-            TextView metroAreaTextView = (TextView) findViewById(R.id.txt_metroArea);
             metroAreaTextView.setText(metroArea.getMetroAreaName());
-
-            LinearLayout leagueLayout = (LinearLayout)findViewById(R.id.layout_league);
-            leagueLayout.setVisibility(View.VISIBLE);
+        } else if(provider != null) {
+            metroAreaTextView.setText("Select Metro Area");
         }
 
-        // profile
-        if(profile != null && profile.id == null) {
-            LinearLayout profileLayout = (LinearLayout)findViewById(R.id.layout_profile);
-            profileLayout.setVisibility(View.VISIBLE);
-
-            //TODO: EditText emailEditText = (EditText) findViewById(R.id.edit_email);
-            //emailEditText.setText(profile.getEmail());
-            //emailEditText.setError(null);
-            EditText displayNameEditText = (EditText) findViewById(R.id.edit_displayName);
-            displayNameEditText.setText(profile.getDisplayName());
-            displayNameEditText.setError(null);
-            EditText phoneEditText = (EditText) findViewById(R.id.edit_phone);
-            phoneEditText.setText(profile.getPhoneNumber());
-            phoneEditText.setError(null);
-        }
-
-        // league
         if(league != null) {
-            TextView leagueTextView = (TextView) findViewById(R.id.txt_league);
             leagueTextView.setText(league.getLeagueName());
-
-            LinearLayout levelLayout = (LinearLayout)findViewById(R.id.layout_level);
-            levelLayout.setVisibility(View.VISIBLE);
+        } else if(metroArea != null) {
+            metroAreaTextView.setText("Select League");
         }
 
-        // level
         if(level != null) {
-            TextView leagueTextView = (TextView) findViewById(R.id.txt_level);
             leagueTextView.setText(level.getDescription());
+        } else if(league != null) {
+            metroAreaTextView.setText("Select League");
         }
-    }
 
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-
-        LinearLayout profileLayout = (LinearLayout)findViewById(R.id.layout_profile);
-        if(profileLayout.getVisibility() == View.VISIBLE) {
-            EditText emailEditText = (EditText) findViewById(edit_email);
-            EditText displayNameEditText = (EditText) findViewById(R.id.edit_displayName);
-            EditText phoneEditText = (EditText) findViewById(R.id.edit_phone);
-
-            if(profile == null) {
-                profile = new LeagueProfile();
-            }
-
-            //TODOD: profile.setEmail(emailEditText.getText().toString());
-            profile.setDisplayName(displayNameEditText.getText().toString());
-            profile.setPhoneNumber(phoneEditText.getText().toString());
+        if(facility != null) {
+            facilityTextView.setText(facility.getName());
         }
+
+        setNextButtonText();
     }
 
     public void onSelectProvider(final View view) {
@@ -180,6 +131,11 @@ public class LeagueRegistrationActivity extends AppCompatActivity
     }
 
     public void onSelectMetroArea(final View view) {
+        if(provider == null) {
+            Toast.makeText(this, "Select League Provider", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         LeagueMetroAreaTbl maTbl = new LeagueMetroAreaTbl();
         List<LeagueMetroArea> metroAreas = maTbl.getByProviderId(provider.id);
 
@@ -197,6 +153,16 @@ public class LeagueRegistrationActivity extends AppCompatActivity
     }
 
     public void onSelectLeague(final View view) {
+        if(provider == null) {
+            Toast.makeText(this, "Select League Provider", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if(metroArea == null) {
+            Toast.makeText(this, "Select Metro Area", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         LeagueTbl leagueTbl = new LeagueTbl();
         List<League> leagues = leagueTbl.getActiveLeagues(metroArea.id);
 
@@ -214,6 +180,21 @@ public class LeagueRegistrationActivity extends AppCompatActivity
     }
 
     public void onSelectLevel(final View view) {
+        if(provider == null) {
+            Toast.makeText(this, "Select League Provider", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if(metroArea == null) {
+            Toast.makeText(this, "Select Metro Area", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if(league == null) {
+            Toast.makeText(this, "Select League", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         PlayingLevelTbl levelTbl = new PlayingLevelTbl();
         List<PlayingLevel> levels = levelTbl.getLevelsByProviderId(provider.id);
 
@@ -242,84 +223,44 @@ public class LeagueRegistrationActivity extends AppCompatActivity
         }
     }
 
-    public void onSave(final View view) {
+    public void onNext(final View view) {
         //Toast.makeText(this, "onSave", Toast.LENGTH_LONG).show();
         boolean isFormValid = true;
         if(provider == null) {
-            TextView providerTextView = (TextView)findViewById(R.id.txt_provider);
             providerTextView.setError("Required!");
             isFormValid = false;
         } else if(metroArea == null) {
-            TextView metroAreaTextView = (TextView)findViewById(R.id.txt_metroArea);
             metroAreaTextView.setError("Required!");
             metroAreaTextView.requestFocus();
             isFormValid = false;
         } else if(league == null) {
-            TextView leagueTextView = (TextView) findViewById(R.id.txt_league);
             leagueTextView.setError("Required!");
             leagueTextView.requestFocus();
             isFormValid = false;
         } else if(level == null) {
-            TextView levelTextView = (TextView)findViewById(R.id.txt_level);
             levelTextView.setError("Required!");
             levelTextView.requestFocus();
             isFormValid = false;
         } else if(facility == null) {
-            TextView facilityTextView = (TextView)findViewById(R.id.txt_facility);
             facilityTextView.setError("Required!");
             facilityTextView.requestFocus();
             isFormValid = false;
         }
 
-        if(profile != null && profile.id == null) {
-            /*TODO: EditText etEmail = (EditText)findViewById(R.id.edit_email);
-            profile.setEmail(etEmail.getText().toString());
-            if(etEmail.getText().length() == 0) {
-                etEmail.setError("Required!");
-                etEmail.requestFocus();
-                isFormValid = false;
-            } else if(!android.util.Patterns.EMAIL_ADDRESS.matcher(etEmail.getText().toString()).matches()) {
-                etEmail.setError("Invalid!");
-                etEmail.requestFocus();
-                isFormValid = false;
-            }*/
-
-            EmailListView emailListView = (EmailListView) findViewById(R.id.view_emails);
-            List<String> emails = emailListView.getEmails();
-            if(emails.size() == 0) {
-                TextView emailLbl = (TextView)findViewById(R.id.txt_email);
-                emailLbl.setError("Required!");
-                isFormValid = false;
-            } else {
-                profile.setEmails2(emails);
-            }
-
-            EditText etDisplayName = (EditText)findViewById(R.id.edit_displayName);
-            profile.setDisplayName(etDisplayName.getText().toString());
-            if(etDisplayName.getText().length() == 0) {
-                etDisplayName.setError("Required!");
-                etDisplayName.requestFocus();
-                isFormValid = false;
-            }
-
-            EditText etPhone = (EditText)findViewById(R.id.edit_phone);
-            profile.setPhoneNumber(etPhone.getText().toString());
-            if(etPhone.getText().length() == 0) {
-                etPhone.setError("Required!");
-                etPhone.requestFocus();
-                isFormValid = false;
-            }
-        }
-
         if(isFormValid) {
-            LeagueRegistrationFacade regFacade = new LeagueRegistrationFacade();
-            registration = regFacade.createLeagueRegistration(provider, metroArea, league, level, profile, facility);
+            if(profile != null && league.getTeamType() == League.TEAM_TYPE_SINGLES) {
+                LeagueRegistrationFacade regFacade = new LeagueRegistrationFacade();
+                registration = regFacade.createLeagueRegistration(provider, metroArea, league, level, profile, facility);
 
-            if(registration != null) {
-                setResult(Activity.RESULT_OK);
-                finish();
+                if (registration != null) {
+                    setResult(Activity.RESULT_OK);
+                    finish();
+                } else {
+                    Toast.makeText(this, "Unable to create a new league registration", Toast.LENGTH_SHORT).show();
+                }
             } else {
-                Toast.makeText(this, "Unable to create a new league registration", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, LeagueRegistrationActivityEpilog.class);
+                startActivityForResult(intent, REQUEST_REGISTRATION_EPILOG);
             }
         }
     }
@@ -336,112 +277,65 @@ public class LeagueRegistrationActivity extends AppCompatActivity
                 return;
             }
 
-            String selectedTitle = item.getTitle();
-            TextView providerTextView = (TextView)findViewById(R.id.txt_provider);
-            providerTextView.setText(selectedTitle);
+            providerTextView.setText(item.getTitle());
             providerTextView.setError(null);
-
             LeagueProviderTbl providerTbl = new LeagueProviderTbl();
             provider = (LeagueProvider)providerTbl.find(item.getStringValue());
 
-            LinearLayout metroAreaLayout = (LinearLayout)findViewById(R.id.layout_metroArea);
-            metroAreaLayout.setVisibility(View.VISIBLE);
-            TextView metroAreaTextView = (TextView)findViewById(R.id.txt_metroArea);
             metroAreaTextView.setText("Select Metro Area");
             metroAreaTextView.setError(null);
             metroArea = null;
 
-            LinearLayout profileLayout = (LinearLayout) findViewById(R.id.layout_profile);
-            profileLayout.setVisibility(View.GONE);
-            profile = null;
-
-            LinearLayout leagueLayout = (LinearLayout)findViewById(R.id.layout_league);
-            leagueLayout.setVisibility(View.GONE);
+            leagueTextView.setText(null);
+            leagueTextView.setError(null);
             league = null;
 
-            LinearLayout levelLayout = (LinearLayout)findViewById(R.id.layout_level);
-            levelLayout.setVisibility(View.GONE);
+            levelTextView.setText(null);
+            levelTextView.setError(null);
             level = null;
 
+            profile = null;
+
+            setNextButtonText();
         } else if(fragment.getTag().equals("MetroAreaPicker")){
             if(metroArea != null && metroArea.id.equals(item.getStringValue())) {
                 return;
             }
 
-            String selectedTitle = item.getTitle();
-            TextView metroAreaTextView = (TextView)findViewById(R.id.txt_metroArea);
-            metroAreaTextView.setText(selectedTitle);
+            metroAreaTextView.setText(item.getTitle());
             metroAreaTextView.setError(null);
-
             LeagueMetroAreaTbl areaTbl = new LeagueMetroAreaTbl();
             metroArea = (LeagueMetroArea)areaTbl.find(item.getStringValue());
 
-            TCUserFacade userFacade = new TCUserFacade();
-            TCUser self = userFacade.getSelf();
-            LeagueProfileTbl profileTbl = new LeagueProfileTbl();
-            LeagueProfile p = profileTbl.findByUserIdAndAreaId(self.id, metroArea.id);
-
-            if(p == null) {
-                profile = new LeagueProfile();
-
-                LinearLayout profileLayout = (LinearLayout) findViewById(R.id.layout_profile);
-
-                TCUser user = TCUserFacade.builder().resolveEmails().build();
-
-                List<String> userEmails = new ArrayList<String>();
-                for(TCUserEmail userEmail : user.getEmails()) {
-                    userEmails.add(userEmail.getEmail());
-                }
-                EmailListView emailListView = (EmailListView) findViewById(R.id.view_emails);
-                emailListView.initItems(userEmails);
-
-                EditText etDisplayName = (EditText)findViewById(R.id.edit_displayName);
-                etDisplayName.setText(user.getDisplayName());
-                etDisplayName.setError(null);
-                profile.setDisplayName(user.getDisplayName());
-                EditText etPhone = (EditText)findViewById(R.id.edit_phone);
-                etPhone.setText(user.getPhoneNbr());
-                etPhone.setError(null);
-                profile.setPhoneNumber(user.getPhoneNbr());
-
-                profileLayout.setVisibility(View.VISIBLE);
-            } else {
-                profile = p;
-                LinearLayout profileLayout = (LinearLayout) findViewById(R.id.layout_profile);
-                profileLayout.setVisibility(View.GONE);
-
-            }
-
-            LinearLayout leagueLayout = (LinearLayout) findViewById(R.id.layout_league);
-            leagueLayout.setVisibility(View.VISIBLE);
-            TextView leagueTextView = (TextView) findViewById(R.id.txt_league);
             leagueTextView.setText("Select League");
             leagueTextView.setError(null);
             league = null;
 
-            LinearLayout levelLayout = (LinearLayout)findViewById(R.id.layout_level);
-            levelLayout.setVisibility(View.GONE);
+            levelTextView.setText(null);
+            levelTextView.setError(null);
             level = null;
 
+            TCUserFacade userFacade = new TCUserFacade();
+            TCUser self = userFacade.getSelf();
+            LeagueProfileTbl profileTbl = new LeagueProfileTbl();
+            profile = profileTbl.findByUserIdAndAreaId(self.id, metroArea.id);
+
+            setNextButtonText();
         } else if(fragment.getTag().equals("LeaguePicker")){
             if(league != null && league.id.equals(item.getStringValue())) {
                 return;
             }
 
-            String selectedTitle = item.getTitle();
-            TextView leagueTextView = (TextView)findViewById(R.id.txt_league);
-            leagueTextView.setText(selectedTitle);
+            leagueTextView.setText(item.getTitle());
             leagueTextView.setError(null);
-
             LeagueTbl leagueTbl = new LeagueTbl();
             league = (League)leagueTbl.find(item.getStringValue());
 
-            LinearLayout levelLayout = (LinearLayout)findViewById(R.id.layout_level);
-            levelLayout.setVisibility(View.VISIBLE);
-            TextView levelTextView = (TextView) findViewById(R.id.txt_level);
             levelTextView.setText("Select Level");
             levelTextView.setError(null);
             level = null;
+
+            setNextButtonText();
         } else if(fragment.getTag().equals("LevelPicker")){
             if(level != null && level.id.equals(item.getStringValue())) {
                    return;
@@ -457,10 +351,19 @@ public class LeagueRegistrationActivity extends AppCompatActivity
         }
     }
 
+    private void setNextButtonText() {
+        if(profile != null && league != null && league.getTeamType() == League.TEAM_TYPE_SINGLES) {
+            Button nextBtn = (Button)findViewById(R.id.btn_next);
+            nextBtn.setText("Save");
+        } else {
+            Button nextBtn = (Button)findViewById(R.id.btn_next);
+            nextBtn.setText("Next");
+        }
+    }
+
     @Override
     public void onItemSelected(Facility facility) {
-        LeagueRegistrationActivity.facility = facility;
-        TextView facilityTextView = (TextView)findViewById(R.id.txt_facility);
+        LeagueRegistrationActivityProlog.facility = facility;
         facilityTextView.setText(facility.getName());
     }
 
@@ -471,11 +374,18 @@ public class LeagueRegistrationActivity extends AppCompatActivity
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
                 facility = FacilityActivity.facility;
-                TextView facilityTextView = (TextView)findViewById(R.id.txt_facility);
                 facilityTextView.setText(facility.getName());
             }
 
             dismissUserFacilityDlg();
+        } else if (requestCode == REQUEST_REGISTRATION_EPILOG) {
+            if (resultCode == RESULT_OK) {
+                setResult(RESULT_OK);
+                finish();
+            } else {
+                setResult(RESULT_CANCELED);
+                finish();
+            }
         }
     }
 

@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.logiforge.tenniscloud.R;
 import com.logiforge.tenniscloud.activities.editleaguematch.EditLeagueMatchActivity;
+import com.logiforge.tenniscloud.activities.editleaguematch.EditLeagueMatchPrologActivity;
 
 public class DashboardActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -190,7 +191,8 @@ public class DashboardActivity extends AppCompatActivity
             if(matchTypeDlg != null) {
                 matchTypeDlg.dismiss();
             }
-            Intent intent = new Intent(this, EditLeagueMatchActivity.class);
+            EditLeagueMatchPrologActivity.initStaticData();
+            Intent intent = new Intent(this, EditLeagueMatchPrologActivity.class);
             startActivity(intent);
         } else if(view.getId() == R.id.new_friendly_match) {
             DialogFragment matchTypeDlg = (DialogFragment)getSupportFragmentManager().findFragmentByTag("act_dashboard_dlg_add");

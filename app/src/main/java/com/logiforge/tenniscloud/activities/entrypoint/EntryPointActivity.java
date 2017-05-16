@@ -15,22 +15,27 @@ import com.logiforge.lavolta.android.db.InstallationTable;
 import com.logiforge.tenniscloud.R;
 import com.logiforge.tenniscloud.TCLavolta;
 import com.logiforge.tenniscloud.activities.dashboard.DashboardActivity;
+import com.logiforge.tenniscloud.db.LeagueFlightTbl;
 import com.logiforge.tenniscloud.db.LeagueMetroAreaTbl;
 import com.logiforge.tenniscloud.db.LeagueProviderTbl;
 import com.logiforge.tenniscloud.db.LeagueTbl;
 import com.logiforge.tenniscloud.db.MatchTbl;
 import com.logiforge.tenniscloud.db.PlayingLevelTbl;
+import com.logiforge.tenniscloud.db.TCUserEmailTbl;
 import com.logiforge.tenniscloud.db.TCUserTbl;
 import com.logiforge.tenniscloud.model.League;
+import com.logiforge.tenniscloud.model.LeagueFlight;
 import com.logiforge.tenniscloud.model.LeagueMetroArea;
 import com.logiforge.tenniscloud.model.LeagueProvider;
 import com.logiforge.tenniscloud.model.Match;
 import com.logiforge.tenniscloud.model.PlayingLevel;
 import com.logiforge.tenniscloud.model.TCUser;
+import com.logiforge.tenniscloud.model.TCUserEmail;
 
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
+import java.util.List;
 import java.util.UUID;
 
 public class EntryPointActivity extends AppCompatActivity {
@@ -58,12 +63,18 @@ public class EntryPointActivity extends AppCompatActivity {
             InstallationTable instTbl = new InstallationTable();
             instTbl.updateAuthorization("iorlanov", "iorlanov@comcast.net", "Igor Orlanov", null, null);
 
-            // TCUser
+            // test data
             TCUserTbl userTbl = new TCUserTbl();
             if(userTbl.count() == 0) {
-                userTbl.syncAdd(new TCUser(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
-                        "iorlanov", "Igor Orlanov", "iorlanov@comcast.net", "770 633-0568", TCUser.GENDER_MALE));
-
+                // TCUser
+                String iorlanovUUID = UUID.randomUUID().toString();
+                userTbl.syncAdd(new TCUser(iorlanovUUID, 0L, DbDynamicTable.SYNC_STATE_ADDED,
+                        "iorlanov", "Igor Orlanov", "770 633-0568", TCUser.GENDER_MALE));
+                TCUserEmailTbl userEmailTable = new TCUserEmailTbl();
+                userEmailTable.syncAdd(new TCUserEmail(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
+                        iorlanovUUID, "iorlanov@comcast.net", true));
+                userEmailTable.syncAdd(new TCUserEmail(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
+                        iorlanovUUID, "igor.orlanov@logiforge.com", false));
 
                 // PROVIDERS
                 LeagueProviderTbl leagueProviderTbl = new LeagueProviderTbl();
@@ -241,6 +252,7 @@ public class EntryPointActivity extends AppCompatActivity {
                                 "Spring Men's Flex Singles",
                                 new LocalDate(2017, 1, 17), new LocalDate(2017, 2, 11), new LocalDate(2017, 4, 9))
                 );
+
                 String ultimateLosAngelesSummer17WomenUid = UUID.randomUUID().toString();
                 leagueTbl.syncAdd(
                         new League(ultimateLosAngelesSummer17WomenUid, 0L, DbDynamicTable.SYNC_STATE_ADDED,
@@ -370,29 +382,60 @@ public class EntryPointActivity extends AppCompatActivity {
                                 new LocalDate(2017, 5, 14), new LocalDate(2017, 5, 22), new LocalDate(2017, 7, 9))
                 );
 
-                MatchTbl matchTbl = new MatchTbl();
-                matchTbl.deleteAll();
-                matchTbl.syncAdd(
-                        new Match(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
-                                Match.MATCH_TYPE_FREINDLY_MATCH, LocalDate.now(), new LocalTime(9, 00),
-                                Match.MATCH_FORMAT_REGULAR_BESTOF3, Match.MATCH_OUTCOME_NOT_YET_PLAYED,
-                                null, null, null, null));
-                matchTbl.syncAdd(
-                        new Match(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
-                                Match.MATCH_TYPE_FREINDLY_MATCH, LocalDate.now(), new LocalTime(18, 00),
-                                Match.MATCH_FORMAT_REGULAR_BESTOF3, Match.MATCH_OUTCOME_NOT_YET_PLAYED,
-                                null, null, null, null));
-                for (int i = 1; i < 10; i++) {
-                    matchTbl.syncAdd(
-                            new Match(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
-                                    Match.MATCH_TYPE_FREINDLY_MATCH, LocalDate.now().plusDays(1), new LocalTime(9, 00),
-                                    Match.MATCH_FORMAT_REGULAR_BESTOF3, Match.MATCH_OUTCOME_NOT_YET_PLAYED,
-                                    null, null, null, null));
-                    matchTbl.syncAdd(
-                            new Match(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
-                                    Match.MATCH_TYPE_FREINDLY_MATCH, LocalDate.now().plusDays(1), new LocalTime(18, 00),
-                                    Match.MATCH_FORMAT_REGULAR_BESTOF3, Match.MATCH_OUTCOME_NOT_YET_PLAYED,
-                                    null, null, null, null));
+                // FLIGHTS
+                LeagueFlightTbl flightTbl = new LeagueFlightTbl();
+                // Ultimate
+                List<PlayingLevel> ultimateLevels = levelTbl.getLevelsByProviderId(ultimateUid);
+                for(PlayingLevel level : ultimateLevels) {
+                    flightTbl.syncAdd(new LeagueFlight(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
+                            ultimateLosAngelesSpring17WomenUid, level.id));
+                    flightTbl.syncAdd(new LeagueFlight(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
+                            ultimateLosAngelesSpring17MenUid, level.id));
+                    flightTbl.syncAdd(new LeagueFlight(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
+                        ultimateLosAngelesSummer17WomenUid, level.id));
+                    flightTbl.syncAdd(new LeagueFlight(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
+                        ultimateLosAngelesSummer17MenUid, level.id));
+                    flightTbl.syncAdd(new LeagueFlight(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
+                        ultimateAtlantaSpring17WomenBusinessUid, level.id));
+                    flightTbl.syncAdd(new LeagueFlight(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
+                        ultimateAtlantaSpring17WomenWeekdaysUid, level.id));
+                    flightTbl.syncAdd(new LeagueFlight(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
+                        ultimateAtlantaSpring17MenUid, level.id));
+                    flightTbl.syncAdd(new LeagueFlight(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
+                        ultimateAtlantaSpring17MixedUid, level.id));
+                }
+
+                // t2
+                List<PlayingLevel> t2Levels = levelTbl.getLevelsByProviderId(t2Uid);
+                for(PlayingLevel level : t2Levels) {
+                    flightTbl.syncAdd(new LeagueFlight(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
+                        t2AtlantaSpring17MixedUid, level.id));
+                    flightTbl.syncAdd(new LeagueFlight(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
+                        t2AtlantaSpring17SeniorMenDoubleUid, level.id));
+                    flightTbl.syncAdd(new LeagueFlight(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
+                        t2AtlantaSpring17MenDoubleUid, level.id));
+                    flightTbl.syncAdd(new LeagueFlight(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
+                        t2AtlantaSpring17MenUid, level.id));
+                }
+
+                // league tennis
+                List<PlayingLevel> leagueTennisLevels = levelTbl.getLevelsByProviderId(leagueTennisUid);
+                for(PlayingLevel level : leagueTennisLevels) {
+                    flightTbl.syncAdd(new LeagueFlight(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
+                            leagueTennisAtlantaSpring17MenUid, level.id));
+                    flightTbl.syncAdd(new LeagueFlight(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
+                            leagueTennisAtlantaSpring17MenDoublesUid, level.id));
+                    flightTbl.syncAdd(new LeagueFlight(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
+                            leagueTennisAtlantaSpring17MixedUid, level.id));
+                }
+
+                // flex tennis
+                List<PlayingLevel> flexTennisLevels = levelTbl.getLevelsByProviderId(flexTennisUid);
+                for(PlayingLevel level : flexTennisLevels) {
+                    flightTbl.syncAdd(new LeagueFlight(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
+                            flexTennisAtlantaSummer17MenUid, level.id));
+                    flightTbl.syncAdd(new LeagueFlight(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
+                            flexTennisAtlantaSummer17MixedUid, level.id));
                 }
             }
 

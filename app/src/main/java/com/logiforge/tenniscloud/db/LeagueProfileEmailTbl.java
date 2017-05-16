@@ -7,7 +7,7 @@ import com.logiforge.lavolta.android.db.DbDynamicTable;
 import com.logiforge.lavolta.android.model.DynamicEntity;
 import com.logiforge.lavolta.android.model.api.sync.InventoryItem;
 import com.logiforge.tenniscloud.db.util.DbUtil;
-import com.logiforge.tenniscloud.model.TCUserEmail;
+import com.logiforge.tenniscloud.model.LeagueProfileEmail;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,25 +16,23 @@ import java.util.List;
  * Created by iorlanov on 5/5/17.
  */
 
-public class TCUserEmailTbl extends DbDynamicTable {
-    public static final String TABLE_NAME = "TCUSER_EMAIL";
-    public static final String COL_USER_NAME = "USER_NAME";
+public class LeagueProfileEmailTbl extends DbDynamicTable {
+    public static final String TABLE_NAME = "LEAGUE_PROFILE_EMAIL";
+    public static final String COL_LEAGUE_PROFILE_ID = "LEAGUE_PROFILE_ID";
     public static final String COL_EMAIL = "EMAIL";
-    public static final String COL_CONFIRMED = "CONFIRMED";
 
     public static final String CREATE_STATEMENT =
-            "CREATE TABLE TCUSER_EMAIL (" +
+            "CREATE TABLE LEAGUE_PROFILE_EMAIL (" +
                     "ID TEXT PRIMARY KEY," +
                     "VERSION INTEGER," +
                     "SYNC_STATE INTEGER," +
-                    "USER_NAME TEXT," +
-                    "EMAIL TEXT," +
-                    "CONFIRMED INTEGER" +
+                    "LEAGUE_PROFILE_ID TEXT," +
+                    "EMAIL TEXT" +
                     ")";
 
     @Override
     public DynamicEntity find(String id) {
-        TCUserEmail e = null;
+        LeagueProfileEmail e = null;
 
         Cursor c;
         c = db.query(TABLE_NAME, null,
@@ -69,17 +67,16 @@ public class TCUserEmailTbl extends DbDynamicTable {
 
     @Override
     protected ContentValues getContentForInsert(DynamicEntity dynamicEntity) {
-        return null;
+        return getContentForUpdate(dynamicEntity);
     }
 
     @Override
     protected ContentValues getContentForUpdate(DynamicEntity dynamicEntity) {
-        TCUserEmail userEmail = (TCUserEmail)dynamicEntity;
+        LeagueProfileEmail profileEmail = (LeagueProfileEmail)dynamicEntity;
 
         ContentValues values = new ContentValues();
-        values.put(COL_USER_NAME, userEmail.getUserName());
-        values.put(COL_EMAIL, userEmail.getEmail());
-        values.put(COL_CONFIRMED, DbUtil.toInteger(userEmail.getConfirmed()));
+        values.put(COL_LEAGUE_PROFILE_ID, profileEmail.getLeagueProfileId());
+        values.put(COL_EMAIL, profileEmail.getEmail());
 
         return values;
     }
@@ -89,14 +86,13 @@ public class TCUserEmailTbl extends DbDynamicTable {
         return TABLE_NAME;
     }
 
-    private TCUserEmail fromCursor(Cursor c) {
-        return new TCUserEmail(
+    private LeagueProfileEmail fromCursor(Cursor c) {
+        return new LeagueProfileEmail(
                 getString(COL_ID, c),
                 getLong(COL_VERSION, c),
                 getInt(COL_SYNC_STATE, c),
-                getString(COL_USER_NAME, c),
-                getString(COL_EMAIL, c),
-                getBoolean(COL_CONFIRMED, c)
+                getString(COL_LEAGUE_PROFILE_ID, c),
+                getString(COL_EMAIL, c)
         );
     }
 }

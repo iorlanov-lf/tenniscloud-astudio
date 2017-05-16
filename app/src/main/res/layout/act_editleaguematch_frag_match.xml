@@ -9,41 +9,16 @@
         android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-
         <TextView
-            android:id="@+id/txt_homeAway"
+            android:id="@+id/lbl_homeAway"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:text="Home Match"/>
-        <Button
-            android:id="@+id/btn_homeAway"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="0dp" android:minWidth="0dp"
-            android:text="..."
-            android:onClick="onSelectHomeAway"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/lbl_matchWeek"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Match Week"/>
-
+            android:focusable="false"
+            android:text="Home/Away"/>
         <Spinner
-            android:id="@+id/spnr_matchWeek"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:drawable/btn_dropdown"
-            android:spinnerMode="dropdown" />
-
+            android:id="@+id/spnr_homeAway"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 
     <LinearLayout
@@ -118,9 +93,7 @@
         <Spinner
             android:id="@+id/spnr_outcome"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:drawable/btn_dropdown"
-            android:spinnerMode="dialog" />
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 

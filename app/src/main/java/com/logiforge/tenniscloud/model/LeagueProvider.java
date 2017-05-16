@@ -30,4 +30,9 @@ public class LeagueProvider extends DynamicEntity {
     public void setProviderName(String providerName) {
         this.providerName = providerName;
     }
+
+    @Override
+    public String toString() {
+        return providerName;
+    }
 }

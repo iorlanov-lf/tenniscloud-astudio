@@ -142,7 +142,14 @@ public class MatchListFragment extends Fragment {
         LocalDate today = LocalDate.now();
         LocalDate todayPlusEight = LocalDate.now().plusDays(8);
         for(Match match : matches) {
-            if(match.getScheduledDt().equals(today)) {
+            if(match.getScheduledDt() == null) {
+                List<Match> unscheduledList = listDataChild.get("Unscheduled");
+                if(unscheduledList == null) {
+                    unscheduledList = new ArrayList<Match>();
+                    listDataChild.put("Unscheduled", unscheduledList);
+                }
+                unscheduledList.add(match);
+            } else if(match.getScheduledDt().equals(today)) {
                 List<Match> todayList = listDataChild.get("Scheduled Today");
                 if(todayList == null) {
                     todayList = new ArrayList<Match>();
@@ -157,6 +164,10 @@ public class MatchListFragment extends Fragment {
                 }
                 nextSevenDaysList.add(match);
             }
+        }
+
+        if(listDataChild.containsKey("Unscheduled")) {
+            listDataHeader.add("Unscheduled");
         }
 
         if(listDataChild.containsKey("Scheduled Today")) {

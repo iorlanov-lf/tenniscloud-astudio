@@ -18,10 +18,9 @@ import java.util.List;
  */
 public class LeagueProfileTbl extends DbDynamicTable {
     public static final String TABLE_NAME = "LEAGUE_PROFILE";
-    public static final String COL_USER_NAME = "USER_NAME";
+    public static final String COL_USER_ID = "USER_ID";
     public static final String COL_METRO_AREA_ID = "METRO_AREA_ID";
     public static final String COL_DISPLAY_NAME = "DISPLAY_NAME";
-    public static final String COL_EMAIL = "EMAIL";
     public static final String COL_PHONE_NUMBER = "PHONE_NUMBER";
 
     public static final String CREATE_STATEMENT =
@@ -29,10 +28,9 @@ public class LeagueProfileTbl extends DbDynamicTable {
                     "ID TEXT PRIMARY KEY," +
                     "VERSION INTEGER," +
                     "SYNC_STATE INTEGER," +
-                    "USER_NAME TEXT," +
+                    "USER_ID TEXT," +
                     "METRO_AREA_ID TEXT," +
                     "DISPLAY_NAME TEXT," +
-                    "EMAIL TEXT," +
                     "PHONE_NUMBER TEXT" +
                     ")";
 
@@ -81,10 +79,9 @@ public class LeagueProfileTbl extends DbDynamicTable {
         LeagueProfile profile = (LeagueProfile)dynamicEntity;
 
         ContentValues values = new ContentValues();
-        values.put(COL_USER_NAME, profile.getUserName());
+        values.put(COL_USER_ID, profile.getUserId());
         values.put(COL_METRO_AREA_ID, profile.getLeagueMetroAreaId());
         values.put(COL_DISPLAY_NAME, profile.getDisplayName());
-        values.put(COL_EMAIL, profile.getEmail());
         values.put(COL_PHONE_NUMBER, profile.getPhoneNumber());
 
         return values;
@@ -95,13 +92,13 @@ public class LeagueProfileTbl extends DbDynamicTable {
         return TABLE_NAME;
     }
 
-    public LeagueProfile findByUserNameAndAreaId(String userName, String areaId) {
+    public LeagueProfile findByUserIdAndAreaId(String userId, String areaId) {
         LeagueProfile profile = null;
 
         Cursor c;
         c = db.query(TABLE_NAME, null,
-                COL_USER_NAME+"=?"+" AND "+COL_METRO_AREA_ID+"=?",
-                new String[]{userName, areaId},
+                COL_USER_ID+"=?"+" AND "+COL_METRO_AREA_ID+"=?",
+                new String[]{userId, areaId},
                 null, null, null);
 
         if (c.moveToFirst()) {
@@ -114,20 +111,13 @@ public class LeagueProfileTbl extends DbDynamicTable {
         return profile;
     }
 
-    public LeagueProfile findByAreaId(String areaId) {
-        TCUserTbl userTbl = new TCUserTbl();
-        TCUser user = userTbl.getSelf();
-
-        return findByUserNameAndAreaId(user.getUserName(), areaId);
-    }
-
-    public List<LeagueProfile> getUserProfiles(String userName) {
+    public List<LeagueProfile> getByUserId(String userId) {
         List<LeagueProfile> profiles = new ArrayList<LeagueProfile>();
 
         Cursor c;
         c = db.query(TABLE_NAME, null,
-                COL_USER_NAME+"=?",
-                new String[]{userName},
+                COL_USER_ID+"=?",
+                new String[]{userId},
                 null, null, null);
 
         while (c.moveToNext()) {
@@ -145,10 +135,9 @@ public class LeagueProfileTbl extends DbDynamicTable {
                 getString(COL_ID, c),
                 getLong(COL_VERSION, c),
                 getInt(COL_SYNC_STATE, c),
-                getString(COL_USER_NAME, c),
+                getString(COL_USER_ID, c),
                 getString(COL_METRO_AREA_ID, c),
                 getString(COL_DISPLAY_NAME, c),
-                getString(COL_EMAIL, c),
                 getString(COL_PHONE_NUMBER, c)
         );
     }

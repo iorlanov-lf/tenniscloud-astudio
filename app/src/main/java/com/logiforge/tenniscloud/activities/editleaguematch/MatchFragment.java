@@ -17,6 +17,10 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.logiforge.tenniscloud.R;
+import com.logiforge.tenniscloud.facades.TCUserFacade;
+import com.logiforge.tenniscloud.model.Match;
+import com.logiforge.tenniscloud.model.MatchPlayer;
+import com.logiforge.tenniscloud.model.TCUser;
 
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
@@ -26,17 +30,32 @@ import org.joda.time.LocalTime;
  */
 
 public class MatchFragment extends Fragment {
+    private Match match;
+    private Match.HomeAway homeAway;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.act_editleaguematch_frag_match, container, false);
 
-        Spinner matchWeekDropdown = (Spinner)rootView.findViewById(R.id.spnr_matchWeek);
-        String[] items = new String[]{
-                "Week 1", "Week 2", "Week 3", "Week 4", "Week 5", "Week 6", "Week 7", "Week 8", "Week 9",
-                "Playoff Round 1", "Playoff Round 2", "Playoff Round 3", "Quaterfinal", "Semifinal", "Final" };
-        ArrayAdapter<String> matchWeekAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_dropdown_item, items);
-        matchWeekDropdown.setAdapter(matchWeekAdapter);
+        match = EditLeagueMatchActivity.match;
+
+        Spinner homeAwayDropdown = (Spinner)rootView.findViewById(R.id.spnr_homeAway);
+        ArrayAdapter<Match.HomeAway> homeAwayAdapter =
+                new ArrayAdapter<Match.HomeAway>(getActivity(), android.R.layout.simple_spinner_dropdown_item, Match.HomeAway.values());
+        homeAwayDropdown.setAdapter(homeAwayAdapter);
+        if(homeAway != null) {
+            homeAwayDropdown.setSelection(homeAway.ordinal());
+        } else {
+            TCUserFacade userFacade = new TCUserFacade();
+            MatchPlayer me = match.findPlayer(userFacade.getSelf().id);
+            if(me.getHomeTeam()) {
+                homeAway = Match.HomeAway.HomeMatch;
+            } else {
+                homeAway = Match.HomeAway.AwayMatch;
+            }
+            homeAwayDropdown.setSelection(homeAway.ordinal());
+        }
 
         EditText deadlineEditText = (EditText)rootView.findViewById(R.id.edit_deadline);
         deadlineEditText.setOnTouchListener(new View.OnTouchListener() {

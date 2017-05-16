@@ -6,8 +6,8 @@ import android.database.Cursor;
 import com.logiforge.lavolta.android.db.DbDynamicTable;
 import com.logiforge.lavolta.android.model.DynamicEntity;
 import com.logiforge.lavolta.android.model.api.sync.InventoryItem;
-import com.logiforge.tenniscloud.db.util.DbUtil;
 import com.logiforge.tenniscloud.model.LeagueProfileEmail;
+import com.logiforge.tenniscloud.model.MatchPlayerEmail;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,23 +16,23 @@ import java.util.List;
  * Created by iorlanov on 5/5/17.
  */
 
-public class LeagueProfileEmailTbl extends DbDynamicTable {
-    public static final String TABLE_NAME = "LEAGUE_PROFILE_EMAIL";
-    public static final String COL_LEAGUE_PROFILE_ID = "LEAGUE_PROFILE_ID";
+public class MatchPlayerEmailTbl extends DbDynamicTable {
+    public static final String TABLE_NAME = "MATCH_PLAYER_EMAIL";
+    public static final String COL_MATCH_PLAYER_ID = "MATCH_PLAYER_ID";
     public static final String COL_EMAIL = "EMAIL";
 
     public static final String CREATE_STATEMENT =
-            "CREATE TABLE TCUSER_EMAIL (" +
+            "CREATE TABLE MATCH_PLAYER_EMAIL (" +
                     "ID TEXT PRIMARY KEY," +
                     "VERSION INTEGER," +
                     "SYNC_STATE INTEGER," +
-                    "LEAGUE_PROFILE_ID TEXT," +
+                    "MATCH_PLAYER_ID TEXT," +
                     "EMAIL TEXT" +
                     ")";
 
     @Override
     public DynamicEntity find(String id) {
-        LeagueProfileEmail e = null;
+        MatchPlayerEmail e = null;
 
         Cursor c;
         c = db.query(TABLE_NAME, null,
@@ -67,16 +67,16 @@ public class LeagueProfileEmailTbl extends DbDynamicTable {
 
     @Override
     protected ContentValues getContentForInsert(DynamicEntity dynamicEntity) {
-        return null;
+        return getContentForUpdate(dynamicEntity);
     }
 
     @Override
     protected ContentValues getContentForUpdate(DynamicEntity dynamicEntity) {
-        LeagueProfileEmail profileEmail = (LeagueProfileEmail)dynamicEntity;
+        MatchPlayerEmail playerEmail = (MatchPlayerEmail)dynamicEntity;
 
         ContentValues values = new ContentValues();
-        values.put(COL_LEAGUE_PROFILE_ID, profileEmail.getLeagueProfileId());
-        values.put(COL_EMAIL, profileEmail.getEmail());
+        values.put(COL_MATCH_PLAYER_ID, playerEmail.getMatchPlayerId());
+        values.put(COL_EMAIL, playerEmail.getEmail());
 
         return values;
     }
@@ -86,12 +86,12 @@ public class LeagueProfileEmailTbl extends DbDynamicTable {
         return TABLE_NAME;
     }
 
-    private LeagueProfileEmail fromCursor(Cursor c) {
-        return new LeagueProfileEmail(
+    private MatchPlayerEmail fromCursor(Cursor c) {
+        return new MatchPlayerEmail(
                 getString(COL_ID, c),
                 getLong(COL_VERSION, c),
                 getInt(COL_SYNC_STATE, c),
-                getString(COL_LEAGUE_PROFILE_ID, c),
+                getString(COL_MATCH_PLAYER_ID, c),
                 getString(COL_EMAIL, c)
         );
     }

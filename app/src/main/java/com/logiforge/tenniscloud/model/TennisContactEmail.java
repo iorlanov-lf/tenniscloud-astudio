@@ -6,33 +6,33 @@ import com.logiforge.lavolta.android.model.DynamicEntity;
  * Created by iorlanov on 5/5/17.
  */
 
-public class LeagueProfileEmail extends DynamicEntity {
+public class TennisContactEmail extends DynamicEntity {
 
-    String leagueProfileId;
+    String tennisContactId;
     String email;
 
     @Override
     public String getParentId() {
-        return leagueProfileId;
+        return tennisContactId;
     }
 
-    public LeagueProfileEmail() {
+    public TennisContactEmail() {
         super();
     }
 
-    public LeagueProfileEmail(String id, Long version, Integer syncState,
-                              String leagueProfileId, String email) {
+    public TennisContactEmail(String id, Long version, Integer syncState,
+                              String tennisContactId, String email) {
         super(id, version, syncState);
 
-        this.leagueProfileId = leagueProfileId;
+        this.tennisContactId = tennisContactId;
         this.email = email;
     }
 
-    public String getLeagueProfileId() {
-        return leagueProfileId;
+    public String getTennisContactId() {
+        return tennisContactId;
     }
-    public void setLeagueProfileId(String leagueProfileId) {
-        this.leagueProfileId = leagueProfileId;
+    public void setTennisContactId(String tennisContactId) {
+        this.tennisContactId = tennisContactId;
     }
 
     public String getEmail() {

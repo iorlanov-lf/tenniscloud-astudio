@@ -7,15 +7,13 @@ import java.util.List;
 /**
  * Created by iorlanov on 2/4/2017.
  */
-public class MatchPlayer extends DynamicEntity {
-    String matchId;
-    Boolean isHomeTeam;
-    List<MatchAvailability> availabilityList;
+public class Partner extends DynamicEntity {
+    String leagueRegistrationId;
 
     // simple player
     String firstLastName;
     String phoneNbr;
-    List<MatchPlayerEmail> emails;
+    List<PartnerEmail> emails;
 
     // TCUser player
     String userId;
@@ -31,50 +29,25 @@ public class MatchPlayer extends DynamicEntity {
 
     @Override
     public String getParentId() {
-        return matchId;
+        return leagueRegistrationId;
     }
 
-    public MatchPlayer() {
+    public Partner() {
         super();
     }
 
-    public MatchPlayer(String id, Long version, Integer syncState,
-                       String matchId, Boolean isHomeTeam,
-                       String firstLastName, String phoneNbr,
-                       String userId, String contactId, String leagueProfileId) {
+    public Partner(String id, Long version, Integer syncState,
+                   String leagueRegistrationId,
+                   String firstLastName, String phoneNbr,
+                   String userId, String contactId, String leagueProfileId) {
         super(id, version, syncState);
 
-        this.matchId = matchId;
-        this.isHomeTeam = isHomeTeam;
+        this.leagueRegistrationId = leagueRegistrationId;
         this.firstLastName = firstLastName;
         this.phoneNbr = phoneNbr;
         this.userId = userId;
         this.contactId = contactId;
         this.leagueProfileId = leagueProfileId;
-    }
-
-    public String getMatchId() {
-        return matchId;
-    }
-
-    public void setMatchId(String matchId) {
-        this.matchId = matchId;
-    }
-
-    public Boolean getHomeTeam() {
-        return isHomeTeam;
-    }
-
-    public void setHomeTeam(Boolean homeTeam) {
-        isHomeTeam = homeTeam;
-    }
-
-    public List<MatchAvailability> getAvailabilityList() {
-        return availabilityList;
-    }
-
-    public void setAvailabilityList(List<MatchAvailability> availabilityList) {
-        this.availabilityList = availabilityList;
     }
 
     public String getFirstLastName() {
@@ -141,11 +114,11 @@ public class MatchPlayer extends DynamicEntity {
         this.leagueProfile = leagueProfile;
     }
 
-    public List<MatchPlayerEmail> getEmails() {
+    public List<PartnerEmail> getEmails() {
         return emails;
     }
 
-    public void setEmails(List<MatchPlayerEmail> emails) {
+    public void setEmails(List<PartnerEmail> emails) {
         this.emails = emails;
     }
 }

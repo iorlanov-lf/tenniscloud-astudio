@@ -7,6 +7,7 @@ import com.logiforge.lavolta.android.db.DbDynamicTable;
 import com.logiforge.lavolta.android.model.DynamicEntity;
 import com.logiforge.lavolta.android.model.api.sync.InventoryItem;
 import com.logiforge.tenniscloud.model.MatchPlayer;
+import com.logiforge.tenniscloud.model.Partner;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,10 +15,9 @@ import java.util.List;
 /**
  * Created by iorlanov on 2/23/2017.
  */
-public class MatchPlayerTbl extends DbDynamicTable {
-    public static final String TABLE_NAME = "MATCH_PLAYER";
-    public static final String COL_MATCH_ID = "MATCH_ID";
-    public static final String COL_IS_HOME_TEAM = "IS_HOME_TEAM";
+public class PartnerTbl extends DbDynamicTable {
+    public static final String TABLE_NAME = "PARTNER";
+    public static final String COL_LEAGUE_REGISTRATION_ID = "LEAGUE_REGISTRATION";
     public static final String COL_FIRST_LAST_NAME = "FIRST_LAST_NAME";
     public static final String COL_PHONE_NUMBER = "PHONE_NUMBER";
     public static final String COL_USER_ID = "USER_ID";
@@ -25,12 +25,11 @@ public class MatchPlayerTbl extends DbDynamicTable {
     public static final String COL_LEAGUE_PROFILE_ID = "LEAGUE_PROFILE_ID";
 
     public static final String CREATE_STATEMENT =
-            "CREATE TABLE MATCH_PLAYER (" +
+            "CREATE TABLE PARTNER (" +
                     "ID TEXT PRIMARY KEY," +
                     "VERSION INTEGER," +
                     "SYNC_STATE INTEGER," +
-                    "MATCH_ID TEXT," +
-                    "IS_HOME_TEAM INTEGER," +
+                    "LEAGUE_REGISTRATION_ID TEXT," +
                     "FIRST_LAST_NAME TEXT," +
                     "PHONE_NUMBER TEXT," +
                     "USER_ID TEXT," +
@@ -40,7 +39,7 @@ public class MatchPlayerTbl extends DbDynamicTable {
 
     @Override
     public DynamicEntity find(String id) {
-        MatchPlayer mp = null;
+        Partner p = null;
 
         Cursor c;
         c = db.query(TABLE_NAME, null,
@@ -49,13 +48,13 @@ public class MatchPlayerTbl extends DbDynamicTable {
                 null, null, null);
 
         if (c.moveToFirst()) {
-            mp = fromCursor(c);
+            p = fromCursor(c);
         }
         if (c != null && !c.isClosed()) {
             c.close();
         }
 
-        return mp;
+        return p;
     }
 
     @Override
@@ -88,13 +87,12 @@ public class MatchPlayerTbl extends DbDynamicTable {
         return TABLE_NAME;
     }
 
-    private MatchPlayer fromCursor(Cursor c) {
-        return new MatchPlayer(
+    private Partner fromCursor(Cursor c) {
+        return new Partner(
                 getString(COL_ID, c),
                 getLong(COL_VERSION, c),
                 getInt(COL_SYNC_STATE, c),
-                getString(COL_MATCH_ID, c),
-                getBoolean(COL_IS_HOME_TEAM, c),
+                getString(COL_LEAGUE_REGISTRATION_ID, c),
                 getString(COL_FIRST_LAST_NAME, c),
                 getString(COL_PHONE_NUMBER, c),
                 getString(COL_USER_ID, c),
