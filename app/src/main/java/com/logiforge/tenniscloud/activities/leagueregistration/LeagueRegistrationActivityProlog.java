@@ -12,9 +12,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +28,7 @@ import com.logiforge.lavolta.android.model.Installation;
 import com.logiforge.tenniscloud.R;
 import com.logiforge.tenniscloud.activities.facility.FacilityActivity;
 import com.logiforge.tenniscloud.activities.facility.UserFacilityDlg;
+import com.logiforge.tenniscloud.activities.util.EmailListView;
 import com.logiforge.tenniscloud.activities.util.ItemPickerDialogFragment;
 import com.logiforge.tenniscloud.db.FacilityTbl;
 import com.logiforge.tenniscloud.db.LeagueFlightTbl;
@@ -40,15 +43,20 @@ import com.logiforge.tenniscloud.db.TCUserFacilityTbl;
 import com.logiforge.tenniscloud.db.TCUserTbl;
 import com.logiforge.tenniscloud.facades.FacilityFacade;
 import com.logiforge.tenniscloud.facades.LeagueRegistrationFacade;
+import com.logiforge.tenniscloud.facades.TCUserFacade;
 import com.logiforge.tenniscloud.model.Facility;
 import com.logiforge.tenniscloud.model.League;
 import com.logiforge.tenniscloud.model.LeagueFlight;
 import com.logiforge.tenniscloud.model.LeagueMetroArea;
 import com.logiforge.tenniscloud.model.LeagueProfile;
+import com.logiforge.tenniscloud.model.LeagueProfileEmail;
 import com.logiforge.tenniscloud.model.LeagueProvider;
 import com.logiforge.tenniscloud.model.LeagueRegistration;
 import com.logiforge.tenniscloud.model.PlayingLevel;
 import com.logiforge.tenniscloud.model.TCUser;
+import com.logiforge.tenniscloud.model.TCUserEmail;
+
+import static com.logiforge.tenniscloud.R.id.edit_email;
 
 
 public class LeagueRegistrationActivity extends AppCompatActivity
@@ -107,9 +115,9 @@ public class LeagueRegistrationActivity extends AppCompatActivity
             LinearLayout profileLayout = (LinearLayout)findViewById(R.id.layout_profile);
             profileLayout.setVisibility(View.VISIBLE);
 
-            EditText emailEditText = (EditText) findViewById(R.id.edit_email);
-            emailEditText.setText(profile.getEmail());
-            emailEditText.setError(null);
+            //TODO: EditText emailEditText = (EditText) findViewById(R.id.edit_email);
+            //emailEditText.setText(profile.getEmail());
+            //emailEditText.setError(null);
             EditText displayNameEditText = (EditText) findViewById(R.id.edit_displayName);
             displayNameEditText.setText(profile.getDisplayName());
             displayNameEditText.setError(null);
@@ -140,7 +148,7 @@ public class LeagueRegistrationActivity extends AppCompatActivity
 
         LinearLayout profileLayout = (LinearLayout)findViewById(R.id.layout_profile);
         if(profileLayout.getVisibility() == View.VISIBLE) {
-            EditText emailEditText = (EditText) findViewById(R.id.edit_email);
+            EditText emailEditText = (EditText) findViewById(edit_email);
             EditText displayNameEditText = (EditText) findViewById(R.id.edit_displayName);
             EditText phoneEditText = (EditText) findViewById(R.id.edit_phone);
 
@@ -148,7 +156,7 @@ public class LeagueRegistrationActivity extends AppCompatActivity
                 profile = new LeagueProfile();
             }
 
-            profile.setEmail(emailEditText.getText().toString());
+            //TODOD: profile.setEmail(emailEditText.getText().toString());
             profile.setDisplayName(displayNameEditText.getText().toString());
             profile.setPhoneNumber(phoneEditText.getText().toString());
         }
@@ -264,12 +272,26 @@ public class LeagueRegistrationActivity extends AppCompatActivity
         }
 
         if(profile != null && profile.id == null) {
-            EditText etEmail = (EditText)findViewById(R.id.edit_email);
+            /*TODO: EditText etEmail = (EditText)findViewById(R.id.edit_email);
             profile.setEmail(etEmail.getText().toString());
             if(etEmail.getText().length() == 0) {
                 etEmail.setError("Required!");
                 etEmail.requestFocus();
                 isFormValid = false;
+            } else if(!android.util.Patterns.EMAIL_ADDRESS.matcher(etEmail.getText().toString()).matches()) {
+                etEmail.setError("Invalid!");
+                etEmail.requestFocus();
+                isFormValid = false;
+            }*/
+
+            EmailListView emailListView = (EmailListView) findViewById(R.id.view_emails);
+            List<String> emails = emailListView.getEmails();
+            if(emails.size() == 0) {
+                TextView emailLbl = (TextView)findViewById(R.id.txt_email);
+                emailLbl.setError("Required!");
+                isFormValid = false;
+            } else {
+                profile.setEmails2(emails);
             }
 
             EditText etDisplayName = (EditText)findViewById(R.id.edit_displayName);
@@ -319,9 +341,8 @@ public class LeagueRegistrationActivity extends AppCompatActivity
             providerTextView.setText(selectedTitle);
             providerTextView.setError(null);
 
-            provider = new LeagueProvider();
-            provider.id = item.getStringValue();
-            provider.setProviderName(selectedTitle);
+            LeagueProviderTbl providerTbl = new LeagueProviderTbl();
+            provider = (LeagueProvider)providerTbl.find(item.getStringValue());
 
             LinearLayout metroAreaLayout = (LinearLayout)findViewById(R.id.layout_metroArea);
             metroAreaLayout.setVisibility(View.VISIBLE);
@@ -352,25 +373,28 @@ public class LeagueRegistrationActivity extends AppCompatActivity
             metroAreaTextView.setText(selectedTitle);
             metroAreaTextView.setError(null);
 
-            metroArea = new LeagueMetroArea();
-            metroArea.id = item.getStringValue();
-            metroArea.setMetroAreaName(selectedTitle);
+            LeagueMetroAreaTbl areaTbl = new LeagueMetroAreaTbl();
+            metroArea = (LeagueMetroArea)areaTbl.find(item.getStringValue());
 
+            TCUserFacade userFacade = new TCUserFacade();
+            TCUser self = userFacade.getSelf();
             LeagueProfileTbl profileTbl = new LeagueProfileTbl();
-            LeagueProfile p = profileTbl.findByAreaId(metroArea.id);
+            LeagueProfile p = profileTbl.findByUserIdAndAreaId(self.id, metroArea.id);
 
             if(p == null) {
                 profile = new LeagueProfile();
 
                 LinearLayout profileLayout = (LinearLayout) findViewById(R.id.layout_profile);
-                profileLayout.setVisibility(View.VISIBLE);
 
-                TCUserTbl userTbl = new TCUserTbl();
-                TCUser user = userTbl.getSelf();
-                EditText etEmail = (EditText)findViewById(R.id.edit_email);
-                etEmail.setText(user.getEmail());
-                etEmail.setError(null);
-                profile.setEmail(user.getEmail());
+                TCUser user = TCUserFacade.builder().resolveEmails().build();
+
+                List<String> userEmails = new ArrayList<String>();
+                for(TCUserEmail userEmail : user.getEmails()) {
+                    userEmails.add(userEmail.getEmail());
+                }
+                EmailListView emailListView = (EmailListView) findViewById(R.id.view_emails);
+                emailListView.initItems(userEmails);
+
                 EditText etDisplayName = (EditText)findViewById(R.id.edit_displayName);
                 etDisplayName.setText(user.getDisplayName());
                 etDisplayName.setError(null);
@@ -378,7 +402,9 @@ public class LeagueRegistrationActivity extends AppCompatActivity
                 EditText etPhone = (EditText)findViewById(R.id.edit_phone);
                 etPhone.setText(user.getPhoneNbr());
                 etPhone.setError(null);
-                profile.setEmail(user.getPhoneNbr());
+                profile.setPhoneNumber(user.getPhoneNbr());
+
+                profileLayout.setVisibility(View.VISIBLE);
             } else {
                 profile = p;
                 LinearLayout profileLayout = (LinearLayout) findViewById(R.id.layout_profile);
@@ -407,9 +433,8 @@ public class LeagueRegistrationActivity extends AppCompatActivity
             leagueTextView.setText(selectedTitle);
             leagueTextView.setError(null);
 
-            league = new League();
-            league.id = item.getStringValue();
-            league.setLeagueName(selectedTitle);
+            LeagueTbl leagueTbl = new LeagueTbl();
+            league = (League)leagueTbl.find(item.getStringValue());
 
             LinearLayout levelLayout = (LinearLayout)findViewById(R.id.layout_level);
             levelLayout.setVisibility(View.VISIBLE);
@@ -427,9 +452,8 @@ public class LeagueRegistrationActivity extends AppCompatActivity
             levelTextView.setText(selectedTitle);
             levelTextView.setError(null);
 
-            level = new PlayingLevel();
-            level.id = item.getStringValue();
-            level.setDescription(selectedTitle);
+            PlayingLevelTbl levelTbl = new PlayingLevelTbl();
+            level = (PlayingLevel)levelTbl.find(item.getStringValue());
         }
     }
 
