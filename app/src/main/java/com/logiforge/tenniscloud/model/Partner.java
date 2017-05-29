@@ -2,6 +2,7 @@ package com.logiforge.tenniscloud.model;
 
 import com.logiforge.lavolta.android.model.DynamicEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -48,6 +49,14 @@ public class Partner extends DynamicEntity {
         this.userId = userId;
         this.contactId = contactId;
         this.leagueProfileId = leagueProfileId;
+    }
+
+    public String getLeagueRegistrationId() {
+        return leagueRegistrationId;
+    }
+
+    public void setLeagueRegistrationId(String leagueRegistrationId) {
+        this.leagueRegistrationId = leagueRegistrationId;
     }
 
     public String getFirstLastName() {
@@ -120,5 +129,12 @@ public class Partner extends DynamicEntity {
 
     public void setEmails(List<PartnerEmail> emails) {
         this.emails = emails;
+    }
+
+    public void setEmails2(List<String> emailList) {
+        emails = new ArrayList<PartnerEmail>();
+        for(String email : emailList) {
+            emails.add(new PartnerEmail(null, email));
+        }
     }
 }

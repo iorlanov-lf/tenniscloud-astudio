@@ -24,6 +24,12 @@ public class MatchTbl extends DbDynamicTable {
     public static final String COL_SCHEDULED_TM = "SCHEDULED_TM";
     public static final String COL_MATCH_FORMAT = "MATCH_FORMAT";
     public static final String COL_OUTCOME = "OUTCOME";
+    public static final String COL_SET1_HOME_POINTS = "SET1_HOME_POINTS";
+    public static final String COL_SET1_VISITOR_POINTS = "SET1_VISITOR_POINTS";
+    public static final String COL_SET2_HOME_POINTS = "SET2_HOME_POINTS";
+    public static final String COL_SET2_VISITOR_POINTS = "SET2_VISITOR_POINTS";
+    public static final String COL_SET3_HOME_POINTS = "SET3_HOME_POINTS";
+    public static final String COL_SET3_VISITOR_POINTS = "SET3_VISITOR_POINTS";
     public static final String COL_FACILITY_ID = "FACILITY_ID";
     public static final String COL_LEAGUE_FLIGHT_ID = "LEAGUE_FLIGHT_ID";
     public static final String COL_LEAGUE_WEEK = "LEAGUE_WEEK";
@@ -39,6 +45,12 @@ public class MatchTbl extends DbDynamicTable {
                     "SCHEDULED_TM TEXT," +
                     "MATCH_FORMAT INTEGER," +
                     "OUTCOME INTEGER," +
+                    "SET1_HOME_POINTS INTEGER," +
+                    "SET1_VISITOR_POINTS INTEGER," +
+                    "SET2_HOME_POINTS INTEGER," +
+                    "SET2_VISITOR_POINTS INTEGER," +
+                    "SET3_HOME_POINTS INTEGER," +
+                    "SET3_VISITOR_POINTS INTEGER," +
                     "FACILITY_ID TEXT," +
                     "LEAGUE_FLIGHT_ID TEXT," +
                     "LEAGUE_WEEK INTEGER," +
@@ -95,11 +107,16 @@ public class MatchTbl extends DbDynamicTable {
         values.put(COL_SCHEDULED_TM, DbUtil.toString(match.getScheduledTm()));
         values.put(COL_MATCH_FORMAT, match.getMatchFormat());
         values.put(COL_OUTCOME, match.getOutcome());
+        values.put(COL_SET1_HOME_POINTS, match.getPoints()[0]);
+        values.put(COL_SET1_VISITOR_POINTS, match.getPoints()[1]);
+        values.put(COL_SET2_HOME_POINTS, match.getPoints()[2]);
+        values.put(COL_SET2_VISITOR_POINTS, match.getPoints()[3]);
+        values.put(COL_SET3_HOME_POINTS, match.getPoints()[4]);
+        values.put(COL_SET3_VISITOR_POINTS, match.getPoints()[5]);
         values.put(COL_FACILITY_ID, match.getFacilityId());
         values.put(COL_LEAGUE_FLIGHT_ID, match.getLeagueFlightId());
         values.put(COL_LEAGUE_WEEK, match.getLeagueWeek());
-        values.put(COL_DEADLINE_DT, match.getOutcome());
-        values.put(COL_OUTCOME, DbUtil.toString(match.getDeadlineDt()));
+        values.put(COL_DEADLINE_DT, DbUtil.toString(match.getDeadlineDt()));
 
         return values;
     }
@@ -145,6 +162,12 @@ public class MatchTbl extends DbDynamicTable {
                 DbUtil.getLocalTime(COL_SCHEDULED_TM, c),
                 getInt(COL_MATCH_TYPE, c),
                 getInt(COL_OUTCOME, c),
+                getInt(COL_SET1_HOME_POINTS, c),
+                getInt(COL_SET1_VISITOR_POINTS, c),
+                getInt(COL_SET2_HOME_POINTS, c),
+                getInt(COL_SET2_VISITOR_POINTS, c),
+                getInt(COL_SET3_HOME_POINTS, c),
+                getInt(COL_SET3_VISITOR_POINTS, c),
                 getString(COL_FACILITY_ID, c),
                 getString(COL_LEAGUE_FLIGHT_ID, c),
                 getInt(COL_LEAGUE_WEEK, c),

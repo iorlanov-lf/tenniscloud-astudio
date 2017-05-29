@@ -5,11 +5,15 @@ import com.logiforge.lavolta.android.app.DefaultAuthPlugin;
 import com.logiforge.lavolta.android.app.Lavolta;
 import com.logiforge.lavolta.android.app.SyncUrlFactory;
 import com.logiforge.lavolta.android.db.LavoltaDb;
+import com.logiforge.lavolta.android.model.api.LogContext;
 import com.logiforge.lavolta.android.model.api.sync.DataDump;
 import com.logiforge.lavolta.android.model.api.sync.DataSlice;
 import com.logiforge.lavolta.android.model.api.sync.LocalChanges;
+import com.logiforge.lavolta.android.model.api.sync.LocalChangesSyncResult;
 import com.logiforge.lavolta.android.model.api.sync.RemoteChangesDigest;
 import com.logiforge.lavolta.android.model.config.SyncSetupSpecs;
+import com.logiforge.lavolta.android.sync.jobs.ReconcileDynamicDataJob;
+import com.logiforge.lavolta.android.sync.jobs.bo.CommitRequest;
 import com.logiforge.lavolta.android.sync.jobs.bo.JournalTransaction;
 import com.logiforge.lavolta.android.sync.jobs.bo.SyncBO;
 import com.logiforge.tenniscloud.db.AppDb;
@@ -51,7 +55,33 @@ public class TCLavolta extends Lavolta {
 
     @Override
     protected SyncBO getSyncBO() {
-        return null;
+        return new SyncBO() {
+
+            @Override
+            public void processCommitResults(CommitRequest commitRequest, LocalChangesSyncResult localChangesSyncResult, LogContext logContext) throws Exception {
+
+            }
+
+            @Override
+            public void applyUpdates(RemoteChangesDigest remoteChangesDigest, LocalChanges localChanges, LogContext logContext) throws Exception {
+
+            }
+
+            @Override
+            public void applyReplaceDataSlice(RemoteChangesDigest remoteChangesDigest, DataSlice dataSlice, LogContext logContext) throws Exception {
+
+            }
+
+            @Override
+            public void applyAddDataSlice(RemoteChangesDigest remoteChangesDigest, DataSlice dataSlice, LogContext logContext) throws Exception {
+
+            }
+
+            @Override
+            public ReconcileDynamicDataJob.ReconcileResult reconcile(LogContext logContext) throws Exception {
+                return null;
+            }
+        };
     }
 
     @Override

@@ -34,6 +34,7 @@ import com.logiforge.tenniscloud.model.LeagueMetroArea;
 import com.logiforge.tenniscloud.model.LeagueProfile;
 import com.logiforge.tenniscloud.model.LeagueProvider;
 import com.logiforge.tenniscloud.model.LeagueRegistration;
+import com.logiforge.tenniscloud.model.Partner;
 import com.logiforge.tenniscloud.model.PlayingLevel;
 import com.logiforge.tenniscloud.model.TCUser;
 
@@ -47,12 +48,13 @@ public class LeagueRegistrationActivityProlog extends AppCompatActivity
     private static final int REQUEST_SELECT_FACILITY = 20;
     private static final int REQUEST_REGISTRATION_EPILOG = 30;
 
-    private static LeagueProvider provider;
-    private static LeagueMetroArea metroArea;
-    private static LeagueProfile profile;
-    private static League league;
-    private static PlayingLevel level;
-    private static Facility facility;
+    public static LeagueProvider provider;
+    public static LeagueMetroArea metroArea;
+    public static League league;
+    public static PlayingLevel level;
+    public static Facility facility;
+    public static LeagueProfile profile;
+    public static Partner partner;
     public static LeagueRegistration registration;
 
     TextView providerTextView;
@@ -64,10 +66,10 @@ public class LeagueRegistrationActivityProlog extends AppCompatActivity
     public static void initState() {
         provider = null;
         metroArea = null;
-        profile = null;
         league = null;
         level = null;
         facility = null;
+        profile = null;
         registration = null;
     }
 
@@ -224,7 +226,6 @@ public class LeagueRegistrationActivityProlog extends AppCompatActivity
     }
 
     public void onNext(final View view) {
-        //Toast.makeText(this, "onSave", Toast.LENGTH_LONG).show();
         boolean isFormValid = true;
         if(provider == null) {
             providerTextView.setError("Required!");
@@ -250,7 +251,7 @@ public class LeagueRegistrationActivityProlog extends AppCompatActivity
         if(isFormValid) {
             if(profile != null && league.getTeamType() == League.TEAM_TYPE_SINGLES) {
                 LeagueRegistrationFacade regFacade = new LeagueRegistrationFacade();
-                registration = regFacade.createLeagueRegistration(provider, metroArea, league, level, profile, facility);
+                registration = regFacade.createLeagueRegistration(provider, metroArea, league, level, facility, profile, partner);
 
                 if (registration != null) {
                     setResult(Activity.RESULT_OK);
@@ -365,6 +366,7 @@ public class LeagueRegistrationActivityProlog extends AppCompatActivity
     public void onItemSelected(Facility facility) {
         LeagueRegistrationActivityProlog.facility = facility;
         facilityTextView.setText(facility.getName());
+        facilityTextView.setError(null);
     }
 
     @Override
@@ -375,6 +377,7 @@ public class LeagueRegistrationActivityProlog extends AppCompatActivity
             if (resultCode == RESULT_OK) {
                 facility = FacilityActivity.facility;
                 facilityTextView.setText(facility.getName());
+                facilityTextView.setError(null);
             }
 
             dismissUserFacilityDlg();

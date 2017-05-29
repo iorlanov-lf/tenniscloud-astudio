@@ -37,6 +37,9 @@
         <activity
             android:name=".activities.editleaguematch.EditLeagueMatchPrologActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.viewleaguematch.ViewLeagueMatchActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

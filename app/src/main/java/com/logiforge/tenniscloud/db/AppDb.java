@@ -69,8 +69,6 @@ public class AppDb extends SQLiteOpenHelper
         db.execSQL(PartnerEmailTbl.CREATE_STATEMENT);
         db.execSQL(PlayingLevelTbl.CREATE_STATEMENT);
 
-        db.execSQL(SetScoreTbl.CREATE_STATEMENT);
-
         db.execSQL(TCUserTbl.CREATE_STATEMENT);
         db.execSQL(TCUserEmailTbl.CREATE_STATEMENT);
         db.execSQL(TCUserFacilityTbl.CREATE_STATEMENT);

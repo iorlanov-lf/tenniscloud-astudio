@@ -76,41 +76,20 @@
     <LinearLayout
         android:id="@+id/layout_matchWeek"
         android:orientation="horizontal"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/layout_league">
 
-        <TextView
-            android:id="@+id/lbl_matchWeek"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:focusable="false"
-            android:text="Match Week"/>
         <Spinner
             android:id="@+id/spnr_matchWeek"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/layout_homeAway"
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/layout_matchWeek">
-
-        <TextView
-            android:id="@+id/lbl_homeAway"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:focusable="false"
-            android:text="Home/Away"/>
+            android:layout_width="0px"
+            android:layout_weight="0.5"
+            android:layout_height="wrap_content"/>
         <Spinner
             android:id="@+id/spnr_homeAway"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
+            android:layout_width="0px"
+            android:layout_weight="0.5"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 
     <LinearLayout
@@ -118,7 +97,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/layout_homeAway">
+        android:layout_below="@+id/layout_matchWeek">
 
         <TextView
             android:id="@+id/lbl_opponent1Email"

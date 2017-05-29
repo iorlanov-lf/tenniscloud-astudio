@@ -9,6 +9,7 @@ import com.logiforge.lavolta.android.model.api.sync.InventoryItem;
 import com.logiforge.tenniscloud.db.util.DbUtil;
 import com.logiforge.tenniscloud.model.LeagueProfileEmail;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -84,6 +85,25 @@ public class LeagueProfileEmailTbl extends DbDynamicTable {
     @Override
     protected String getTableName() {
         return TABLE_NAME;
+    }
+
+    public List<LeagueProfileEmail> findEmailsByProfileId(String partnerId) {
+        List<LeagueProfileEmail> emails = new ArrayList<LeagueProfileEmail>();
+
+        Cursor c;
+        c = db.query(TABLE_NAME, null,
+                COL_LEAGUE_PROFILE_ID+"=?",
+                new String[]{partnerId},
+                null, null, null);
+
+        while (c.moveToNext()) {
+            emails.add(fromCursor(c));
+        }
+        if (c != null && !c.isClosed()) {
+            c.close();
+        }
+
+        return emails;
     }
 
     private LeagueProfileEmail fromCursor(Cursor c) {

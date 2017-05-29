@@ -2,12 +2,12 @@ package com.logiforge.tenniscloud.activities.dashboard;
 
 import android.support.v4.app.DialogFragment;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -18,17 +18,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.logiforge.tenniscloud.R;
-import com.logiforge.tenniscloud.activities.editleaguematch.EditLeagueMatchActivity;
 import com.logiforge.tenniscloud.activities.editleaguematch.EditLeagueMatchPrologActivity;
 
 public class DashboardActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-            MatchListFragment.OnFragmentInteractionListener,
-            LeagueListFragment.OnFragmentInteractionListener,
             View.OnClickListener {
+
+    public static final int REQUEST_NEW_LEAGUE_MATCH = 10;
+    public static final int REQUEST_VIEW_LEAGUE_MATCH = 20;
+
+    MatchListFragment matchListFragment;
+    LeagueListFragment leagueListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,67 +53,13 @@ public class DashboardActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         // pager setup
-        // Get the ViewPager and set it's PagerAdapter so that it can display items
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-        viewPager.setAdapter(new DashboardPagerAdapter(getSupportFragmentManager(),
-               DashboardActivity.this));
+        viewPager.setAdapter(new DashboardPagerAdapter(getSupportFragmentManager()));
 
         // Give the TabLayout the ViewPager
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
-
-        /*
-        tabLayout.removeAllTabs();
-        tabLayout.addTab(tabLayout.newTab(), true);
-        tabLayout.addTab(tabLayout.newTab(), false);
-        int tabCount = tabLayout.getTabCount();
-        for(int i = 0; i < tabCount; i++){
-            TabLayout.Tab tab = tabLayout.getTabAt(i);
-            tab.setCustomView(R.layout.act_dashboard_tab);
-            View customView = tab.getCustomView();
-            TextView textView = (TextView)customView.findViewById(R.id.text1);
-            textView.setText(""+i*10);
-
-            ImageView staticImgView = (ImageView)customView.findViewById(R.id.static_image);
-            ColorStateList colours = getResources()
-                    .getColorStateList(R.color.tab_icon_colors);
-            Drawable d = DrawableCompat.wrap(getResources().getDrawable(R.drawable.ic_menu_camera)); // DrawableCompat.wrap(staticImgView.getDrawable());
-            DrawableCompat.setTintList(d.mutate(), colours);
-            staticImgView.setImageDrawable(d);
-            if(i==0) {
-                customView.setSelected(true);
-            }
-
-            ImageView dynImgView = (ImageView)customView.findViewById(R.id.dynamic_image);
-
-            dynImgView.post(new MyRunnable(dynImgView) );
-        }
-        */
     }
-
-    /*
-    static class MyRunnable implements Runnable {
-        ImageView dynImgView;
-        public MyRunnable(ImageView dynImgView) {
-            this.dynImgView = dynImgView;
-        }
-
-        public void run() {
-            int w = dynImgView.getMeasuredWidth();
-            int h = dynImgView.getMeasuredHeight();
-            if(w != 0 || h != 0) {
-                Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-                Canvas canvas = new Canvas(bitmap);
-                Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-                paint.setColor(Color.RED);
-                paint.setStyle(Paint.Style.STROKE);
-                paint.setStrokeWidth(5);
-                canvas.drawCircle(w / 2, h / 2, (int) (0.7 * (Math.min(h, w) / 2)), paint);
-                dynImgView.setImageBitmap(bitmap);
-            }
-        }
-    }
-    */
 
     @Override
     public void onBackPressed() {
@@ -171,16 +119,6 @@ public class DashboardActivity extends AppCompatActivity
     }
 
     @Override
-    public void onMatchListInteraction(Uri uri) {
-
-    }
-
-    @Override
-    public void onSeasonListInteraction(Uri uri) {
-
-    }
-
-    @Override
     public void onClick(View view) {
         if(view.getId() == R.id.fab) {
             FragmentManager fm = getSupportFragmentManager();
@@ -193,12 +131,60 @@ public class DashboardActivity extends AppCompatActivity
             }
             EditLeagueMatchPrologActivity.initStaticData();
             Intent intent = new Intent(this, EditLeagueMatchPrologActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, REQUEST_NEW_LEAGUE_MATCH);
         } else if(view.getId() == R.id.new_friendly_match) {
             DialogFragment matchTypeDlg = (DialogFragment)getSupportFragmentManager().findFragmentByTag("act_dashboard_dlg_add");
             if(matchTypeDlg != null) {
                 matchTypeDlg.dismiss();
             }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_NEW_LEAGUE_MATCH) {
+            if(resultCode == RESULT_OK) {
+                matchListFragment.refresh();
+            }
+        } else if (requestCode == REQUEST_VIEW_LEAGUE_MATCH) {
+            if(resultCode == RESULT_OK) {
+                matchListFragment.refresh();
+            }
+        }
+    }
+
+    public class DashboardPagerAdapter extends FragmentPagerAdapter {
+        final int PAGE_COUNT = 2;
+        private String TAB_TITLES[] = new String[] { "Matches", "Leagues" };
+
+        public DashboardPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+                case 0:
+                    matchListFragment = new MatchListFragment();
+                    return matchListFragment;
+
+                case 1:
+                    leagueListFragment = new LeagueListFragment();
+                    return leagueListFragment;
+
+                default:
+                    return null;
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return PAGE_COUNT;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return TAB_TITLES[position];
         }
     }
 }

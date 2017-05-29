@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.logiforge.tenniscloud.R;
 
@@ -70,14 +71,12 @@ public class EmailListView extends LinearLayout
             String emails = bundle.getString(STATE_EMAILS);
             if(emails.length() > 0) {
                 String[] emailArray = emails.split(";");
-                for(String email : emailArray) {
-                    LinearLayout emailView = (LinearLayout) inflater.inflate(R.layout.item_editable_email, null);
-                    this.addView(emailView);
-
-                    if(!email.equals(BLANK_PLACEHOLDER)) {
-                        EditText editTextEmail = (EditText) emailView.findViewById(R.id.edit_email);
-                        editTextEmail.setText(email);
+                if(emailArray.length != 0) {
+                    ArrayList<String> emailList = new ArrayList<String>();
+                    for(String email : emailArray) {
+                        emailList.add(email);
                     }
+                    initItems(emailList);
                 }
             }
         } else {
@@ -124,8 +123,10 @@ public class EmailListView extends LinearLayout
             LinearLayout emailView = (LinearLayout) inflater.inflate(R.layout.item_editable_email, null);
             this.addView(emailView);
 
-            EditText editTextEmail = (EditText)emailView.findViewById(R.id.edit_email);
-            editTextEmail.setText(email);
+            if(!email.equals(BLANK_PLACEHOLDER)) {
+                EditText editTextEmail = (EditText) emailView.findViewById(R.id.edit_email);
+                editTextEmail.setText(email);
+            }
 
             Button removeBtn = (Button)emailView.findViewById(R.id.btn_remove);
             removeBtn.setOnClickListener(this);
@@ -143,5 +144,10 @@ public class EmailListView extends LinearLayout
         }
 
         return emails;
+    }
+
+    public void setError(String msg) {
+        TextView emailLbl = (TextView)findViewById(R.id.txt_email);
+        emailLbl.setError(msg);
     }
 }

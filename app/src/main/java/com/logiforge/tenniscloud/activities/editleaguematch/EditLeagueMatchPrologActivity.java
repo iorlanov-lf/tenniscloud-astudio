@@ -27,6 +27,9 @@ import com.logiforge.tenniscloud.model.Match;
 public class EditLeagueMatchPrologActivity extends AppCompatActivity
         implements View.OnClickListener,
         UserLeagueRegistrationDlg.OnItemSelectedListener {
+    private static final String KEY_MATCHWEEK_SPINNER = "KEY_MATCHWEEK_SPINNER";
+    private static final String KEY_HOMEAWAY_SPINNER = "KEY_HOMEAWAY_SPINNER";
+
     private static final int REQUEST_NEXT_STEP = 10;
     private static final int REQUEST_NEW_REGISTRATION = 20;
 
@@ -34,11 +37,17 @@ public class EditLeagueMatchPrologActivity extends AppCompatActivity
     private static Match.MatchWeek matchWeek;
     private static Match.HomeAway homeAway;
 
+    TextView leagueTextView = null;
+    Spinner matchWeekSpinner = null;
+    Spinner homeAwaySpinner = null;
+    View opponent1EmailLayout = null;
+    EditText email1EditText = null;
+    View opponent2EmailLayout = null;
+    EditText email2EditText = null;
+
     public static void initStaticData() {
         registration = null;
         matchWeek = null;
-
-        EditLeagueMatchActivity.initStaticData();
     }
 
     @Override
@@ -50,8 +59,15 @@ public class EditLeagueMatchPrologActivity extends AppCompatActivity
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.act_leaguematch_prolog);
 
+        leagueTextView = (TextView) findViewById(R.id.txt_league);
+        matchWeekSpinner = (Spinner)findViewById(R.id.spnr_matchWeek);
+        homeAwaySpinner = (Spinner)findViewById(R.id.spnr_homeAway);
+        opponent1EmailLayout = findViewById(R.id.layout_opponent1Email);
+        email1EditText = (EditText) findViewById(R.id.edit_opponent1Email);
+        opponent2EmailLayout = findViewById(R.id.layout_opponent2Email);
+        email2EditText = (EditText) findViewById(R.id.edit_opponent2Email);
+
         if(registration != null) {
-            TextView leagueTextView = (TextView) findViewById(R.id.txt_league);
             leagueTextView.setText(
                     registration.getProfile().getLeagueMetroArea().getProvider().getProviderName()
                             + " - " + registration.getLeagueFlight().getLeague().getLeagueName());
@@ -63,95 +79,76 @@ public class EditLeagueMatchPrologActivity extends AppCompatActivity
             hideOpponent2Email();
         }
 
-        Spinner matchWeekDropdown = (Spinner)findViewById(R.id.spnr_matchWeek);
         ArrayAdapter<Match.MatchWeek> matchWeekAdapter = new ArrayAdapter<Match.MatchWeek>(this, android.R.layout.simple_spinner_dropdown_item, Match.MatchWeek.values());
-        matchWeekDropdown.setAdapter(matchWeekAdapter);
-        if(matchWeek != null) {
-            matchWeekDropdown.setSelection(matchWeek.ordinal());
-        } else {
-            matchWeek = Match.MatchWeek.WEEK01;
+        matchWeekSpinner.setAdapter(matchWeekAdapter);
+        if(savedInstanceState != null) {
+            matchWeekSpinner.setSelection(savedInstanceState.getInt(KEY_MATCHWEEK_SPINNER));
         }
 
-        Spinner homeAwayDropdown = (Spinner)findViewById(R.id.spnr_homeAway);
         ArrayAdapter<Match.HomeAway> homeAwayAdapter = new ArrayAdapter<Match.HomeAway>(this, android.R.layout.simple_spinner_dropdown_item, Match.HomeAway.values());
-        homeAwayDropdown.setAdapter(homeAwayAdapter);
-        if(homeAway != null) {
-            homeAwayDropdown.setSelection(homeAway.ordinal());
-        } else {
-            homeAway = Match.HomeAway.HomeMatch;
+        homeAwaySpinner.setAdapter(homeAwayAdapter);
+        if(savedInstanceState != null) {
+            homeAwaySpinner.setSelection(savedInstanceState.getInt(KEY_HOMEAWAY_SPINNER));
         }
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
-        Spinner matchWeekDropdown = (Spinner)findViewById(R.id.spnr_matchWeek);
-        matchWeek = (Match.MatchWeek)matchWeekDropdown.getSelectedItem();
-
-        Spinner homeAwayDropdown = (Spinner)findViewById(R.id.spnr_homeAway);
-        homeAway = (Match.HomeAway)homeAwayDropdown.getSelectedItem();
+        outState.putInt(KEY_MATCHWEEK_SPINNER, matchWeekSpinner.getSelectedItemPosition());
+        outState.putInt(KEY_HOMEAWAY_SPINNER, homeAwaySpinner.getSelectedItemPosition());
     }
 
     public void onNext(final View view) {
         boolean isFormValid = true;
         if(registration == null) {
-            TextView leagueTextView = (TextView)findViewById(R.id.txt_league);
             leagueTextView.setError("Required!");
             isFormValid = false;
         }
 
-        Spinner matchWeekDropdown = (Spinner)findViewById(R.id.spnr_matchWeek);
-        matchWeek = (Match.MatchWeek)matchWeekDropdown.getSelectedItem();
+        matchWeek = (Match.MatchWeek)matchWeekSpinner.getSelectedItem();
+        homeAway = (Match.HomeAway)homeAwaySpinner.getSelectedItem();
 
-        Spinner homeAwayDropdown = (Spinner)findViewById(R.id.spnr_homeAway);
-        homeAway = (Match.HomeAway)homeAwayDropdown.getSelectedItem();
-
-        EditText opponent1EmailEditText = (EditText)findViewById(R.id.edit_opponent1Email);
-        String email1 = opponent1EmailEditText.getText().toString();
+        String email1 = email1EditText.getText().toString();
         if(email1.length() == 0) {
-            opponent1EmailEditText.setError("Required!");
-            opponent1EmailEditText.requestFocus();
+            email1EditText.setError("Required!");
+            email1EditText.requestFocus();
             isFormValid = false;
         } else if(!android.util.Patterns.EMAIL_ADDRESS.matcher(email1).matches()) {
-            opponent1EmailEditText.setError("Invalid!");
-            opponent1EmailEditText.requestFocus();
+            email1EditText.setError("Invalid!");
+            email1EditText.requestFocus();
             isFormValid = false;
         }
 
         String email2 = null;
-        View opponent2EmailLayout = findViewById(R.id.layout_opponent2Email);
         if(opponent2EmailLayout.getVisibility() == View.VISIBLE) {
-            EditText opponent2EmailEditText = (EditText)findViewById(R.id.edit_opponent2Email);
-            email2 = opponent2EmailEditText.getText().toString();
+            email2 = email2EditText.getText().toString();
             if (email2.length() == 0) {
-                opponent2EmailEditText.setError("Required!");
-                opponent2EmailEditText.requestFocus();
+                email2EditText.setError("Required!");
+                email2EditText.requestFocus();
                 isFormValid = false;
             } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email2).matches()) {
-                opponent2EmailEditText.setError("Invalid!");
-                opponent2EmailEditText.requestFocus();
+                email2EditText.setError("Invalid!");
+                email2EditText.requestFocus();
                 isFormValid = false;
             }
         }
 
         if(isFormValid) {
-            EditLeagueMatchActivity.registration = registration;
             Match match = new Match();
             match.setLeagueWeek(matchWeek.getId());
             match.setLeagueFlight(registration.getLeagueFlight());
-            EditLeagueMatchActivity.match = match;
 
             LeagueMatchFacade leagueMatchFacade = new LeagueMatchFacade();
 
             if(registration.getLeagueFlight().getLeague().getTeamType() == League.TEAM_TYPE_SINGLES) {
-                leagueMatchFacade.createSinglesLeagueMatch(this, match, registration, homeAway, email1);
+                leagueMatchFacade.createLeagueMatch(this, match, registration, homeAway, email1, null);
             } else {
-                leagueMatchFacade.createDoublesLeagueMatch(this, match, registration, homeAway, email1, email2);
+                leagueMatchFacade.createLeagueMatch(this, match, registration, homeAway, email1, email2);
             }
 
-            EditLeagueMatchActivity.match = match;
-            EditLeagueMatchActivity.registration = registration;
+            EditLeagueMatchActivity.initStaticData(match);
             Intent intent = new Intent(this, EditLeagueMatchActivity.class);
             startActivityForResult(intent, REQUEST_NEXT_STEP);
         }
@@ -223,7 +220,6 @@ public class EditLeagueMatchPrologActivity extends AppCompatActivity
 
     private void setLeagueTextView(LeagueRegistration registration) {
         EditLeagueMatchPrologActivity.registration = registration;
-        TextView leagueTextView = (TextView)findViewById(R.id.txt_league);
         leagueTextView.setError(null);
         leagueTextView.setText(
                 registration.getProfile().getLeagueMetroArea().getProvider().getProviderName()
@@ -231,15 +227,12 @@ public class EditLeagueMatchPrologActivity extends AppCompatActivity
     }
 
     private void hideOpponent2Email() {
-        View opponent2EmailLayout = findViewById(R.id.layout_opponent2Email);
-        EditText email2EditText = (EditText) findViewById(R.id.edit_opponent2Email);
         email2EditText.setText(null);
         email2EditText.setError(null);
         opponent2EmailLayout.setVisibility(View.GONE);
     }
 
     private void showOpponent2Email() {
-        View opponent2EmailLayout = findViewById(R.id.layout_opponent2Email);
         opponent2EmailLayout.setVisibility(View.VISIBLE);
     }
 }

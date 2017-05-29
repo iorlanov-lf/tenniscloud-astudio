@@ -9,14 +9,13 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <Spinner
-            android:id="@+id/spnr_matchWeek"
+        <TextView
+            android:id="@+id/txt_matchWeek"
             android:layout_width="0px"
             android:layout_weight="0.5"
-            android:layout_height="wrap_content">
-        </Spinner>
-        <Spinner
-            android:id="@+id/spnr_homeAway"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/txt_homeAway"
             android:layout_width="0px"
             android:layout_weight="0.5"
             android:layout_height="wrap_content"/>
@@ -33,21 +32,10 @@
             android:layout_height="wrap_content"
             android:text="Play By: "/>
 
-        <EditText
-            android:id="@+id/edit_deadline"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="false"
-            android:focusableInTouchMode="false"/>
-
-        <Button
-            android:id="@+id/btn_clear_deadline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="0dp" android:minWidth="0dp"
-            android:text="X"/>
+        <TextView
+            android:id="@+id/txt_deadline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
     </LinearLayout>
 
@@ -62,14 +50,11 @@
             android:layout_height="wrap_content"
             android:text="Scheduled on: "/>
 
-        <EditText
-            android:id="@+id/edit_schDate"
+        <TextView
+            android:id="@+id/txt_schDate"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="false"
-            android:focusableInTouchMode="false"/>
+            android:layout_height="wrap_content"/>
 
         <TextView
             android:id="@+id/lbl_scheduledAt"
@@ -77,21 +62,11 @@
             android:layout_height="wrap_content"
             android:text=" at "/>
 
-        <EditText
-            android:id="@+id/edit_schTime"
+        <TextView
+            android:id="@+id/txt_schTime"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="false"
-            android:focusableInTouchMode="false"/>
-
-        <Button
-            android:id="@+id/btn_clear_scheduled"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="0dp" android:minWidth="0dp"
-            android:text="X"/>
+            android:layout_height="wrap_content"/>
 
     </LinearLayout>
 
@@ -106,8 +81,8 @@
             android:layout_height="wrap_content"
             android:text="Outcome: "/>
 
-        <Spinner
-            android:id="@+id/spnr_outcome"
+        <TextView
+            android:id="@+id/txt_outcome"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
@@ -128,38 +103,38 @@
         <TableRow>
             <TextView
                 android:text="Set 1"/>
-            <Spinner
-                android:id="@+id/spnr_scoreHome1">
+            <TextView
+                android:id="@+id/txt_scoreHome1">
 
-            </Spinner>
-            <Spinner
-                android:id="@+id/spnr_scoreVisitor1">
+            </TextView>
+            <TextView
+                android:id="@+id/txt_scoreVisitor1">
 
-            </Spinner>
+            </TextView>
         </TableRow>
         <TableRow>
             <TextView
                 android:text="Set 2"/>
-            <Spinner
-                android:id="@+id/spnr_scoreHome2">
+            <TextView
+                android:id="@+id/txt_scoreHome2">
 
-            </Spinner>
-            <Spinner
-                android:id="@+id/spnr_scoreVisitor2">
+            </TextView>
+            <TextView
+                android:id="@+id/txt_scoreVisitor2">
 
-            </Spinner>
+            </TextView>
         </TableRow>
         <TableRow>
             <TextView
                 android:text="Set 3"/>
-            <Spinner
-                android:id="@+id/spnr_scoreHome3">
+            <TextView
+                android:id="@+id/txt_scoreHome3">
 
-            </Spinner>
-            <Spinner
-                android:id="@+id/spnr_scoreVisitor3">
+            </TextView>
+            <TextView
+                android:id="@+id/txt_scoreVisitor3">
 
-            </Spinner>
+            </TextView>
         </TableRow>
     </TableLayout>
 

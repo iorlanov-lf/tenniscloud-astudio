@@ -1,8 +1,10 @@
 package com.logiforge.tenniscloud.model;
 
+import com.logiforge.lavolta.android.api.protocol.MPackDynEntityConverter;
 import com.logiforge.lavolta.android.db.DbDynamicTable;
 import com.logiforge.lavolta.android.model.DynamicEntity;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -162,5 +164,18 @@ public class MatchPlayer extends DynamicEntity {
 
     public void setEmails(List<MatchPlayerEmail> emails) {
         this.emails = emails;
+    }
+
+    public static class Converter extends MPackDynEntityConverter {
+
+        @Override
+        public void pack(Object o, Object o1) throws IOException {
+
+        }
+
+        @Override
+        public Object unpack(Object o) throws IOException {
+            return null;
+        }
     }
 }

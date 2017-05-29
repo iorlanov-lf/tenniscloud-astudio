@@ -14,6 +14,8 @@ import com.logiforge.tenniscloud.db.LeagueProfileTbl;
 import com.logiforge.tenniscloud.db.LeagueProviderTbl;
 import com.logiforge.tenniscloud.db.LeagueRegistrationTbl;
 import com.logiforge.tenniscloud.db.LeagueTbl;
+import com.logiforge.tenniscloud.db.PartnerEmailTbl;
+import com.logiforge.tenniscloud.db.PartnerTbl;
 import com.logiforge.tenniscloud.db.PlayingLevelTbl;
 import com.logiforge.tenniscloud.db.TCLavoltaDb;
 import com.logiforge.tenniscloud.db.TCUserEmailTbl;
@@ -25,6 +27,8 @@ import com.logiforge.tenniscloud.model.LeagueProfile;
 import com.logiforge.tenniscloud.model.LeagueProfileEmail;
 import com.logiforge.tenniscloud.model.LeagueProvider;
 import com.logiforge.tenniscloud.model.LeagueRegistration;
+import com.logiforge.tenniscloud.model.Partner;
+import com.logiforge.tenniscloud.model.PartnerEmail;
 import com.logiforge.tenniscloud.model.PlayingLevel;
 import com.logiforge.tenniscloud.model.TCUser;
 import com.logiforge.tenniscloud.model.TCUserEmail;
@@ -66,6 +70,7 @@ public class LeagueRegistrationFacade {
         LeagueProviderTbl providerTbl = new LeagueProviderTbl();
         PlayingLevelTbl levelTbl = new PlayingLevelTbl();
         LeagueTbl leagueTbl = new LeagueTbl();
+        PartnerTbl partnerTbl = new PartnerTbl();
 
         List<LeagueRegistration> registrations = new ArrayList<LeagueRegistration>();
 
@@ -78,6 +83,7 @@ public class LeagueRegistrationFacade {
                 for (LeagueRegistration registration : profileRegistrations) {
                     // profile
                     registration.setProfile(profile);
+
                     // area
                     LeagueMetroArea area = (LeagueMetroArea)areaTbl.find(profile.getLeagueMetroAreaId());
                     profile.setLeagueMetroArea(area);
@@ -98,6 +104,12 @@ public class LeagueRegistrationFacade {
                     // facility
                     Facility facility = (Facility)facilityTbl.find(registration.getFacilityId());
                     registration.setFacility(facility);
+
+                    // partner
+                    PartnerFacade.Builder partnerBuilder =
+                            new PartnerFacade.Builder(partnerTbl.getByRegistrationId(registration.id));
+                    Partner partner = partnerBuilder.resolveEmails().build();
+                    registration.setPartner(partner);
                 }
             }
         }
@@ -107,7 +119,7 @@ public class LeagueRegistrationFacade {
 
     public LeagueRegistration createLeagueRegistration(
             LeagueProvider provider, LeagueMetroArea area, League league,
-            PlayingLevel level, LeagueProfile profile, Facility facility) {
+            PlayingLevel level, Facility facility, LeagueProfile profile, Partner partner) {
 
         LeagueRegistration registration = null;
 
@@ -162,29 +174,31 @@ public class LeagueRegistrationFacade {
             registration.setFacilityId(facility.id);
             lregTbl.uiAdd(txn, registration, null);
 
+            if(partner != null) {
+                PartnerTbl partnerTbl = new PartnerTbl();
+                partner.setLeagueRegistrationId(registration.id);
+                partnerTbl.uiAdd(txn, partner, null);
+
+                PartnerEmailTbl partnerEmailTbl = new PartnerEmailTbl();
+                for(PartnerEmail email : partner.getEmails()) {
+                    email.setPartnerId(partner.id);
+                    partnerEmailTbl.uiAdd(txn, email, null);
+                }
+            }
+
+            db.commitTxn(txn);
+
             // set relationships
             registration.setProfile(profile);
             registration.setLeagueFlight(flight);
             registration.setFacility(facility);
-
-            profile.setLeagueMetroArea(area);
-            area.setProvider(provider);
-            flight.setPlayingLevel(level);
-            flight.setLeague(league);
-            league.setLeagueMetroArea(area);
-
-            db.commitTxn(txn);
-
-            // build object graph
-            registration.setProfile(profile);
-            registration.setLeagueFlight(flight);
-            registration.setFacility(facility);
+            registration.setPartner(partner);
 
             profile.setLeagueMetroArea(area);
             area.setProvider(provider);
 
-            flight.setLeague(league);
             flight.setPlayingLevel(level);
+            flight.setLeague(league);
             league.setLeagueMetroArea(area);
 
         } catch(Exception e) {

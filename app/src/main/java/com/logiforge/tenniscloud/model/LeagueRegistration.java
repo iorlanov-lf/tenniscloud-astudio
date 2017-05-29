@@ -14,6 +14,7 @@ public class LeagueRegistration extends DynamicEntity {
     LeagueDivision leagueDivision;
     String facilityId;
     Facility facility;
+    Partner partner;
 
     @Override
     public String getParentId() {
@@ -96,5 +97,13 @@ public class LeagueRegistration extends DynamicEntity {
 
     public void setFacility(Facility facility) {
         this.facility = facility;
+    }
+
+    public Partner getPartner() {
+        return partner;
+    }
+
+    public void setPartner(Partner partner) {
+        this.partner = partner;
     }
 }

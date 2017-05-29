@@ -1,5 +1,6 @@
 package com.logiforge.tenniscloud.model;
 
+import com.logiforge.lavolta.android.db.DbDynamicTable;
 import com.logiforge.lavolta.android.model.DynamicEntity;
 
 /**
@@ -23,6 +24,13 @@ public class PartnerEmail extends DynamicEntity {
     public PartnerEmail(String id, Long version, Integer syncState,
                         String partnerId, String email) {
         super(id, version, syncState);
+
+        this.partnerId = partnerId;
+        this.email = email;
+    }
+
+    public PartnerEmail(String partnerId, String email) {
+        super(null, 0L, DbDynamicTable.SYNC_STATE_ADDED);
 
         this.partnerId = partnerId;
         this.email = email;

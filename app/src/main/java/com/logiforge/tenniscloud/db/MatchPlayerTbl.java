@@ -2,6 +2,7 @@ package com.logiforge.tenniscloud.db;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
 import com.logiforge.lavolta.android.db.DbDynamicTable;
 import com.logiforge.lavolta.android.model.DynamicEntity;
@@ -9,6 +10,7 @@ import com.logiforge.lavolta.android.model.api.sync.InventoryItem;
 import com.logiforge.tenniscloud.db.util.DbUtil;
 import com.logiforge.tenniscloud.model.MatchPlayer;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -98,6 +100,33 @@ public class MatchPlayerTbl extends DbDynamicTable {
     @Override
     protected String getTableName() {
         return TABLE_NAME;
+    }
+
+    public MatchPlayerTbl() {
+        super();
+    }
+
+    public MatchPlayerTbl(SQLiteDatabase db) {
+        super(db);
+    }
+
+    public List<MatchPlayer> findPlayersByMatchId(String matchId) {
+        List<MatchPlayer> players = new ArrayList<MatchPlayer>();
+
+        Cursor c;
+        c = db.query(TABLE_NAME, null,
+                COL_MATCH_ID + "=?",
+                new String[]{matchId},
+                null, null, null);
+
+        while (c.moveToNext()) {
+            players.add(fromCursor(c));
+        }
+        if (c != null && !c.isClosed()) {
+            c.close();
+        }
+
+        return players;
     }
 
     private MatchPlayer fromCursor(Cursor c) {

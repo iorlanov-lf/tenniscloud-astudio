@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,21 +20,21 @@ import com.logiforge.tenniscloud.model.Match;
  */
 public class MatchListAdapter extends BaseExpandableListAdapter {
 
-    private Context _context;
-    private List<String> _listDataHeader; // header titles
+    private Context context;
+    private List<String> listDataHeader; // header titles
     // child data in format of header title, child title
-    private HashMap<String, List<Match>> _listDataChild;
+    private HashMap<String, List<Match>> listDataChild;
 
     public MatchListAdapter(Context context, List<String> listDataHeader,
                                  HashMap<String, List<Match>> listChildData) {
-        this._context = context;
-        this._listDataHeader = listDataHeader;
-        this._listDataChild = listChildData;
+        this.context = context;
+        this.listDataHeader = listDataHeader;
+        this.listDataChild = listChildData;
     }
 
     @Override
     public Object getChild(int groupPosition, int childPosititon) {
-        return this._listDataChild.get(this._listDataHeader.get(groupPosition))
+        return this.listDataChild.get(this.listDataHeader.get(groupPosition))
                 .get(childPosititon);
     }
 
@@ -49,13 +50,12 @@ public class MatchListAdapter extends BaseExpandableListAdapter {
         final Match match = (Match) getChild(groupPosition, childPosition);
 
         if (convertView == null) {
-            LayoutInflater infalInflater = (LayoutInflater) this._context
+            LayoutInflater infalInflater = (LayoutInflater) this.context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(R.layout.act_dashboard_frag_match_list_match_item, null);
         }
 
-        TextView txtListChild = (TextView) convertView
-                .findViewById(R.id.lblListItem);
+        TextView txtListChild = (TextView) convertView.findViewById(R.id.lblListItem);
 
         if(match.getScheduledDt() == null) {
             txtListChild.setText("Unscheduled");
@@ -67,18 +67,18 @@ public class MatchListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        return this._listDataChild.get(this._listDataHeader.get(groupPosition))
+        return this.listDataChild.get(this.listDataHeader.get(groupPosition))
                 .size();
     }
 
     @Override
     public Object getGroup(int groupPosition) {
-        return this._listDataHeader.get(groupPosition);
+        return this.listDataHeader.get(groupPosition);
     }
 
     @Override
     public int getGroupCount() {
-        return this._listDataHeader.size();
+        return this.listDataHeader.size();
     }
 
     @Override
@@ -91,13 +91,12 @@ public class MatchListAdapter extends BaseExpandableListAdapter {
                              View convertView, ViewGroup parent) {
         String headerTitle = (String) getGroup(groupPosition);
         if (convertView == null) {
-            LayoutInflater infalInflater = (LayoutInflater) this._context
+            LayoutInflater infalInflater = (LayoutInflater) this.context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(R.layout.act_dashboard_frag_match_list_group_item, null);
         }
 
-        TextView lblListHeader = (TextView) convertView
-                .findViewById(R.id.lblListHeader);
+        TextView lblListHeader = (TextView) convertView.findViewById(R.id.lblListHeader);
         lblListHeader.setTypeface(null, Typeface.BOLD);
         lblListHeader.setText(headerTitle);
 

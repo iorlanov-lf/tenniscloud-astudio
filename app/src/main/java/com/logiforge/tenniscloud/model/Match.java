@@ -23,13 +23,46 @@ public class Match extends DynamicEntity {
     public static final int MATCH_FORMAT_SUPER_TIEBREAK = 3;
     public static final int MATCH_FORMAT_10GAME_SET = 4;
 
-    public static final int MATCH_OUTCOME_NOT_YET_PLAYED = 0;
-    public static final int MATCH_OUTCOME_COMPLETED = 1;
-    public static final int MATCH_OUTCOME_INCOMPLETE = 2;
-    public static final int MATCH_OUTCOME_HOME_FORFEITED = 3;
-    public static final int MATCH_OUTCOME_HOME_RETIRED = 4;
-    public static final int MATCH_OUTCOME_VISITOR_FORFEITED = 5;
-    public static final int MATCH_OUTCOME_VISITOR_RETIRED = 6;
+    public enum Outcome {
+        NOT_YET_PLAYED(0, "Not Yet Played"),
+        COMPLETED(10, "Completed"),
+        INCOMPLETE(20, "Incomplete"),
+        HOME_FORFEITED(30, "Home Team Forfieted"),
+        HOME_RETIRED(40, "Home Team Retired"),
+        VISITOR_FORFEITED(50, "Visiting Team Forfieted"),
+        VISITOR_RETIRED(60, "Visiting Team Retired");
+
+        public static Outcome getById(int id) {
+            for(Outcome outcome : values()) {
+                if(outcome.getId() == id) {
+                    return outcome;
+                }
+            }
+
+            return null;
+        }
+
+        private final int id;
+        private final String name;
+
+        Outcome(int id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
 
     public enum MatchWeek {
         WEEK01(10, "Week 1"),
@@ -47,6 +80,16 @@ public class Match extends DynamicEntity {
         QUTERFINAL(4000, "Quaterfinal"),
         SEMIFINAL(5000, "Semifinal"),
         FINAL(6000, "Final");
+
+        public static MatchWeek getById(int id) {
+            for(MatchWeek matchWeek : values()) {
+                if(matchWeek.getId() == id) {
+                    return matchWeek;
+                }
+            }
+
+            return null;
+        }
 
         private final int id;
         private final String name;
@@ -102,7 +145,7 @@ public class Match extends DynamicEntity {
     LocalTime scheduledTm;
     Integer matchFormat;
     Integer outcome;
-    List<SetScore> setScores;
+    Integer[] points;
     List<MatchPlayer> players;
     String facilityId;
     Facility facility;
@@ -120,11 +163,22 @@ public class Match extends DynamicEntity {
 
     public Match() {
         super();
+        points = new Integer[6];
+        points[0] = 0;
+        points[1] = 0;
+        points[2] = 0;
+        points[3] = 0;
+        points[4] = 0;
+        points[5] = 0;
     }
 
     public Match(String id, Long version, Integer syncState,
                  Integer matchType, LocalDate scheduledDt, LocalTime scheduledTm,
-                 Integer matchFormat, Integer outcome, String facilityId,
+                 Integer matchFormat, Integer outcome,
+                 Integer set1HomePoints, Integer set1VisitorPoints,
+                 Integer set2HomePoints, Integer set2VisitorPoints,
+                 Integer set3HomePoints, Integer set3VisitorPoints,
+                 String facilityId,
                  String leagueFlightId, Integer leagueWeek, LocalDate deadlineDt) {
         super(id, version, syncState);
 
@@ -134,6 +188,13 @@ public class Match extends DynamicEntity {
 
         this.matchFormat = matchFormat;
         this.outcome = outcome;
+        this.points = new Integer[6];
+        points[0] = set1HomePoints;
+        points[1] = set1VisitorPoints;
+        points[2] = set2HomePoints;
+        points[3] = set2VisitorPoints;
+        points[4] = set3HomePoints;
+        points[5] = set3VisitorPoints;
         this.facilityId = facilityId;
 
         this.leagueFlightId = leagueFlightId;
@@ -141,7 +202,7 @@ public class Match extends DynamicEntity {
         this.deadlineDt = deadlineDt;
     }
 
-    public MatchPlayer findPlayer(String userId) {
+    public MatchPlayer findPlayerByUserId(String userId) {
         MatchPlayer playerToReturn = null;
 
         if(players != null) {
@@ -203,12 +264,12 @@ public class Match extends DynamicEntity {
         this.outcome = outcome;
     }
 
-    public List<SetScore> getSetScores() {
-        return setScores;
+    public Integer[] getPoints() {
+        return points;
     }
 
-    public void setSetScores(List<SetScore> setScores) {
-        this.setScores = setScores;
+    public void setPoints(Integer[] points) {
+        this.points = points;
     }
 
     public List<MatchPlayer> getPlayers() {

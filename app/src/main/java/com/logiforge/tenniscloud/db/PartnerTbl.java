@@ -6,6 +6,7 @@ import android.database.Cursor;
 import com.logiforge.lavolta.android.db.DbDynamicTable;
 import com.logiforge.lavolta.android.model.DynamicEntity;
 import com.logiforge.lavolta.android.model.api.sync.InventoryItem;
+import com.logiforge.tenniscloud.db.util.DbUtil;
 import com.logiforge.tenniscloud.model.MatchPlayer;
 import com.logiforge.tenniscloud.model.Partner;
 
@@ -17,7 +18,7 @@ import java.util.List;
  */
 public class PartnerTbl extends DbDynamicTable {
     public static final String TABLE_NAME = "PARTNER";
-    public static final String COL_LEAGUE_REGISTRATION_ID = "LEAGUE_REGISTRATION";
+    public static final String COL_LEAGUE_REGISTRATION_ID = "LEAGUE_REGISTRATION_ID";
     public static final String COL_FIRST_LAST_NAME = "FIRST_LAST_NAME";
     public static final String COL_PHONE_NUMBER = "PHONE_NUMBER";
     public static final String COL_USER_ID = "USER_ID";
@@ -74,17 +75,46 @@ public class PartnerTbl extends DbDynamicTable {
 
     @Override
     protected ContentValues getContentForInsert(DynamicEntity dynamicEntity) {
-        return null;
+        return getContentForUpdate(dynamicEntity);
     }
 
     @Override
     protected ContentValues getContentForUpdate(DynamicEntity dynamicEntity) {
-        return null;
+        Partner partner = (Partner)dynamicEntity;
+
+        ContentValues values = new ContentValues();
+        values.put(COL_LEAGUE_REGISTRATION_ID, partner.getLeagueRegistrationId());
+        values.put(COL_FIRST_LAST_NAME, partner.getFirstLastName());
+        values.put(COL_PHONE_NUMBER, partner.getPhoneNbr());
+        values.put(COL_USER_ID, partner.getUserId());
+        values.put(COL_CONTACT_ID, partner.getContactId());
+        values.put(COL_LEAGUE_PROFILE_ID, partner.getLeagueProfileId());
+
+        return values;
     }
 
     @Override
     protected String getTableName() {
         return TABLE_NAME;
+    }
+
+    public Partner getByRegistrationId(String registrationId) {
+        Partner p = null;
+
+        Cursor c;
+        c = db.query(TABLE_NAME, null,
+                COL_LEAGUE_REGISTRATION_ID+"=?",
+                new String[]{registrationId},
+                null, null, null);
+
+        if (c.moveToFirst()) {
+            p = fromCursor(c);
+        }
+        if (c != null && !c.isClosed()) {
+            c.close();
+        }
+
+        return p;
     }
 
     private Partner fromCursor(Cursor c) {
