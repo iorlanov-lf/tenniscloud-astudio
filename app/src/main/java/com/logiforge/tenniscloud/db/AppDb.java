@@ -57,6 +57,7 @@ public class AppDb extends SQLiteOpenHelper
         db.execSQL(LeagueMetroAreaTbl.CREATE_STATEMENT);
         db.execSQL(LeagueProfileTbl.CREATE_STATEMENT);
         db.execSQL(LeagueProfileEmailTbl.CREATE_STATEMENT);
+        db.execSQL(LeagueProfilePhoneTbl.CREATE_STATEMENT);
         db.execSQL(LeagueProviderTbl.CREATE_STATEMENT);
         db.execSQL(LeagueRegistrationTbl.CREATE_STATEMENT);
 
@@ -64,16 +65,22 @@ public class AppDb extends SQLiteOpenHelper
         db.execSQL(MatchAvailabilityTbl.CREATE_STATEMENT);
         db.execSQL(MatchPlayerTbl.CREATE_STATEMENT);
         db.execSQL(MatchPlayerEmailTbl.CREATE_STATEMENT);
+        db.execSQL(MatchPlayerPhoneTbl.CREATE_STATEMENT);
 
         db.execSQL(PartnerTbl.CREATE_STATEMENT);
         db.execSQL(PartnerEmailTbl.CREATE_STATEMENT);
+        db.execSQL(PartnerPhoneTbl.CREATE_STATEMENT);
+
         db.execSQL(PlayingLevelTbl.CREATE_STATEMENT);
 
         db.execSQL(TCUserTbl.CREATE_STATEMENT);
         db.execSQL(TCUserEmailTbl.CREATE_STATEMENT);
+        db.execSQL(TCUserPhoneTbl.CREATE_STATEMENT);
         db.execSQL(TCUserFacilityTbl.CREATE_STATEMENT);
+
         db.execSQL(TennisContactTbl.CREATE_STATEMENT);
         db.execSQL(TennisContactEmailTbl.CREATE_STATEMENT);
+        db.execSQL(TennisContactPhoneTbl.CREATE_STATEMENT);
     }
 
     @Override

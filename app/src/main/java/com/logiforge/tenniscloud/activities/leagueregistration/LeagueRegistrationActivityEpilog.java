@@ -6,12 +6,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.logiforge.tenniscloud.R;
+import com.logiforge.tenniscloud.activities.util.ContactInfoView;
 import com.logiforge.tenniscloud.activities.util.EmailListView;
+import com.logiforge.tenniscloud.activities.util.PhoneListView;
 import com.logiforge.tenniscloud.facades.LeagueRegistrationFacade;
 import com.logiforge.tenniscloud.facades.TCUserFacade;
 import com.logiforge.tenniscloud.model.League;
@@ -19,6 +19,8 @@ import com.logiforge.tenniscloud.model.LeagueProfile;
 import com.logiforge.tenniscloud.model.Partner;
 import com.logiforge.tenniscloud.model.TCUser;
 import com.logiforge.tenniscloud.model.TCUserEmail;
+import com.logiforge.tenniscloud.model.TCUserPhone;
+import com.logiforge.tenniscloud.model.util.Phone;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,11 +31,13 @@ import static com.logiforge.tenniscloud.activities.leagueregistration.LeagueRegi
 import static com.logiforge.tenniscloud.activities.leagueregistration.LeagueRegistrationActivityProlog.level;
 import static com.logiforge.tenniscloud.activities.leagueregistration.LeagueRegistrationActivityProlog.facility;
 import static com.logiforge.tenniscloud.activities.leagueregistration.LeagueRegistrationActivityProlog.profile;
-import static com.logiforge.tenniscloud.activities.leagueregistration.LeagueRegistrationActivityProlog.partner;
 import static com.logiforge.tenniscloud.activities.leagueregistration.LeagueRegistrationActivityProlog.registration;
 
 public class LeagueRegistrationActivityEpilog extends AppCompatActivity {
     private static final String TAG = LeagueRegistrationActivityEpilog.class.getSimpleName();
+
+    ContactInfoView profileView;
+    ContactInfoView partnerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,130 +46,97 @@ public class LeagueRegistrationActivityEpilog extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        if(profile == null) {
-            profile = new LeagueProfile();
+        profileView = (ContactInfoView)findViewById(R.id.view_self);
+        partnerView = (ContactInfoView)findViewById(R.id.view_partner);
 
-            LinearLayout profileLayout = (LinearLayout) findViewById(R.id.layout_profile);
+        if(savedInstanceState == null) {
+            if (profile == null) {
 
-            TCUser user = TCUserFacade.builder().resolveEmails().build();
+                TCUser user = TCUserFacade.builder().resolveEmails().resolvePhones().build();
 
-            List<String> userEmails = new ArrayList<String>();
-            for(TCUserEmail userEmail : user.getEmails()) {
-                userEmails.add(userEmail.getEmail());
+                EditText etDisplayName = (EditText) findViewById(R.id.edit_displayName);
+                etDisplayName.setText(user.getDisplayName());
+                etDisplayName.setError(null);
+
+                List<String> userEmails = new ArrayList<String>();
+                for (TCUserEmail userEmail : user.getEmails()) {
+                    userEmails.add(userEmail.getEmail());
+                }
+                EmailListView emailListView = (EmailListView) findViewById(R.id.view_emails);
+                emailListView.initItems(userEmails);
+
+                List<Phone> userPhones = new ArrayList<Phone>();
+                for (TCUserPhone userPhone : user.getPhones()) {
+                    userPhones.add(new Phone(userPhone.getPhone(), userPhone.getPhoneType()));
+                }
+                PhoneListView phoneListView = (PhoneListView) findViewById(R.id.view_phones);
+                phoneListView.initItems(userPhones);
+            } else {
+                profileView.setVisibility(View.GONE);
             }
-            EmailListView emailListView = (EmailListView) findViewById(R.id.view_emails);
-            emailListView.initItems(userEmails);
-
-            EditText etDisplayName = (EditText)findViewById(R.id.edit_displayName);
-            etDisplayName.setText(user.getDisplayName());
-            etDisplayName.setError(null);
-            profile.setDisplayName(user.getDisplayName());
-            EditText etPhone = (EditText)findViewById(R.id.edit_phone);
-            etPhone.setText(user.getPhoneNbr());
-            etPhone.setError(null);
-            profile.setPhoneNumber(user.getPhoneNbr());
-
-            profileLayout.setVisibility(View.VISIBLE);
-        } else if(profile.id == null) {
-            LinearLayout profileLayout = (LinearLayout)findViewById(R.id.layout_profile);
-            profileLayout.setVisibility(View.VISIBLE);
         }
 
-        if(league.getTeamType() == League.TEAM_TYPE_DOUBLES) {
-            LinearLayout partnerLayout = (LinearLayout)findViewById(R.id.layout_partner);
-            partnerLayout.setVisibility(View.VISIBLE);
-
-            partner = new Partner();
+        if (league.getTeamType() == League.TEAM_TYPE_SINGLES) {
+            partnerView.setVisibility(View.GONE);
         }
     }
 
-    /*
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-
-        LinearLayout profileLayout = (LinearLayout)findViewById(R.id.layout_profile);
-        if(profileLayout.getVisibility() == View.VISIBLE) {
-            EditText displayNameEditText = (EditText) findViewById(R.id.edit_displayName);
-            EditText phoneEditText = (EditText) findViewById(R.id.edit_phone);
-
-            if(profile == null) {
-                profile = new LeagueProfile();
-            }
-
-            profile.setDisplayName(displayNameEditText.getText().toString());
-            profile.setPhoneNumber(phoneEditText.getText().toString());
-        }
-    }*/
-
     public void onSave(final View view) {
         boolean isFormValid = true;
+        LeagueProfile profileToSubmit = profile;
+        Partner partnerToSubmit = null;
 
-        if(profile.id == null) {
-            EmailListView emailListView = (EmailListView) findViewById(R.id.view_emails);
-            List<String> emails = emailListView.getEmails();
+        if(profile == null) {
+            profileToSubmit = new LeagueProfile();
+
+            if(profileView.getName().length() == 0) {
+                profileView.setNameError("Required!");
+                isFormValid = false;
+            } else {
+                profileToSubmit.setDisplayName(profileView.getName());
+            }
+
+            List<String> emails = profileView.getEmails();
             if(emails.size() == 0) {
-                emailListView.setError("Required!");
+                profileView.setEmailError("Required!");
                 isFormValid = false;
             } else {
-                profile.setEmails2(emails);
+                profileToSubmit.setEmailsFromStrings(emails);
             }
 
-            EditText etDisplayName = (EditText)findViewById(R.id.edit_displayName);
-            profile.setDisplayName(etDisplayName.getText().toString());
-            if(etDisplayName.getText().length() == 0) {
-                etDisplayName.setError("Required!");
-                etDisplayName.requestFocus();
-                isFormValid = false;
-            } else {
-                profile.setDisplayName(etDisplayName.getText().toString());
-            }
-
-            EditText etPhone = (EditText)findViewById(R.id.edit_phone);
-            profile.setPhoneNumber(etPhone.getText().toString());
-            if(etPhone.getText().length() == 0) {
-                etPhone.setError("Required!");
-                etPhone.requestFocus();
-                isFormValid = false;
-            } else {
-                profile.setPhoneNumber(etPhone.getText().toString());
+            List<Phone> phones = profileView.getPhones();
+            if(phones.size() > 0) {
+                profileToSubmit.setPhonesFromUtilPhones(phones);
             }
         }
 
-        if(partner != null) {
-            EmailListView emailListView = (EmailListView) findViewById(R.id.view_partner_emails);
-            List<String> emails = emailListView.getEmails();
+        if(league.getTeamType() == League.TEAM_TYPE_DOUBLES) {
+            partnerToSubmit = new Partner();
+
+            if(partnerView.getName().length() == 0) {
+                partnerView.setNameError("Required!");
+                isFormValid = false;
+            } else {
+                partnerToSubmit.setDisplayName(partnerView.getName());
+            }
+
+            List<String> emails = partnerView.getEmails();
             if(emails.size() == 0) {
-                emailListView.setError("Required!");
+                partnerView.setEmailError("Required!");
                 isFormValid = false;
             } else {
-                partner.setEmails2(emails);
+                partnerToSubmit.setEmailsFromStrings(emails);
             }
 
-            EditText etDisplayName = (EditText)findViewById(R.id.edit_displayName);
-            profile.setDisplayName(etDisplayName.getText().toString());
-            if(etDisplayName.getText().length() == 0) {
-                etDisplayName.setError("Required!");
-                etDisplayName.requestFocus();
-                isFormValid = false;
-            } else {
-                profile.setDisplayName(etDisplayName.getText().toString());
-            }
-
-            EditText etPhone = (EditText)findViewById(R.id.edit_phone);
-            profile.setPhoneNumber(etPhone.getText().toString());
-            if(etPhone.getText().length() == 0) {
-                etPhone.setError("Required!");
-                etPhone.requestFocus();
-                isFormValid = false;
-            } else {
-                profile.setPhoneNumber(etPhone.getText().toString());
+            List<Phone> phones = partnerView.getPhones();
+            if(phones.size() > 0) {
+                partnerToSubmit.setPhonesFromUtilPhones(phones);
             }
         }
 
         if(isFormValid) {
             LeagueRegistrationFacade regFacade = new LeagueRegistrationFacade();
-            registration = regFacade.createLeagueRegistration(provider, metroArea, league, level, facility, profile, partner);
+            registration = regFacade.createLeagueRegistration(provider, metroArea, league, level, facility, profileToSubmit, partnerToSubmit);
 
             if(registration != null) {
                 setResult(Activity.RESULT_OK);

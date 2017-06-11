@@ -29,6 +29,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EditLeagueMatchActivity extends AppCompatActivity {
+    static final String MATCH_FRAGMENT_TAG_KEY = "matchFragmentTag";
+    static final String PLAYERS_FRAGMENT_TAG_KEY = "playersFragmentTag";
+    static final String SCHEDULE_FRAGMENT_TAG_KEY = "scheduleFragmentTag";
+
     protected static Match match;
     public static void initStaticData(Match match) {
         LeagueMatchFacade.Builder matchBuilder = new LeagueMatchFacade.Builder(match);
@@ -39,9 +43,10 @@ public class EditLeagueMatchActivity extends AppCompatActivity {
     private TextView providerTextView;
     private TextView leagueTextView;
     private TabLayout tabLayout;
-    private MatchFragment matchFragment;
-    private PlayersFragment playersFragment;
-    private ScheduleFragment scheduleFragment;
+
+    public String matchFragmentTag;
+    public String playersFragmentTag;
+    public String scheduleFragmentTag;
 
     private EditLeagueMatchPagerAdapter pagerAdapter;
     private ViewPager viewPager;
@@ -70,6 +75,20 @@ public class EditLeagueMatchActivity extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.container);
         viewPager.setAdapter(pagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
+
+        if(savedInstanceState != null) {
+            matchFragmentTag = savedInstanceState.getString(MATCH_FRAGMENT_TAG_KEY);
+            playersFragmentTag = savedInstanceState.getString(PLAYERS_FRAGMENT_TAG_KEY);
+            scheduleFragmentTag = savedInstanceState.getString(SCHEDULE_FRAGMENT_TAG_KEY);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putString(MATCH_FRAGMENT_TAG_KEY, matchFragmentTag);
+        savedInstanceState.putString(PLAYERS_FRAGMENT_TAG_KEY, playersFragmentTag);
+        savedInstanceState.putString(SCHEDULE_FRAGMENT_TAG_KEY, scheduleFragmentTag);
     }
 
     public void onCancel(final View view) {
@@ -78,46 +97,48 @@ public class EditLeagueMatchActivity extends AppCompatActivity {
     }
 
     public void onSave(final View view) {
-        // match attributes
-        if(matchFragment != null) {
-            if(matchFragment.validate()) {
-                match.setLeagueWeek(matchFragment.getMatchWeek());
-                match.setDeadlineDt(matchFragment.getDeadlineDt());
-                match.setScheduledDt(matchFragment.getScheduledDt());
-                match.setScheduledTm(matchFragment.getScheduledTm());
-                match.setOutcome(matchFragment.getOutcome());
-                Integer[] points = matchFragment.getPoints();
-                match.setPoints(points);
-            } else {
-                return;
-            }
+        MatchFragment matchFragment =
+                (MatchFragment)getSupportFragmentManager().findFragmentByTag(matchFragmentTag);
+        PlayersFragment playersFragment =
+                (PlayersFragment)getSupportFragmentManager().findFragmentByTag(playersFragmentTag);
+
+        if(!matchFragment.validate()) {
+            Toast.makeText(this, "There are errors on Match page", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        // players
-        List<MatchPlayer> playersToUpdate = new ArrayList<MatchPlayer>();
-        if(matchFragment != null) {
-            TCUserFacade userFacade = new TCUserFacade();
-            MatchPlayer me = match.findPlayerByUserId(userFacade.getSelf().id);
-            Match.HomeAway homeAway = matchFragment.getHomeAway();
-            if ((me.getHomeTeam() && homeAway == Match.HomeAway.AwayMatch) ||
-                    (!me.getHomeTeam() && homeAway == Match.HomeAway.HomeMatch)) {
-                List<MatchPlayer> players = match.getPlayers();
-                if (players != null) {
-                    for (MatchPlayer player : players) {
-                        player.setHomeTeam(!player.getHomeTeam());
-                        playersToUpdate.add(player);
-                    }
-                }
-            }
+        if(!playersFragment.validate()) {
+            Toast.makeText(this, "There are errors on Players page", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        // scores
         LeagueMatchFacade matchFacade = new LeagueMatchFacade();
-        if(matchFacade.updateLeagueMatch(this, match, playersToUpdate)) {
+
+        Match updatedMatch = new Match(match);
+        updatedMatch.setLeagueWeek(matchFragment.getMatchWeek());
+        updatedMatch.setDeadlineDt(matchFragment.getDeadlineDt());
+        updatedMatch.setScheduledDt(matchFragment.getScheduledDt());
+        updatedMatch.setScheduledTm(matchFragment.getScheduledTm());
+        updatedMatch.setOutcome(matchFragment.getOutcome());
+        Integer[] points = matchFragment.getPoints();
+        updatedMatch.setPoints(points);
+        matchFacade.setPlayerHomeTeam(updatedMatch, matchFragment.getHomeAway());
+
+        if(matchFacade.updateLeagueMatch(this, match, updatedMatch)) {
             setResult(Activity.RESULT_OK);
             finish();
         } else {
             Toast.makeText(this, "Unable to update match", Toast.LENGTH_SHORT);
+        }
+    }
+
+    public void onDelete(final View view) {
+        LeagueMatchFacade matchFacade = new LeagueMatchFacade();
+        if(matchFacade.unsubscribeFromLeagueMatch(this, match)) {
+            setResult(Activity.RESULT_OK);
+            finish();
+        } else {
+            Toast.makeText(this, "Unable to delete match", Toast.LENGTH_SHORT);
         }
     }
 
@@ -132,14 +153,11 @@ public class EditLeagueMatchActivity extends AppCompatActivity {
         @Override
         public Fragment getItem(int position) {
             if(position == 0) {
-                matchFragment = new MatchFragment();
-                return matchFragment;
+                return new MatchFragment();
             } else if(position == 1) {
-                playersFragment = new PlayersFragment();
-                return playersFragment;
+                return new PlayersFragment();
             } else  {
-                scheduleFragment = new ScheduleFragment();
-                return scheduleFragment;
+                return new ScheduleFragment();
             }
         }
 

@@ -10,28 +10,35 @@ import com.logiforge.tenniscloud.db.FacilityTbl;
 import com.logiforge.tenniscloud.db.LeagueFlightTbl;
 import com.logiforge.tenniscloud.db.LeagueMetroAreaTbl;
 import com.logiforge.tenniscloud.db.LeagueProfileEmailTbl;
+import com.logiforge.tenniscloud.db.LeagueProfilePhoneTbl;
 import com.logiforge.tenniscloud.db.LeagueProfileTbl;
 import com.logiforge.tenniscloud.db.LeagueProviderTbl;
 import com.logiforge.tenniscloud.db.LeagueRegistrationTbl;
 import com.logiforge.tenniscloud.db.LeagueTbl;
 import com.logiforge.tenniscloud.db.PartnerEmailTbl;
+import com.logiforge.tenniscloud.db.PartnerPhoneTbl;
 import com.logiforge.tenniscloud.db.PartnerTbl;
 import com.logiforge.tenniscloud.db.PlayingLevelTbl;
 import com.logiforge.tenniscloud.db.TCLavoltaDb;
 import com.logiforge.tenniscloud.db.TCUserEmailTbl;
+import com.logiforge.tenniscloud.db.TCUserPhoneTbl;
 import com.logiforge.tenniscloud.model.Facility;
 import com.logiforge.tenniscloud.model.League;
 import com.logiforge.tenniscloud.model.LeagueFlight;
 import com.logiforge.tenniscloud.model.LeagueMetroArea;
 import com.logiforge.tenniscloud.model.LeagueProfile;
 import com.logiforge.tenniscloud.model.LeagueProfileEmail;
+import com.logiforge.tenniscloud.model.LeagueProfilePhone;
 import com.logiforge.tenniscloud.model.LeagueProvider;
 import com.logiforge.tenniscloud.model.LeagueRegistration;
 import com.logiforge.tenniscloud.model.Partner;
 import com.logiforge.tenniscloud.model.PartnerEmail;
+import com.logiforge.tenniscloud.model.PartnerPhone;
 import com.logiforge.tenniscloud.model.PlayingLevel;
 import com.logiforge.tenniscloud.model.TCUser;
 import com.logiforge.tenniscloud.model.TCUserEmail;
+import com.logiforge.tenniscloud.model.TCUserPhone;
+import com.logiforge.tenniscloud.model.util.Phone;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -108,7 +115,7 @@ public class LeagueRegistrationFacade {
                     // partner
                     PartnerFacade.Builder partnerBuilder =
                             new PartnerFacade.Builder(partnerTbl.getByRegistrationId(registration.id));
-                    Partner partner = partnerBuilder.resolveEmails().build();
+                    Partner partner = partnerBuilder.resolveEmails().resolvePhones().build();
                     registration.setPartner(partner);
                 }
             }
@@ -139,7 +146,7 @@ public class LeagueRegistrationFacade {
             }
 
             if(profile.id == null) {
-                TCUser self = TCUserFacade.builder().resolveEmails().build();
+                TCUser self = TCUserFacade.builder().resolveEmails().resolvePhones().build();
                 profile.setUserId(self.id);
                 profile.setLeagueMetroAreaId(area.id);
                 LeagueProfileTbl profileTbl = new LeagueProfileTbl();
@@ -166,6 +173,28 @@ public class LeagueRegistrationFacade {
                         userEmailTbl.uiAdd(txn, newUserEmail, null);
                     }
                 }
+
+                LeagueProfilePhoneTbl profilePhoneTbl = new LeagueProfilePhoneTbl();
+                TCUserPhoneTbl userPhoneTbl = new TCUserPhoneTbl();
+                for(LeagueProfilePhone phone : profile.getPhones()) {
+                    phone.setLeagueProfileId(profile.id);
+                    profilePhoneTbl.uiAdd(txn, phone, null);
+
+                    // see if there are new phones
+                    boolean found = false;
+                    for (TCUserPhone userPhone : self.getPhones())
+                    {
+                        if( Phone.compareNumbers(userPhone.getPhone(), phone.getPhone()) ) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if(!found) {
+                        TCUserPhone newUserPhone = new TCUserPhone(self.id, phone.getPhone(), phone.getPhoneType());
+                        userPhoneTbl.uiAdd(txn, newUserPhone, null);
+                    }
+                }
             }
 
             registration = new LeagueRegistration();
@@ -183,6 +212,12 @@ public class LeagueRegistrationFacade {
                 for(PartnerEmail email : partner.getEmails()) {
                     email.setPartnerId(partner.id);
                     partnerEmailTbl.uiAdd(txn, email, null);
+                }
+
+                PartnerPhoneTbl partnerPhoneTbl = new PartnerPhoneTbl();
+                for(PartnerPhone phone : partner.getPhones()) {
+                    phone.setPartnerId(partner.id);
+                    partnerPhoneTbl.uiAdd(txn, phone, null);
                 }
             }
 

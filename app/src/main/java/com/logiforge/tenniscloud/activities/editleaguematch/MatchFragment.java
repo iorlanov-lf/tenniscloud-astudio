@@ -2,6 +2,7 @@ package com.logiforge.tenniscloud.activities.editleaguematch;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -200,6 +201,14 @@ public class MatchFragment extends Fragment {
         }
 
         return rootView;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        EditLeagueMatchActivity activity = (EditLeagueMatchActivity)context;
+        activity.matchFragmentTag = this.getTag();
     }
 
     @Override

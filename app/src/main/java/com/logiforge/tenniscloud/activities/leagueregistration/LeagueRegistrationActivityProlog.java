@@ -54,7 +54,6 @@ public class LeagueRegistrationActivityProlog extends AppCompatActivity
     public static PlayingLevel level;
     public static Facility facility;
     public static LeagueProfile profile;
-    public static Partner partner;
     public static LeagueRegistration registration;
 
     TextView providerTextView;
@@ -251,7 +250,7 @@ public class LeagueRegistrationActivityProlog extends AppCompatActivity
         if(isFormValid) {
             if(profile != null && league.getTeamType() == League.TEAM_TYPE_SINGLES) {
                 LeagueRegistrationFacade regFacade = new LeagueRegistrationFacade();
-                registration = regFacade.createLeagueRegistration(provider, metroArea, league, level, facility, profile, partner);
+                registration = regFacade.createLeagueRegistration(provider, metroArea, league, level, facility, profile, null);
 
                 if (registration != null) {
                     setResult(Activity.RESULT_OK);

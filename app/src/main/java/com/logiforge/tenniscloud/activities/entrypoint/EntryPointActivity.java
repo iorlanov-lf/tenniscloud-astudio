@@ -22,6 +22,7 @@ import com.logiforge.tenniscloud.db.LeagueTbl;
 import com.logiforge.tenniscloud.db.MatchTbl;
 import com.logiforge.tenniscloud.db.PlayingLevelTbl;
 import com.logiforge.tenniscloud.db.TCUserEmailTbl;
+import com.logiforge.tenniscloud.db.TCUserPhoneTbl;
 import com.logiforge.tenniscloud.db.TCUserTbl;
 import com.logiforge.tenniscloud.model.League;
 import com.logiforge.tenniscloud.model.LeagueFlight;
@@ -31,6 +32,8 @@ import com.logiforge.tenniscloud.model.Match;
 import com.logiforge.tenniscloud.model.PlayingLevel;
 import com.logiforge.tenniscloud.model.TCUser;
 import com.logiforge.tenniscloud.model.TCUserEmail;
+import com.logiforge.tenniscloud.model.TCUserPhone;
+import com.logiforge.tenniscloud.model.util.PhoneType;
 
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
@@ -69,12 +72,17 @@ public class EntryPointActivity extends AppCompatActivity {
                 // TCUser
                 String iorlanovUUID = UUID.randomUUID().toString();
                 userTbl.syncAdd(new TCUser(iorlanovUUID, 0L, DbDynamicTable.SYNC_STATE_ADDED,
-                        "iorlanov", "Igor Orlanov", "770 633-0568", TCUser.GENDER_MALE));
+                        "iorlanov", "Igor Orlanov", TCUser.GENDER_MALE));
                 TCUserEmailTbl userEmailTable = new TCUserEmailTbl();
                 userEmailTable.syncAdd(new TCUserEmail(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
                         iorlanovUUID, "iorlanov@comcast.net", true));
                 userEmailTable.syncAdd(new TCUserEmail(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
                         iorlanovUUID, "igor.orlanov@logiforge.com", false));
+                TCUserPhoneTbl userPhoneTbl = new TCUserPhoneTbl();
+                userPhoneTbl.syncAdd(new TCUserPhone(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
+                        iorlanovUUID, "770 633-0568", PhoneType.CELL.getId()));
+                userPhoneTbl.syncAdd(new TCUserPhone(UUID.randomUUID().toString(), 0L, DbDynamicTable.SYNC_STATE_ADDED,
+                        iorlanovUUID, "770 613-9861", PhoneType.HOME.getId()));
 
                 // PROVIDERS
                 LeagueProviderTbl leagueProviderTbl = new LeagueProviderTbl();

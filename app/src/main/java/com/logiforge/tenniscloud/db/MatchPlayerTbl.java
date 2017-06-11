@@ -20,9 +20,9 @@ import java.util.List;
 public class MatchPlayerTbl extends DbDynamicTable {
     public static final String TABLE_NAME = "MATCH_PLAYER";
     public static final String COL_MATCH_ID = "MATCH_ID";
+    public static final String COL_IS_SUBSCRIBED = "IS_SUBSCRIBED";
     public static final String COL_IS_HOME_TEAM = "IS_HOME_TEAM";
-    public static final String COL_FIRST_LAST_NAME = "FIRST_LAST_NAME";
-    public static final String COL_PHONE_NUMBER = "PHONE_NUMBER";
+    public static final String COL_DISPLAY_NAME = "DISPLAY_NAME";
     public static final String COL_USER_ID = "USER_ID";
     public static final String COL_CONTACT_ID = "CONTACT_ID";
     public static final String COL_LEAGUE_PROFILE_ID = "LEAGUE_PROFILE_ID";
@@ -33,9 +33,9 @@ public class MatchPlayerTbl extends DbDynamicTable {
                     "VERSION INTEGER," +
                     "SYNC_STATE INTEGER," +
                     "MATCH_ID TEXT," +
+                    "IS_SUBSCRIBED INTEGER," +
                     "IS_HOME_TEAM INTEGER," +
-                    "FIRST_LAST_NAME TEXT," +
-                    "PHONE_NUMBER TEXT," +
+                    "DISPLAY_NAME TEXT," +
                     "USER_ID TEXT," +
                     "CONTACT_ID TEXT," +
                     "LEAGUE_PROFILE_ID TEXT" +
@@ -87,9 +87,9 @@ public class MatchPlayerTbl extends DbDynamicTable {
 
         ContentValues values = new ContentValues();
         values.put(COL_MATCH_ID, matchPlayer.getMatchId());
+        values.put(COL_IS_SUBSCRIBED, DbUtil.toInteger(matchPlayer.getSubscribed()));
         values.put(COL_IS_HOME_TEAM, DbUtil.toInteger(matchPlayer.getHomeTeam()));
-        values.put(COL_FIRST_LAST_NAME, matchPlayer.getFirstLastName());
-        values.put(COL_PHONE_NUMBER, matchPlayer.getPhoneNbr());
+        values.put(COL_DISPLAY_NAME, matchPlayer.getDisplayName());
         values.put(COL_USER_ID, matchPlayer.getUserId());
         values.put(COL_CONTACT_ID, matchPlayer.getContactId());
         values.put(COL_LEAGUE_PROFILE_ID, matchPlayer.getLeagueProfileId());
@@ -135,9 +135,9 @@ public class MatchPlayerTbl extends DbDynamicTable {
                 getLong(COL_VERSION, c),
                 getInt(COL_SYNC_STATE, c),
                 getString(COL_MATCH_ID, c),
+                getBoolean(COL_IS_SUBSCRIBED, c),
                 getBoolean(COL_IS_HOME_TEAM, c),
-                getString(COL_FIRST_LAST_NAME, c),
-                getString(COL_PHONE_NUMBER, c),
+                getString(COL_DISPLAY_NAME, c),
                 getString(COL_USER_ID, c),
                 getString(COL_CONTACT_ID, c),
                 getString(COL_LEAGUE_PROFILE_ID, c)

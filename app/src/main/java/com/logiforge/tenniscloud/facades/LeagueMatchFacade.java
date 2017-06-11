@@ -13,6 +13,7 @@ import com.logiforge.tenniscloud.db.LeagueMetroAreaTbl;
 import com.logiforge.tenniscloud.db.LeagueProviderTbl;
 import com.logiforge.tenniscloud.db.LeagueTbl;
 import com.logiforge.tenniscloud.db.MatchPlayerEmailTbl;
+import com.logiforge.tenniscloud.db.MatchPlayerPhoneTbl;
 import com.logiforge.tenniscloud.db.MatchPlayerTbl;
 import com.logiforge.tenniscloud.db.MatchTbl;
 import com.logiforge.tenniscloud.db.PlayingLevelTbl;
@@ -25,12 +26,18 @@ import com.logiforge.tenniscloud.model.LeagueRegistration;
 import com.logiforge.tenniscloud.model.Match;
 import com.logiforge.tenniscloud.model.MatchPlayer;
 import com.logiforge.tenniscloud.model.MatchPlayerEmail;
+import com.logiforge.tenniscloud.model.MatchPlayerPhone;
 import com.logiforge.tenniscloud.model.Partner;
 import com.logiforge.tenniscloud.model.PartnerEmail;
+import com.logiforge.tenniscloud.model.PartnerPhone;
 import com.logiforge.tenniscloud.model.PlayingLevel;
 
+import org.joda.time.LocalDate;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by iorlanov on 5/2/17.
@@ -63,6 +70,16 @@ public class LeagueMatchFacade {
                 if (resolvePlayersFlag) {
                     MatchPlayerTbl playerTbl = new MatchPlayerTbl();
                     match.setPlayers(playerTbl.findPlayersByMatchId(match.id));
+
+                    for(MatchPlayer player : match.getPlayers()) {
+                        if(player.getLeagueProfileId() == null) {
+                            MatchPlayerEmailTbl emailTbl = new MatchPlayerEmailTbl();
+                            player.setEmails(emailTbl.findEmailsByPlayerId(player.id));
+
+                            MatchPlayerPhoneTbl phoneTbl = new MatchPlayerPhoneTbl();
+                            player.setPhones(phoneTbl.findPhonesByPlayerId(player.id));
+                        }
+                    }
                 }
 
                 if(resolveLeagueData) {
@@ -89,11 +106,96 @@ public class LeagueMatchFacade {
         }
     }
 
+    public static class PlayerBreakdown {
+        public PlayerBreakdown(Match match) {
+            TCUserFacade userFacade = new TCUserFacade();
+            self = match.findPlayerByUserId(userFacade.getSelf().id);
+
+            for(MatchPlayer player : match.getPlayers()) {
+                if(!player.id.equals(self.id)) {
+                    if(player.getHomeTeam() == self.getHomeTeam()) {
+                        partner = player;
+                    } else {
+                        if(opponent1 == null) {
+                            opponent1 = player;
+                        } else {
+                            opponent2 = player;
+                        }
+                    }
+                }
+            }
+        }
+
+        public MatchPlayer self;
+        public MatchPlayer partner;
+        public MatchPlayer opponent1;
+        public MatchPlayer opponent2;
+    }
+
+    private static class MatchBreakdownBuilder {
+        private static final String SCHEDULE_GROUP_UNSCHEDULED = "Unscheduled";
+        private static final String SCHEDULE_GROUP_TODAY = "Scheduled Today";
+        private static final String SCHEDULE_GROUP_NEXT7 = "Scheduled Next 7 Days";
+
+        public void buildTimeBreakdown(List<String> headers, Map<String, List<Match>> matches) {
+            MatchTbl matchTbl = new MatchTbl();
+            List<Match> allMatches = matchTbl.getAll();
+            LocalDate today = LocalDate.now();
+            LocalDate todayPlusEight = LocalDate.now().plusDays(8);
+            for(Match match : allMatches) {
+                Builder builder = new Builder(match);
+                builder.resolveLeagueData().resolvePlayers().build();
+                PlayerBreakdown pb = new PlayerBreakdown(match);
+                if(pb.self.getSubscribed()) {
+
+                    if (match.getScheduledDt() == null) {
+                        addMatch(match, matches, SCHEDULE_GROUP_UNSCHEDULED);
+                    } else if (match.getScheduledDt().equals(today)) {
+                        addMatch(match, matches, SCHEDULE_GROUP_TODAY);
+                    } else if (match.getScheduledDt().isAfter(today) && match.getScheduledDt().isBefore(todayPlusEight)) {
+                        addMatch(match, matches, SCHEDULE_GROUP_NEXT7);
+                    }
+                }
+            }
+
+            if(matches.containsKey(SCHEDULE_GROUP_UNSCHEDULED)) {
+                headers.add(SCHEDULE_GROUP_UNSCHEDULED);
+            }
+
+            if(matches.containsKey(SCHEDULE_GROUP_TODAY)) {
+                headers.add(SCHEDULE_GROUP_TODAY);
+            }
+
+            if(matches.containsKey(SCHEDULE_GROUP_NEXT7)) {
+                headers.add(SCHEDULE_GROUP_NEXT7);
+            }
+        }
+
+        private void addMatch(Match match, Map<String, List<Match>> matches, String header) {
+            List<Match> matchList = matches.get(header);
+            if (matchList == null) {
+                matchList = new ArrayList<Match>();
+                matches.put(header, matchList);
+            }
+            matchList.add(match);
+        }
+    }
+
+    public PlayerBreakdown getPlayerBreakdown(Match match) {
+        PlayerBreakdown playerBreakdown = new PlayerBreakdown(match);
+        return playerBreakdown;
+    }
+
+    public void getMatchBreakdownByTime(List<String> headers, Map<String, List<Match>> matches) {
+        MatchBreakdownBuilder builder = new MatchBreakdownBuilder();
+        builder.buildTimeBreakdown(headers, matches);
+    }
+
     public void createLeagueMatch(
             final Context context, final Match match, final LeagueRegistration registration,
             final Match.HomeAway homeAway, final String opponentEmail, final String opponent2Email) {
-        DummyTask task = new DummyTask(context, "Creating singles match ...");
-        task.execute();
+        //DummyTask task = new DummyTask(context, "Creating league match ...");
+        //task.execute();
 
         League league = registration.getLeagueFlight().getLeague();
         Partner partner = registration.getPartner();
@@ -111,13 +213,15 @@ public class LeagueMatchFacade {
         // PLAYERS
         List<MatchPlayer> players = new ArrayList<MatchPlayer>();
         // self
-        MatchPlayer me = new MatchPlayer(null, homeAway == Match.HomeAway.HomeMatch,
-                null, null,
+        MatchPlayer me = new MatchPlayer(null, true,
+                homeAway == Match.HomeAway.HomeMatch,
+                null,
                 null, null, registration.getLeagueProfileId());
         players.add(me);
         // opponent
-        MatchPlayer opponent = new MatchPlayer(null, !(homeAway == Match.HomeAway.HomeMatch),
-                null, null, null, null, null);
+        MatchPlayer opponent = new MatchPlayer(null, false,
+                !(homeAway == Match.HomeAway.HomeMatch),
+                null, null, null, null);
         List<MatchPlayerEmail> opponentEmails = new ArrayList<MatchPlayerEmail>();
         MatchPlayerEmail opponentMatchPlayerEmail = new MatchPlayerEmail(null, opponentEmail);
         opponentEmails.add(opponentMatchPlayerEmail);
@@ -131,18 +235,25 @@ public class LeagueMatchFacade {
         if(league.getTeamType() == League.TEAM_TYPE_DOUBLES) {
             // partner
             partnerMatchPlayer =
-                    new MatchPlayer(null, me.getHomeTeam(),
-                            partner.getFirstLastName(), partner.getPhoneNbr(), null, null, null);
+                    new MatchPlayer(null, false,
+                            me.getHomeTeam(),
+                            partner.getDisplayName(), null, null, null);
             List<MatchPlayerEmail> partnerEmails = new ArrayList<MatchPlayerEmail>();
             for(PartnerEmail pEmail : partner.getEmails()) {
                 partnerEmails.add(new MatchPlayerEmail(null, pEmail.getEmail()));
             }
             partnerMatchPlayer.setEmails(partnerEmails);
+            List<MatchPlayerPhone> partnerPhones = new ArrayList<MatchPlayerPhone>();
+            for(PartnerPhone pPhone : partner.getPhones()) {
+                partnerPhones.add(new MatchPlayerPhone(null, pPhone.getPhone(), pPhone.getPhoneType()));
+            }
+            partnerMatchPlayer.setPhones(partnerPhones);
             players.add(partnerMatchPlayer);
 
             // opponent 2
-            opponent2 = new MatchPlayer(null, opponent.getHomeTeam(),
-                    null, null, null, null, null);
+            opponent2 = new MatchPlayer(null, false,
+                    opponent.getHomeTeam(),
+                    null, null, null, null);
             List<MatchPlayerEmail> opponent2Emails = new ArrayList<MatchPlayerEmail>();
             opponent2MatchPlayerEmail = new MatchPlayerEmail(null, opponent2Email);
             opponent2Emails.add(opponent2MatchPlayerEmail);
@@ -173,10 +284,18 @@ public class LeagueMatchFacade {
             if(partnerMatchPlayer != null) {
                 partnerMatchPlayer.setMatchId(match.id);
                 matchPlayerTbl.uiAdd(txn, partnerMatchPlayer, null);
+
                 List<MatchPlayerEmail> partnerEmails = partnerMatchPlayer.getEmails();
                 for (MatchPlayerEmail email : partnerEmails) {
                     email.setMatchPlayerId(partnerMatchPlayer.id);
                     emailTbl.uiAdd(txn, email, null);
+                }
+
+                MatchPlayerPhoneTbl phoneTbl = new MatchPlayerPhoneTbl();
+                List<MatchPlayerPhone> partnerPhones = partnerMatchPlayer.getPhones();
+                for (MatchPlayerPhone phone : partnerPhones) {
+                    phone.setMatchPlayertId(partnerMatchPlayer.id);
+                    phoneTbl.uiAdd(txn, phone, null);
                 }
             }
 
@@ -197,21 +316,24 @@ public class LeagueMatchFacade {
     }
 
     public boolean updateLeagueMatch(
-            final Context context, final Match match, final List<MatchPlayer> playersToUpdate) {
+            final Context context, final Match match, final Match updatedMatch) {
         LavoltaDb db = Lavolta.db();
         DbTransaction txn = null;
         try {
             txn = db.beginUiTxn(TCLavoltaDb.ACTION_UPDATE_LEAGUE_MATCH);
 
-            MatchTbl matchTbl = new MatchTbl();
-            matchTbl.uiUpdate(txn, match, null, null);
-
-            MatchPlayerTbl playerTbl = new MatchPlayerTbl();
-            for(MatchPlayer player : playersToUpdate) {
-                playerTbl.uiUpdate(txn, player, null, null);
+            if(updatedMatch.isDifferent(match)) {
+                MatchTbl matchTbl = new MatchTbl();
+                matchTbl.uiUpdate(txn, updatedMatch, null, null);
             }
 
-
+            MatchPlayerTbl playerTbl = new MatchPlayerTbl();
+            for(MatchPlayer updatedPlayer : updatedMatch.getPlayers()) {
+                MatchPlayer originalPlayer = match.findPlayerByPlayerId(updatedPlayer.id);
+                if(updatedPlayer.isDifferent(originalPlayer)) {
+                    playerTbl.uiUpdate(txn, updatedPlayer, null, null);
+                }
+            }
 
             db.commitTxn(txn);
             return true;
@@ -220,6 +342,45 @@ public class LeagueMatchFacade {
             return false;
         } finally {
             db.endTxn(txn, false);
+        }
+    }
+
+    public boolean unsubscribeFromLeagueMatch(
+            final Context context, final Match match) {
+        PlayerBreakdown playerBreakdown = getPlayerBreakdown(match);
+
+        LavoltaDb db = Lavolta.db();
+        DbTransaction txn = null;
+        try {
+            txn = db.beginUiTxn(TCLavoltaDb.ACTION_UNSUBSCRIBE_FROM_LEAGUE_MATCH);
+
+            playerBreakdown.self.setSubscribed(false);
+            MatchPlayerTbl matchPlayerTbl = new MatchPlayerTbl();
+            matchPlayerTbl.uiUpdate(txn, playerBreakdown.self, null, null);
+
+            db.commitTxn(txn);
+            return true;
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage());
+            playerBreakdown.self.setSubscribed(true);
+            return false;
+        } finally {
+            db.endTxn(txn, false);
+        }
+    }
+
+    public void setPlayerHomeTeam(Match match, Match.HomeAway homeAway) {
+        PlayerBreakdown playerBreakdown = new PlayerBreakdown(match);
+
+        playerBreakdown.self.setHomeTeam(homeAway == Match.HomeAway.HomeMatch);
+        if(playerBreakdown.partner != null) {
+            playerBreakdown.partner.setHomeTeam(homeAway == Match.HomeAway.HomeMatch);
+        }
+        if(playerBreakdown.opponent1 != null) {
+            playerBreakdown.opponent1.setHomeTeam(homeAway == Match.HomeAway.AwayMatch);
+        }
+        if(playerBreakdown.opponent2 != null) {
+            playerBreakdown.opponent2.setHomeTeam(homeAway == Match.HomeAway.AwayMatch);
         }
     }
 

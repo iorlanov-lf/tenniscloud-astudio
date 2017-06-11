@@ -1,5 +1,6 @@
 package com.logiforge.tenniscloud.activities.viewleaguematch;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -18,5 +19,13 @@ public class PlayersFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.act_editleaguematch_frag_players, container, false);
         return rootView;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        ViewLeagueMatchActivity activity = (ViewLeagueMatchActivity)context;
+        activity.playersFragmentTag = this.getTag();
     }
 }

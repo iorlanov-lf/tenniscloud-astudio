@@ -1,13 +1,16 @@
 package com.logiforge.tenniscloud.model;
 
 import com.logiforge.lavolta.android.api.protocol.MPackDynEntityConverter;
+import com.logiforge.lavolta.android.db.DbDynamicTable;
 import com.logiforge.lavolta.android.model.DynamicEntity;
 import com.logiforge.tenniscloud.db.LeagueProfileTbl;
+import com.logiforge.tenniscloud.model.util.CmpUtil;
 
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -162,7 +165,7 @@ public class Match extends DynamicEntity {
     }
 
     public Match() {
-        super();
+        super(null, 0L, DbDynamicTable.SYNC_STATE_ADDED);
         points = new Integer[6];
         points[0] = 0;
         points[1] = 0;
@@ -202,6 +205,78 @@ public class Match extends DynamicEntity {
         this.deadlineDt = deadlineDt;
     }
 
+    public Match(Match otherMatch) {
+        super(otherMatch.id, otherMatch.version, otherMatch.syncState);
+
+        this.matchType = otherMatch.matchType;
+        this.scheduledDt = otherMatch.scheduledDt;
+        this.scheduledTm = otherMatch.scheduledTm;
+
+        this.matchFormat = otherMatch.matchFormat;
+        this.outcome = otherMatch.outcome;
+        this.points = new Integer[6];
+        points[0] = new Integer(otherMatch.points[0]);
+        points[1] = new Integer(otherMatch.points[1]);
+        points[2] = new Integer(otherMatch.points[2]);
+        points[3] = new Integer(otherMatch.points[3]);
+        points[4] = new Integer(otherMatch.points[4]);
+        points[5] = new Integer(otherMatch.points[5]);
+        this.facilityId = otherMatch.facilityId;
+
+        this.leagueFlightId = otherMatch.leagueFlightId;
+        this.leagueWeek = otherMatch.leagueWeek;
+        this.deadlineDt = otherMatch.deadlineDt;
+
+        if(otherMatch.players != null) {
+            players = new ArrayList<MatchPlayer>();
+            for(MatchPlayer otherPlayer : otherMatch.players) {
+                players.add(new MatchPlayer(otherPlayer));
+            }
+        }
+    }
+
+    public boolean isDifferent(Match otherMatch) {
+        if(!CmpUtil.eq(this.matchType, otherMatch.matchType)) {
+            return true;
+        }
+
+        if(!CmpUtil.eq(this.scheduledDt, otherMatch.scheduledDt)){
+            return true;
+        }
+
+        if(!CmpUtil.eq(this.scheduledTm, otherMatch.scheduledTm)){
+            return true;
+        }
+
+        if(!CmpUtil.eq(this.matchFormat, otherMatch.matchFormat)){
+            return true;
+        }
+
+        if(!CmpUtil.eq(this.outcome, otherMatch.outcome)){
+            return true;
+        }
+
+        for(int i=0; i<6; i++) {
+            if (!CmpUtil.eq(this.points[i], otherMatch.points[i])) {
+                return true;
+            }
+        }
+
+        if(!CmpUtil.eq(this.facilityId, otherMatch.facilityId)){
+            return true;
+        }
+
+        if(!CmpUtil.eq(this.leagueWeek, otherMatch.leagueWeek)){
+            return true;
+        }
+
+        if(!CmpUtil.eq(this.deadlineDt, otherMatch.deadlineDt)){
+            return true;
+        }
+
+        return false;
+    }
+
     public MatchPlayer findPlayerByUserId(String userId) {
         MatchPlayer playerToReturn = null;
 
@@ -222,6 +297,18 @@ public class Match extends DynamicEntity {
         }
 
         return playerToReturn;
+    }
+
+    public MatchPlayer findPlayerByPlayerId(String playerId) {
+        if(players != null) {
+            for (MatchPlayer player : players) {
+                if(player.id.equals(playerId)) {
+                    return player;
+                }
+            }
+        }
+
+        return null;
     }
 
     public Integer getMatchType() {

@@ -1,6 +1,7 @@
 package com.logiforge.tenniscloud.activities.dashboard;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,6 +13,7 @@ import android.widget.ExpandableListView;
 import com.logiforge.tenniscloud.R;
 import com.logiforge.tenniscloud.activities.viewleaguematch.ViewLeagueMatchActivity;
 import com.logiforge.tenniscloud.db.MatchTbl;
+import com.logiforge.tenniscloud.facades.LeagueMatchFacade;
 import com.logiforge.tenniscloud.model.Match;
 
 import org.joda.time.LocalDate;
@@ -21,9 +23,9 @@ import java.util.HashMap;
 import java.util.List;
 
 public class MatchListFragment extends Fragment {
-    private List<String> listDataHeader; // header titles
-    private HashMap<String, List<Match>> listDataChild;
-    MatchListAdapter listAdapter;
+    private List<String> headers;
+    private HashMap<String, List<Match>> matches;
+    MatchListAdapter matchListAdapter;
 
     public MatchListFragment() {
         // Required empty public constructor
@@ -39,14 +41,14 @@ public class MatchListFragment extends Fragment {
         // preparing list data
         prepareListData();
 
-        listAdapter = new MatchListAdapter(getActivity(), listDataHeader, listDataChild);
+        matchListAdapter = new MatchListAdapter(getActivity(), headers, matches);
 
         // setting list adapter
-        expListView.setAdapter(listAdapter);
+        expListView.setAdapter(matchListAdapter);
         expListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                Match match = (Match)listAdapter.getChild(groupPosition, childPosition);
+                Match match = (Match) matchListAdapter.getChild(groupPosition, childPosition);
                 ViewLeagueMatchActivity.initStaticData(match);
                 Activity activity = MatchListFragment.this.getActivity();
                 Intent intent = new Intent(activity, ViewLeagueMatchActivity.class);
@@ -54,69 +56,39 @@ public class MatchListFragment extends Fragment {
                 return true;
             }
         });
-        for(int i=0; i < listAdapter.getGroupCount(); i++)
+        for(int i = 0; i < matchListAdapter.getGroupCount(); i++)
             expListView.expandGroup(i);
 
         return rootView;
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        DashboardActivity dashboardActivity = (DashboardActivity)context;
+        dashboardActivity.matchListFragmentTag = this.getTag();
+    }
+
     public void refresh() {
         prepareListData();
-        listAdapter.notifyDataSetChanged();
+        matchListAdapter.notifyDataSetChanged();
     }
 
     protected void prepareListData() {
-        if(listDataHeader == null) {
-            listDataHeader = new ArrayList<String>();
+        if(headers == null) {
+            headers = new ArrayList<String>();
         } else {
-            listDataHeader.clear();
+            headers.clear();
         }
 
-        if(listDataChild == null) {
-            listDataChild = new HashMap<String, List<Match>>();
+        if(matches == null) {
+            matches = new HashMap<String, List<Match>>();
         } else {
-            listDataChild.clear();
+            matches.clear();
         }
 
-        MatchTbl matchTbl = new MatchTbl();
-        List<Match> matches = matchTbl.getAll();
-        LocalDate today = LocalDate.now();
-        LocalDate todayPlusEight = LocalDate.now().plusDays(8);
-        for(Match match : matches) {
-            if(match.getScheduledDt() == null) {
-                List<Match> unscheduledList = listDataChild.get("Unscheduled");
-                if(unscheduledList == null) {
-                    unscheduledList = new ArrayList<Match>();
-                    listDataChild.put("Unscheduled", unscheduledList);
-                }
-                unscheduledList.add(match);
-            } else if(match.getScheduledDt().equals(today)) {
-                List<Match> todayList = listDataChild.get("Scheduled Today");
-                if(todayList == null) {
-                    todayList = new ArrayList<Match>();
-                    listDataChild.put("Scheduled Today", todayList);
-                }
-                todayList.add(match);
-            } else if(match.getScheduledDt().isAfter(today) && match.getScheduledDt().isBefore(todayPlusEight) ) {
-                List<Match> nextSevenDaysList = listDataChild.get("Scheduled Next 7 Days");
-                if(nextSevenDaysList == null) {
-                    nextSevenDaysList = new ArrayList<Match>();
-                    listDataChild.put("Scheduled Next 7 Days", nextSevenDaysList);
-                }
-                nextSevenDaysList.add(match);
-            }
-        }
-
-        if(listDataChild.containsKey("Unscheduled")) {
-            listDataHeader.add("Unscheduled");
-        }
-
-        if(listDataChild.containsKey("Scheduled Today")) {
-            listDataHeader.add("Scheduled Today");
-        }
-
-        if(listDataChild.containsKey("Scheduled Next 7 Days")) {
-            listDataHeader.add("Scheduled Next 7 Days");
-        }
+        LeagueMatchFacade matchFacade = new LeagueMatchFacade();
+        matchFacade.getMatchBreakdownByTime(headers, matches);
     }
 }

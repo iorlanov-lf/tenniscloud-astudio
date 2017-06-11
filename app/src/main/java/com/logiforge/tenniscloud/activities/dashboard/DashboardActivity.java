@@ -8,6 +8,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -29,8 +30,12 @@ public class DashboardActivity extends AppCompatActivity
     public static final int REQUEST_NEW_LEAGUE_MATCH = 10;
     public static final int REQUEST_VIEW_LEAGUE_MATCH = 20;
 
-    MatchListFragment matchListFragment;
-    LeagueListFragment leagueListFragment;
+    static final String MATCH_LIST_FRAGMENT_TAG_KEY = "matchListFragmentTag";
+    static final String LEAGUE_LIST_FRAGMENT_TAG_KEY = "leagueListFragmentTag";
+
+    public String matchListFragmentTag;
+    public String leagueListFragmentTag;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +64,18 @@ public class DashboardActivity extends AppCompatActivity
         // Give the TabLayout the ViewPager
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
+
+        if(savedInstanceState != null) {
+            matchListFragmentTag = savedInstanceState.getString(MATCH_LIST_FRAGMENT_TAG_KEY);
+            leagueListFragmentTag = savedInstanceState.getString(LEAGUE_LIST_FRAGMENT_TAG_KEY);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putString(MATCH_LIST_FRAGMENT_TAG_KEY, matchListFragmentTag);
+        savedInstanceState.putString(LEAGUE_LIST_FRAGMENT_TAG_KEY, leagueListFragmentTag);
     }
 
     @Override
@@ -144,10 +161,14 @@ public class DashboardActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_NEW_LEAGUE_MATCH) {
             if(resultCode == RESULT_OK) {
+                MatchListFragment matchListFragment =
+                        (MatchListFragment)getSupportFragmentManager().findFragmentByTag(matchListFragmentTag);
                 matchListFragment.refresh();
             }
         } else if (requestCode == REQUEST_VIEW_LEAGUE_MATCH) {
             if(resultCode == RESULT_OK) {
+                MatchListFragment matchListFragment =
+                        (MatchListFragment)getSupportFragmentManager().findFragmentByTag(matchListFragmentTag);
                 matchListFragment.refresh();
             }
         }
@@ -165,12 +186,10 @@ public class DashboardActivity extends AppCompatActivity
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    matchListFragment = new MatchListFragment();
-                    return matchListFragment;
+                    return new MatchListFragment();
 
                 case 1:
-                    leagueListFragment = new LeagueListFragment();
-                    return leagueListFragment;
+                    return new LeagueListFragment();
 
                 default:
                     return null;

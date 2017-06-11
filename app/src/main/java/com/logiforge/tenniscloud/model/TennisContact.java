@@ -11,8 +11,8 @@ public class TennisContact extends DynamicEntity {
     String userId;
 
     // non-TC contact
-    String firstLastName;
-    String phoneNbr;
+    String displayName;
+    List<TennisContactPhone> phones;
     List<TennisContactEmail> emails;
 
     String otherUserId;
@@ -28,12 +28,11 @@ public class TennisContact extends DynamicEntity {
     }
 
     public TennisContact(String id, Long version, Integer syncState,
-                  String userId, String firstLastName, String phoneNbr, String otherUserId) {
+                  String userId, String displayName, String otherUserId) {
         super(id, version, syncState);
 
         this.userId = userId;
-        this.firstLastName = firstLastName;
-        this.phoneNbr = phoneNbr;
+        this.displayName = displayName;
         this.otherUserId = otherUserId;
     }
 
@@ -45,20 +44,12 @@ public class TennisContact extends DynamicEntity {
         this.userId = userId;
     }
 
-    public String getFirstLastName() {
-        return firstLastName;
+    public String getDisplayName() {
+        return displayName;
     }
 
-    public void setFirstLastName(String firstLastName) {
-        this.firstLastName = firstLastName;
-    }
-
-    public String getPhoneNbr() {
-        return phoneNbr;
-    }
-
-    public void setPhoneNbr(String phoneNbr) {
-        this.phoneNbr = phoneNbr;
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public String getOtherUserId() {
@@ -83,5 +74,13 @@ public class TennisContact extends DynamicEntity {
 
     public void setEmails(List<TennisContactEmail> emails) {
         this.emails = emails;
+    }
+
+    public List<TennisContactPhone> getPhones() {
+        return phones;
+    }
+
+    public void setPhones(List<TennisContactPhone> phones) {
+        this.phones = phones;
     }
 }

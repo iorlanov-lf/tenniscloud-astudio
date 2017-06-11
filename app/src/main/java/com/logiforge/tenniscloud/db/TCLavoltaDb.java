@@ -18,7 +18,8 @@ public class TCLavoltaDb extends LavoltaDb {
     public static final Long ACTION_NEW_LEAGUE_REGISTRATION = 10L;
     public static final Long ACTION_NEW_FACILITY = 20L;
     public static final Long ACTION_NEW_LEAGUE_MATCH = 30L;
-    public static final Long ACTION_UPDATE_LEAGUE_MATCH = 30L;
+    public static final Long ACTION_UPDATE_LEAGUE_MATCH = 40L;
+    public static final Long ACTION_UNSUBSCRIBE_FROM_LEAGUE_MATCH = 50L;
 
     @Override
     protected List<DynEntityMeta> getDynEntityMetaData() {

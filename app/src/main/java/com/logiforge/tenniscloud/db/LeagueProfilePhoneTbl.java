@@ -7,8 +7,7 @@ import com.logiforge.lavolta.android.db.DbDynamicTable;
 import com.logiforge.lavolta.android.model.DynamicEntity;
 import com.logiforge.lavolta.android.model.api.sync.InventoryItem;
 import com.logiforge.tenniscloud.model.LeagueProfileEmail;
-import com.logiforge.tenniscloud.model.MatchPlayer;
-import com.logiforge.tenniscloud.model.MatchPlayerEmail;
+import com.logiforge.tenniscloud.model.LeagueProfilePhone;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,23 +17,25 @@ import java.util.List;
  * Created by iorlanov on 5/5/17.
  */
 
-public class MatchPlayerEmailTbl extends DbDynamicTable {
-    public static final String TABLE_NAME = "MATCH_PLAYER_EMAIL";
-    public static final String COL_MATCH_PLAYER_ID = "MATCH_PLAYER_ID";
-    public static final String COL_EMAIL = "EMAIL";
+public class LeagueProfilePhoneTbl extends DbDynamicTable {
+    public static final String TABLE_NAME = "LEAGUE_PROFILE_PHONE";
+    public static final String COL_LEAGUE_PROFILE_ID = "LEAGUE_PROFILE_ID";
+    public static final String COL_PHONE = "PHONE";
+    public static final String COL_PHONE_TYPE = "PHONE_TYPE";
 
     public static final String CREATE_STATEMENT =
-            "CREATE TABLE MATCH_PLAYER_EMAIL (" +
+            "CREATE TABLE LEAGUE_PROFILE_PHONE (" +
                     "ID TEXT PRIMARY KEY," +
                     "VERSION INTEGER," +
                     "SYNC_STATE INTEGER," +
-                    "MATCH_PLAYER_ID TEXT," +
-                    "EMAIL TEXT" +
+                    "LEAGUE_PROFILE_ID TEXT," +
+                    "PHONE TEXT," +
+                    "PHONE_TYPE INTEGER" +
                     ")";
 
     @Override
     public DynamicEntity find(String id) {
-        MatchPlayerEmail e = null;
+        LeagueProfilePhone phone = null;
 
         Cursor c;
         c = db.query(TABLE_NAME, null,
@@ -43,13 +44,13 @@ public class MatchPlayerEmailTbl extends DbDynamicTable {
                 null, null, null);
 
         if (c.moveToFirst()) {
-            e = fromCursor(c);
+            phone = fromCursor(c);
         }
         if (c != null && !c.isClosed()) {
             c.close();
         }
 
-        return e;
+        return phone;
     }
 
     @Override
@@ -74,11 +75,12 @@ public class MatchPlayerEmailTbl extends DbDynamicTable {
 
     @Override
     protected ContentValues getContentForUpdate(DynamicEntity dynamicEntity) {
-        MatchPlayerEmail playerEmail = (MatchPlayerEmail)dynamicEntity;
+        LeagueProfilePhone profilePhone = (LeagueProfilePhone)dynamicEntity;
 
         ContentValues values = new ContentValues();
-        values.put(COL_MATCH_PLAYER_ID, playerEmail.getMatchPlayerId());
-        values.put(COL_EMAIL, playerEmail.getEmail());
+        values.put(COL_LEAGUE_PROFILE_ID, profilePhone.getLeagueProfileId());
+        values.put(COL_PHONE, profilePhone.getPhone());
+        values.put(COL_PHONE_TYPE, profilePhone.getPhoneType());
 
         return values;
     }
@@ -88,32 +90,33 @@ public class MatchPlayerEmailTbl extends DbDynamicTable {
         return TABLE_NAME;
     }
 
-    public List<MatchPlayerEmail> findEmailsByPlayerId(String partnerId) {
-        List<MatchPlayerEmail> emails = new ArrayList<MatchPlayerEmail>();
+    public List<LeagueProfilePhone> findEmailsByProfileId(String profileId) {
+        List<LeagueProfilePhone> phones = new ArrayList<LeagueProfilePhone>();
 
         Cursor c;
         c = db.query(TABLE_NAME, null,
-                COL_MATCH_PLAYER_ID+"=?",
-                new String[]{partnerId},
+                COL_LEAGUE_PROFILE_ID+"=?",
+                new String[]{profileId},
                 null, null, null);
 
         while (c.moveToNext()) {
-            emails.add(fromCursor(c));
+            phones.add(fromCursor(c));
         }
         if (c != null && !c.isClosed()) {
             c.close();
         }
 
-        return emails;
+        return phones;
     }
 
-    private MatchPlayerEmail fromCursor(Cursor c) {
-        return new MatchPlayerEmail(
+    private LeagueProfilePhone fromCursor(Cursor c) {
+        return new LeagueProfilePhone(
                 getString(COL_ID, c),
                 getLong(COL_VERSION, c),
                 getInt(COL_SYNC_STATE, c),
-                getString(COL_MATCH_PLAYER_ID, c),
-                getString(COL_EMAIL, c)
+                getString(COL_LEAGUE_PROFILE_ID, c),
+                getString(COL_PHONE, c),
+                getInt(COL_PHONE_TYPE, c)
         );
     }
 }

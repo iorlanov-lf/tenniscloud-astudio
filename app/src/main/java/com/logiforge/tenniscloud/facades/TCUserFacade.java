@@ -2,6 +2,7 @@ package com.logiforge.tenniscloud.facades;
 
 import com.logiforge.lavolta.android.facade.LavoltaFacade;
 import com.logiforge.tenniscloud.db.TCUserEmailTbl;
+import com.logiforge.tenniscloud.db.TCUserPhoneTbl;
 import com.logiforge.tenniscloud.db.TCUserTbl;
 import com.logiforge.tenniscloud.model.TCUser;
 
@@ -24,6 +25,7 @@ public class TCUserFacade {
     public static class Builder {
         TCUser user;
         boolean resolveEmailsFlag = false;
+        boolean resolvePhonesFlag = false;
 
         public Builder(TCUser user) {
             this.user = user;
@@ -34,10 +36,20 @@ public class TCUserFacade {
             return this;
         }
 
+        public Builder resolvePhones() {
+            resolvePhonesFlag = true;
+            return this;
+        }
+
         public TCUser build() {
             if(resolveEmailsFlag) {
                 TCUserEmailTbl emailTbl = new TCUserEmailTbl();
                 user.setEmails(emailTbl.findEmailsByUserId(user.id));
+            }
+
+            if(resolvePhonesFlag) {
+                TCUserPhoneTbl phoneTbl = new TCUserPhoneTbl();
+                user.setPhones(phoneTbl.findPhonesByUserId(user.id));
             }
 
             return user;

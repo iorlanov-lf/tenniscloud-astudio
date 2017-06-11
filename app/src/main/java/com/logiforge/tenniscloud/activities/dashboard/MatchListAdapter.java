@@ -1,6 +1,7 @@
 package com.logiforge.tenniscloud.activities.dashboard;
 
 import android.content.Context;
+import android.database.DataSetObserver;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -111,5 +112,10 @@ public class MatchListAdapter extends BaseExpandableListAdapter {
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return true;
+    }
+
+    @Override
+    public void registerDataSetObserver(DataSetObserver observer) {
+        super.registerDataSetObserver(observer);
     }
 }

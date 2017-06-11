@@ -13,8 +13,8 @@ public class TCUser extends DynamicEntity {
 
     String userName;
     String displayName;
-    String phoneNbr;
     Integer gender;
+    List<TCUserPhone> phones;
     List<TCUserEmail> emails;
 
     @Override
@@ -27,12 +27,11 @@ public class TCUser extends DynamicEntity {
     }
 
     public TCUser(String id, Long version, Integer syncState,
-                  String userName, String displayName, String phoneNbr, Integer gender) {
+                  String userName, String displayName, Integer gender) {
         super(id, version, syncState);
 
         this.userName = userName;
         this.displayName = displayName;
-        this.phoneNbr = phoneNbr;
         this.gender = gender;
     }
 
@@ -52,14 +51,6 @@ public class TCUser extends DynamicEntity {
         this.displayName = displayName;
     }
 
-    public String getPhoneNbr() {
-        return phoneNbr;
-    }
-
-    public void setPhoneNbr(String phoneNbr) {
-        this.phoneNbr = phoneNbr;
-    }
-
     public Integer getGender() {
         return gender;
     }
@@ -74,5 +65,13 @@ public class TCUser extends DynamicEntity {
 
     public void setEmails(List<TCUserEmail> emails) {
         this.emails = emails;
+    }
+
+    public List<TCUserPhone> getPhones() {
+        return phones;
+    }
+
+    public void setPhones(List<TCUserPhone> phones) {
+        this.phones = phones;
     }
 }

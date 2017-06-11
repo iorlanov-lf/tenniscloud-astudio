@@ -6,8 +6,6 @@ import android.database.Cursor;
 import com.logiforge.lavolta.android.db.DbDynamicTable;
 import com.logiforge.lavolta.android.model.DynamicEntity;
 import com.logiforge.lavolta.android.model.api.sync.InventoryItem;
-import com.logiforge.tenniscloud.db.util.DbUtil;
-import com.logiforge.tenniscloud.model.MatchPlayer;
 import com.logiforge.tenniscloud.model.Partner;
 
 import java.util.HashMap;
@@ -19,8 +17,7 @@ import java.util.List;
 public class PartnerTbl extends DbDynamicTable {
     public static final String TABLE_NAME = "PARTNER";
     public static final String COL_LEAGUE_REGISTRATION_ID = "LEAGUE_REGISTRATION_ID";
-    public static final String COL_FIRST_LAST_NAME = "FIRST_LAST_NAME";
-    public static final String COL_PHONE_NUMBER = "PHONE_NUMBER";
+    public static final String COL_DISPLAY_NAME = "DISPLAY_NAME";
     public static final String COL_USER_ID = "USER_ID";
     public static final String COL_CONTACT_ID = "CONTACT_ID";
     public static final String COL_LEAGUE_PROFILE_ID = "LEAGUE_PROFILE_ID";
@@ -31,8 +28,7 @@ public class PartnerTbl extends DbDynamicTable {
                     "VERSION INTEGER," +
                     "SYNC_STATE INTEGER," +
                     "LEAGUE_REGISTRATION_ID TEXT," +
-                    "FIRST_LAST_NAME TEXT," +
-                    "PHONE_NUMBER TEXT," +
+                    "DISPLAY_NAME TEXT," +
                     "USER_ID TEXT," +
                     "CONTACT_ID TEXT," +
                     "LEAGUE_PROFILE_ID TEXT" +
@@ -84,8 +80,7 @@ public class PartnerTbl extends DbDynamicTable {
 
         ContentValues values = new ContentValues();
         values.put(COL_LEAGUE_REGISTRATION_ID, partner.getLeagueRegistrationId());
-        values.put(COL_FIRST_LAST_NAME, partner.getFirstLastName());
-        values.put(COL_PHONE_NUMBER, partner.getPhoneNbr());
+        values.put(COL_DISPLAY_NAME, partner.getDisplayName());
         values.put(COL_USER_ID, partner.getUserId());
         values.put(COL_CONTACT_ID, partner.getContactId());
         values.put(COL_LEAGUE_PROFILE_ID, partner.getLeagueProfileId());
@@ -123,8 +118,7 @@ public class PartnerTbl extends DbDynamicTable {
                 getLong(COL_VERSION, c),
                 getInt(COL_SYNC_STATE, c),
                 getString(COL_LEAGUE_REGISTRATION_ID, c),
-                getString(COL_FIRST_LAST_NAME, c),
-                getString(COL_PHONE_NUMBER, c),
+                getString(COL_DISPLAY_NAME, c),
                 getString(COL_USER_ID, c),
                 getString(COL_CONTACT_ID, c),
                 getString(COL_LEAGUE_PROFILE_ID, c)

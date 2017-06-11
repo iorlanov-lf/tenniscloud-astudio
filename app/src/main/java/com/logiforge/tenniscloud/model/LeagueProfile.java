@@ -1,6 +1,8 @@
 package com.logiforge.tenniscloud.model;
 
+import com.logiforge.lavolta.android.db.DbDynamicTable;
 import com.logiforge.lavolta.android.model.DynamicEntity;
+import com.logiforge.tenniscloud.model.util.Phone;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +15,7 @@ public class LeagueProfile extends DynamicEntity {
     String leagueMetroAreaId;
     LeagueMetroArea leagueMetroArea;
     String displayName;
-    String phoneNumber;
+    List<LeagueProfilePhone> phones;
     List<LeagueProfileEmail> emails;
 
     @Override
@@ -22,17 +24,16 @@ public class LeagueProfile extends DynamicEntity {
     }
 
     public LeagueProfile() {
-        super();
+        super(null, 0L, DbDynamicTable.SYNC_STATE_ADDED);
     }
 
     public LeagueProfile(String id, Long version, Integer syncState,
-                  String userId, String leagueMetroAreaId, String displayName, String phoneNumber) {
+                  String userId, String leagueMetroAreaId, String displayName) {
         super(id, version, syncState);
 
         this.userId = userId;
         this.leagueMetroAreaId = leagueMetroAreaId;
         this.displayName = displayName;
-        this.phoneNumber = phoneNumber;
     }
 
     public String getUserId() {
@@ -67,14 +68,6 @@ public class LeagueProfile extends DynamicEntity {
         this.displayName = displayName;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
     public List<LeagueProfileEmail> getEmails() {
         return emails;
     }
@@ -83,10 +76,25 @@ public class LeagueProfile extends DynamicEntity {
         this.emails = emails;
     }
 
-    public void setEmails2(List<String> emailList) {
+    public void setEmailsFromStrings(List<String> emailList) {
         emails = new ArrayList<LeagueProfileEmail>();
         for(String email : emailList) {
             emails.add(new LeagueProfileEmail(null, email));
+        }
+    }
+
+    public List<LeagueProfilePhone> getPhones() {
+        return phones;
+    }
+
+    public void setPhones(List<LeagueProfilePhone> phones) {
+        this.phones = phones;
+    }
+
+    public void setPhonesFromUtilPhones(List<Phone> phoneList) {
+        phones = new ArrayList<LeagueProfilePhone>();
+        for(Phone phone : phoneList) {
+            phones.add(new LeagueProfilePhone(null, phone.number, phone.type));
         }
     }
 }

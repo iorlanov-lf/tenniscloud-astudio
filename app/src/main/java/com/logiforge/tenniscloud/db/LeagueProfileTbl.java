@@ -21,7 +21,6 @@ public class LeagueProfileTbl extends DbDynamicTable {
     public static final String COL_USER_ID = "USER_ID";
     public static final String COL_METRO_AREA_ID = "METRO_AREA_ID";
     public static final String COL_DISPLAY_NAME = "DISPLAY_NAME";
-    public static final String COL_PHONE_NUMBER = "PHONE_NUMBER";
 
     public static final String CREATE_STATEMENT =
             "CREATE TABLE LEAGUE_PROFILE (" +
@@ -30,8 +29,7 @@ public class LeagueProfileTbl extends DbDynamicTable {
                     "SYNC_STATE INTEGER," +
                     "USER_ID TEXT," +
                     "METRO_AREA_ID TEXT," +
-                    "DISPLAY_NAME TEXT," +
-                    "PHONE_NUMBER TEXT" +
+                    "DISPLAY_NAME TEXT" +
                     ")";
 
     @Override
@@ -82,7 +80,6 @@ public class LeagueProfileTbl extends DbDynamicTable {
         values.put(COL_USER_ID, profile.getUserId());
         values.put(COL_METRO_AREA_ID, profile.getLeagueMetroAreaId());
         values.put(COL_DISPLAY_NAME, profile.getDisplayName());
-        values.put(COL_PHONE_NUMBER, profile.getPhoneNumber());
 
         return values;
     }
@@ -137,8 +134,7 @@ public class LeagueProfileTbl extends DbDynamicTable {
                 getInt(COL_SYNC_STATE, c),
                 getString(COL_USER_ID, c),
                 getString(COL_METRO_AREA_ID, c),
-                getString(COL_DISPLAY_NAME, c),
-                getString(COL_PHONE_NUMBER, c)
+                getString(COL_DISPLAY_NAME, c)
         );
     }
 }

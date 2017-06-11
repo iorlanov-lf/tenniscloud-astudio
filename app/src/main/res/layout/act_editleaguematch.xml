@@ -64,8 +64,16 @@
     <android.support.v4.view.ViewPager
         android:id="@+id/container"
         android:layout_below="@+id/tab_layout"
+        android:layout_above="@+id/btn_delete_league_match"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+    <Button
+        android:id="@+id/btn_delete_league_match"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete"
+        android:onClick="onDelete"/>
 </RelativeLayout>

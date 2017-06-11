@@ -27,4 +27,12 @@ public class LeagueListFragment extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.act_dashboard_frag_league_list, container, false);
     }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        DashboardActivity dashboardActivity = (DashboardActivity)context;
+        dashboardActivity.leagueListFragmentTag = this.getTag();
+    }
 }

@@ -25,6 +25,10 @@ import com.logiforge.tenniscloud.model.PlayingLevel;
 public class ViewLeagueMatchActivity extends AppCompatActivity {
     private static final int REQUEST_EDIT = 10;
 
+    static final String MATCH_FRAGMENT_TAG_KEY = "matchFragmentTag";
+    static final String PLAYERS_FRAGMENT_TAG_KEY = "playersFragmentTag";
+    static final String SCHEDULE_FRAGMENT_TAG_KEY = "scheduleFragmentTag";
+
     protected static Match match;
     protected static boolean wasMatchChanged;
     public static void initStaticData(Match match) {
@@ -37,9 +41,10 @@ public class ViewLeagueMatchActivity extends AppCompatActivity {
     private TextView providerTextView;
     private TextView leagueTextView;
     private TabLayout tabLayout;
-    private MatchFragment matchFragment;
-    private PlayersFragment playersFragment;
-    private ScheduleFragment scheduleFragment;
+
+    public String matchFragmentTag;
+    public String playersFragmentTag;
+    public String scheduleFragmentTag;
 
     private ViewLeagueMatchPagerAdapter pagerAdapter;
     private ViewPager viewPager;
@@ -68,6 +73,20 @@ public class ViewLeagueMatchActivity extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.container);
         viewPager.setAdapter(pagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
+
+        if(savedInstanceState != null) {
+            matchFragmentTag = savedInstanceState.getString(MATCH_FRAGMENT_TAG_KEY);
+            playersFragmentTag = savedInstanceState.getString(PLAYERS_FRAGMENT_TAG_KEY);
+            scheduleFragmentTag = savedInstanceState.getString(SCHEDULE_FRAGMENT_TAG_KEY);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putString(MATCH_FRAGMENT_TAG_KEY, matchFragmentTag);
+        savedInstanceState.putString(PLAYERS_FRAGMENT_TAG_KEY, playersFragmentTag);
+        savedInstanceState.putString(SCHEDULE_FRAGMENT_TAG_KEY, scheduleFragmentTag);
     }
 
     public void onDone(final View view) {
@@ -96,6 +115,8 @@ public class ViewLeagueMatchActivity extends AppCompatActivity {
     }
 
     private void populateControls() {
+        MatchFragment matchFragment =
+                (MatchFragment)getSupportFragmentManager().findFragmentByTag(matchFragmentTag);
         if(matchFragment != null) {
             matchFragment.populateControls();
         }
@@ -112,14 +133,11 @@ public class ViewLeagueMatchActivity extends AppCompatActivity {
         @Override
         public Fragment getItem(int position) {
             if(position == 0) {
-                matchFragment = new MatchFragment();
-                return matchFragment;
+                return new MatchFragment();
             } else if(position == 1) {
-                playersFragment = new PlayersFragment();
-                return playersFragment;
+                return new PlayersFragment();
             } else  {
-                scheduleFragment = new ScheduleFragment();
-                return scheduleFragment;
+                return new ScheduleFragment();
             }
         }
 

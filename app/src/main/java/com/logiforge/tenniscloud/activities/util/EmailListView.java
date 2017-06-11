@@ -31,6 +31,8 @@ public class EmailListView extends LinearLayout
 
     LayoutInflater inflater;
 
+    Button addBtn;
+
     public EmailListView(Context context) {
         super(context);
         initViews(context);
@@ -79,6 +81,8 @@ public class EmailListView extends LinearLayout
                     initItems(emailList);
                 }
             }
+
+            setEnabled(isEnabled());
         } else {
             super.onRestoreInstanceState(state);
         }
@@ -95,10 +99,37 @@ public class EmailListView extends LinearLayout
     }
 
     @Override
+    public void setEnabled(boolean isEnabled) {
+        super.setEnabled(isEnabled);
+
+        if(isEnabled) {
+            addBtn.setVisibility(View.VISIBLE);
+        } else {
+            addBtn.setVisibility(View.GONE);
+        }
+
+        for(int i=1; i<getChildCount(); i++) {
+            View itemView = getChildAt(i);
+            EditText editText = (EditText)itemView.findViewById(R.id.edit_email);
+            editText.setEnabled(isEnabled);
+            Button removeBtn = (Button)itemView.findViewById(R.id.btn_remove);
+            if(isEnabled) {
+                removeBtn.setVisibility(View.VISIBLE);
+            } else {
+                removeBtn.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    @Override
     public void onClick(View v) {
         if(v.getId() == R.id.btn_add) {
             LinearLayout emailView = (LinearLayout) inflater.inflate(R.layout.item_editable_email, null);
+            Button removeBtn = (Button)emailView.findViewById(R.id.btn_remove);
+            removeBtn.setOnClickListener(this);
             this.addView(emailView);
+            EditText emailEditText = (EditText)emailView.findViewById(R.id.edit_email);
+            emailEditText.requestFocus();
         } else if(v.getId() == R.id.btn_remove) {
             ViewGroup parent = (ViewGroup)v.getParent();
             this.removeView(parent);
@@ -109,7 +140,7 @@ public class EmailListView extends LinearLayout
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.view_email_list, this);
 
-        Button addBtn = (Button)findViewById(R.id.btn_add);
+        addBtn = (Button)findViewById(R.id.btn_add);
         addBtn.setOnClickListener(this);
     }
 

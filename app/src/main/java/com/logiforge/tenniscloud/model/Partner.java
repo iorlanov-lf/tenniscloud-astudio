@@ -1,6 +1,8 @@
 package com.logiforge.tenniscloud.model;
 
+import com.logiforge.lavolta.android.db.DbDynamicTable;
 import com.logiforge.lavolta.android.model.DynamicEntity;
+import com.logiforge.tenniscloud.model.util.Phone;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +14,8 @@ public class Partner extends DynamicEntity {
     String leagueRegistrationId;
 
     // simple player
-    String firstLastName;
-    String phoneNbr;
+    String DisplayName;
+    List<PartnerPhone> phones;
     List<PartnerEmail> emails;
 
     // TCUser player
@@ -34,18 +36,17 @@ public class Partner extends DynamicEntity {
     }
 
     public Partner() {
-        super();
+        super(null, 0L, DbDynamicTable.SYNC_STATE_ADDED);
     }
 
     public Partner(String id, Long version, Integer syncState,
                    String leagueRegistrationId,
-                   String firstLastName, String phoneNbr,
+                   String displayName,
                    String userId, String contactId, String leagueProfileId) {
         super(id, version, syncState);
 
         this.leagueRegistrationId = leagueRegistrationId;
-        this.firstLastName = firstLastName;
-        this.phoneNbr = phoneNbr;
+        this.DisplayName = displayName;
         this.userId = userId;
         this.contactId = contactId;
         this.leagueProfileId = leagueProfileId;
@@ -59,20 +60,12 @@ public class Partner extends DynamicEntity {
         this.leagueRegistrationId = leagueRegistrationId;
     }
 
-    public String getFirstLastName() {
-        return firstLastName;
+    public String getDisplayName() {
+        return DisplayName;
     }
 
-    public void setFirstLastName(String firstLastName) {
-        this.firstLastName = firstLastName;
-    }
-
-    public String getPhoneNbr() {
-        return phoneNbr;
-    }
-
-    public void setPhoneNbr(String phoneNbr) {
-        this.phoneNbr = phoneNbr;
+    public void setDisplayName(String displayName) {
+        this.DisplayName = displayName;
     }
 
     public String getUserId() {
@@ -131,10 +124,37 @@ public class Partner extends DynamicEntity {
         this.emails = emails;
     }
 
-    public void setEmails2(List<String> emailList) {
+    public List<String> getEmailsAsStrings() {
+        List<String> emailStrings = new ArrayList<String>();
+
+        if(emails != null) {
+            for (PartnerEmail email : emails) {
+                emailStrings.add(email.getEmail());
+            }
+        }
+
+        return emailStrings;
+    }
+
+    public void setEmailsFromStrings(List<String> emailList) {
         emails = new ArrayList<PartnerEmail>();
         for(String email : emailList) {
             emails.add(new PartnerEmail(null, email));
+        }
+    }
+
+    public List<PartnerPhone> getPhones() {
+        return phones;
+    }
+
+    public void setPhones(List<PartnerPhone> phones) {
+        this.phones = phones;
+    }
+
+    public void setPhonesFromUtilPhones(List<Phone> phoneList) {
+        phones = new ArrayList<PartnerPhone>();
+        for(Phone phone : phoneList) {
+            phones.add(new PartnerPhone(null, phone.number, phone.type));
         }
     }
 }
