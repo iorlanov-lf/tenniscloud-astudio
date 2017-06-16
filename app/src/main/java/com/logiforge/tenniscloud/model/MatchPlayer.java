@@ -8,6 +8,7 @@ import com.logiforge.tenniscloud.model.util.ListDiff;
 import com.logiforge.tenniscloud.model.util.Phone;
 
 import java.io.IOException;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +38,9 @@ public class MatchPlayer extends DynamicEntity {
     String leagueProfileId;
     LeagueProfile leagueProfile;
 
+    String leagueRegistrationId;
+    LeagueRegistration leagueRegistration;
+
     @Override
     public String getParentId() {
         return matchId;
@@ -49,7 +53,8 @@ public class MatchPlayer extends DynamicEntity {
     public MatchPlayer(String id, Long version, Integer syncState,
                        String matchId, Boolean isSubscribed,
                        Boolean isHomeTeam, String displayName,
-                       String userId, String contactId, String leagueProfileId) {
+                       String userId, String contactId,
+                       String leagueProfileId, String leagueRegistrationId) {
         super(id, version, syncState);
 
         this.matchId = matchId;
@@ -59,11 +64,13 @@ public class MatchPlayer extends DynamicEntity {
         this.userId = userId;
         this.contactId = contactId;
         this.leagueProfileId = leagueProfileId;
+        this.leagueRegistrationId = leagueRegistrationId;
     }
 
     public MatchPlayer(String matchId, Boolean isSubscribed,
                        Boolean isHomeTeam, String displayName,
-                       String userId, String contactId, String leagueProfileId) {
+                       String userId, String contactId,
+                       String leagueProfileId, String leagueRegistrationId) {
         super(null, 0L, DbDynamicTable.SYNC_STATE_ADDED);
 
         this.matchId = matchId;
@@ -73,6 +80,7 @@ public class MatchPlayer extends DynamicEntity {
         this.userId = userId;
         this.contactId = contactId;
         this.leagueProfileId = leagueProfileId;
+        this.leagueRegistrationId = leagueRegistrationId;
     }
 
     public MatchPlayer(MatchPlayer otherPlayer) {
@@ -85,6 +93,26 @@ public class MatchPlayer extends DynamicEntity {
         this.userId = otherPlayer.userId;
         this.contactId = otherPlayer.contactId;
         this.leagueProfileId = otherPlayer.leagueProfileId;
+        this.leagueRegistrationId = otherPlayer.leagueRegistrationId;
+
+        this.tcUser = otherPlayer.tcUser;
+        this.tennisContact = otherPlayer.tennisContact;
+        this.leagueProfile = otherPlayer.leagueProfile;
+        this.leagueRegistration = otherPlayer.leagueRegistration;
+
+        if(otherPlayer.getEmails() != null) {
+            emails = new ArrayList<>();
+            for (MatchPlayerEmail otherEmail : otherPlayer.getEmails()) {
+                emails.add(new MatchPlayerEmail(otherEmail));
+            }
+        }
+
+        if(otherPlayer.getPhones() != null) {
+            phones = new ArrayList<>();
+            for (MatchPlayerPhone otherPhone : otherPlayer.getPhones()) {
+                phones.add(new MatchPlayerPhone(otherPhone));
+            }
+        }
     }
 
     public boolean isDifferent(MatchPlayer otherPlayer) {
@@ -284,6 +312,25 @@ public class MatchPlayer extends DynamicEntity {
         this.leagueProfile = leagueProfile;
     }
 
+    public String getLeagueRegistrationId() {
+        return leagueRegistrationId;
+    }
+
+    public void setLeagueRegistrationId(String leagueRegistrationId) {
+        this.leagueRegistrationId = leagueRegistrationId;
+    }
+
+    public LeagueRegistration getLeagueRegistration() {
+        return leagueRegistration;
+    }
+
+    public void setLeagueRegistration(LeagueRegistration leagueRegistration) {
+        this.leagueRegistration = leagueRegistration;
+        if(leagueRegistration != null) {
+            this.leagueRegistrationId = leagueRegistration.id;
+        }
+    }
+
     public List<MatchPlayerEmail> getEmails() {
         return emails;
     }
@@ -293,7 +340,7 @@ public class MatchPlayer extends DynamicEntity {
     }
 
     public List<String> getEmailsAsStrings() {
-        List<String> emailStrings = new ArrayList<String>();
+        List<String> emailStrings = new ArrayList<>();
 
         if(emails != null) {
             for (MatchPlayerEmail email : emails) {
@@ -302,6 +349,13 @@ public class MatchPlayer extends DynamicEntity {
         }
 
         return emailStrings;
+    }
+
+    public void setEmailsFromStrings(List<String> emailStrings) {
+        emails = new ArrayList<>();
+        for(String emailString : emailStrings) {
+            emails.add(new MatchPlayerEmail(this.id, emailString));
+        }
     }
 
     public List<MatchPlayerPhone> getPhones() {
@@ -313,7 +367,7 @@ public class MatchPlayer extends DynamicEntity {
     }
 
     public List<Phone> getPhonesAsUtilPhones() {
-        List<Phone> utilPhones = new ArrayList<Phone>();
+        List<Phone> utilPhones = new ArrayList<>();
 
         if(phones != null) {
             for (MatchPlayerPhone phone : phones) {
@@ -322,6 +376,13 @@ public class MatchPlayer extends DynamicEntity {
         }
 
         return utilPhones;
+    }
+
+    public void setPhonesFromUtilPhones(List<Phone> utilPhones) {
+        phones = new ArrayList<>();
+        for(Phone utilPhone : utilPhones) {
+            phones.add(new MatchPlayerPhone(this.id, utilPhone.number, utilPhone.type));
+        }
     }
 
     public static class Converter extends MPackDynEntityConverter {

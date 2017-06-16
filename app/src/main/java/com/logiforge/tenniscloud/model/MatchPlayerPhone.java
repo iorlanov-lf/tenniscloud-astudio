@@ -39,6 +39,20 @@ public class MatchPlayerPhone extends DynamicEntity {
         this.phoneType = phoneType;
     }
 
+    public MatchPlayerPhone(MatchPlayerPhone otherPhone) {
+        super(otherPhone.id, otherPhone.version, otherPhone.syncState);
+
+        this.matchPlayerId = otherPhone.matchPlayerId;
+        this.phone = otherPhone.phone;
+        this.phoneType = otherPhone.phoneType;
+    }
+
+    public void copyLavoltaAttributes(MatchPlayerPhone otherPhone) {
+        this.id = otherPhone.id;
+        this.version = otherPhone.version;
+        this.syncState = otherPhone.syncState;
+    }
+
     public String getMatchPlayerId() {
         return matchPlayerId;
     }

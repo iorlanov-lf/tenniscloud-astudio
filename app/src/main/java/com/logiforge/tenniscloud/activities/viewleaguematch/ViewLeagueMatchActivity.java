@@ -34,7 +34,7 @@ public class ViewLeagueMatchActivity extends AppCompatActivity {
     public static void initStaticData(Match match) {
         LeagueMatchFacade.Builder matchBuilder = new LeagueMatchFacade.Builder(match);
         ViewLeagueMatchActivity.match =
-                matchBuilder.resolvePlayers().resolveLeagueData().build();
+                matchBuilder.resolvePlayers().resolveLeagueData().resolveFacility().build();
         wasMatchChanged = false;
     }
 
@@ -108,6 +108,7 @@ public class ViewLeagueMatchActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_EDIT) {
             if(resultCode == RESULT_OK) {
+                match = EditLeagueMatchActivity.getUpdatedMatch();
                 populateControls();
                 wasMatchChanged = true;
             }
@@ -117,9 +118,10 @@ public class ViewLeagueMatchActivity extends AppCompatActivity {
     private void populateControls() {
         MatchFragment matchFragment =
                 (MatchFragment)getSupportFragmentManager().findFragmentByTag(matchFragmentTag);
-        if(matchFragment != null) {
-            matchFragment.populateControls();
-        }
+        matchFragment.populateControls();
+        PlayersFragment playersFragment =
+                (PlayersFragment)getSupportFragmentManager().findFragmentByTag(playersFragmentTag);
+        playersFragment.populateControls();
     }
 
     public class ViewLeagueMatchPagerAdapter extends FragmentPagerAdapter {

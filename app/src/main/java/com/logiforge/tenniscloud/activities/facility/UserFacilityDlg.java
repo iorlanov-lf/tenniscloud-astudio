@@ -40,11 +40,6 @@ public class UserFacilityDlg extends DialogFragment implements ListView.OnItemCl
 
     public static UserFacilityDlg newInstance() {
         UserFacilityDlg frag = new UserFacilityDlg();
-
-        /*
-        Bundle args = new Bundle();
-        args.putString("title", title);
-        frag.setArguments(args); */
         return frag;
     }
 

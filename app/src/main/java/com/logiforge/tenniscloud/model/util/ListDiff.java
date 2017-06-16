@@ -18,6 +18,10 @@ public class ListDiff <T> {
         deleted = new ArrayList<T>();
     }
 
+    public boolean hasDifference() {
+        return added.size() > 0 || updated.size() > 0 || deleted.size() > 0;
+    }
+
     public static class UpdatedEntity<T> {
         public T original;
         public T updated;

@@ -28,7 +28,6 @@ import java.util.List;
  */
 
 public class PlayersFragment extends Fragment {
-    private Match match;
 
     ContactInfoView partnerView;
     ContactInfoView opponent1View;
@@ -39,7 +38,7 @@ public class PlayersFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.act_editleaguematch_frag_players, container, false);
 
-        match = EditLeagueMatchActivity.match;
+        Match match = EditLeagueMatchActivity.match;
 
         partnerView = (ContactInfoView)rootView.findViewById(R.id.view_partner);
         opponent1View = (ContactInfoView)rootView.findViewById(R.id.view_opponent1);
@@ -121,5 +120,31 @@ public class PlayersFragment extends Fragment {
 
     public boolean validate() {
         return true;
+    }
+
+    public void populateMatch(Match match) {
+        LeagueMatchFacade matchFacade = new LeagueMatchFacade();
+        LeagueMatchFacade.PlayerBreakdown playerBreakdown = matchFacade.getPlayerBreakdown(match);
+
+        MatchPlayer partner = playerBreakdown.partner;
+        if(partner != null) {
+            partner.setDisplayName(partnerView.getName());
+            partner.setEmailsFromStrings(partnerView.getEmails());
+            partner.setPhonesFromUtilPhones(partnerView.getPhones());
+        }
+
+        MatchPlayer opponent1 = playerBreakdown.opponent1;
+        if(opponent1 != null) {
+            opponent1.setDisplayName(opponent1View.getName());
+            opponent1.setEmailsFromStrings(opponent1View.getEmails());
+            opponent1.setPhonesFromUtilPhones(opponent1View.getPhones());
+        }
+
+        MatchPlayer opponent2 = playerBreakdown.opponent2;
+        if(opponent2 != null) {
+            opponent2.setDisplayName(opponent2View.getName());
+            opponent2.setEmailsFromStrings(opponent2View.getEmails());
+            opponent2.setPhonesFromUtilPhones(opponent2View.getPhones());
+        }
     }
 }

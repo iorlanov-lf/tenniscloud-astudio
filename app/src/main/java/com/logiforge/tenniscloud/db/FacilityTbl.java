@@ -8,6 +8,7 @@ import com.logiforge.lavolta.android.model.DynamicEntity;
 import com.logiforge.lavolta.android.model.api.sync.InventoryItem;
 import com.logiforge.tenniscloud.model.Facility;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -98,6 +99,22 @@ public class FacilityTbl extends DbDynamicTable {
     @Override
     protected String getTableName() {
         return TABLE_NAME;
+    }
+
+    public List<Facility> findByLikeName(String substring) {
+        List<Facility> facilities = new ArrayList<>();
+
+        Cursor c = db.rawQuery(
+                "select * from " + TABLE_NAME + " where " + COL_NAME + " like '%" + substring + "%'", null);
+        while (c.moveToNext()) {
+            Facility f = fromCursor(c);
+            facilities.add(f);
+        }
+        if (c != null && !c.isClosed()) {
+            c.close();
+        }
+
+        return facilities;
     }
 
     private Facility fromCursor(Cursor c) {

@@ -1,7 +1,9 @@
 package com.logiforge.tenniscloud.activities.editleaguematch;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 
 import android.support.v4.app.Fragment;
@@ -17,8 +19,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.logiforge.tenniscloud.R;
+import com.logiforge.tenniscloud.activities.facility.FacilityActivity;
+import com.logiforge.tenniscloud.activities.facility.MatchFacilityDlg;
+import com.logiforge.tenniscloud.activities.facility.PlayerFacilitiesFragment;
+import com.logiforge.tenniscloud.activities.facility.UserFacilityDlg;
 import com.logiforge.tenniscloud.facades.LeagueMatchFacade;
 import com.logiforge.tenniscloud.facades.TCUserFacade;
+import com.logiforge.tenniscloud.model.Facility;
 import com.logiforge.tenniscloud.model.League;
 import com.logiforge.tenniscloud.model.LeagueProvider;
 import com.logiforge.tenniscloud.model.Match;
@@ -28,16 +35,24 @@ import com.logiforge.tenniscloud.model.PlayingLevel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EditLeagueMatchActivity extends AppCompatActivity {
+public class EditLeagueMatchActivity extends AppCompatActivity
+        implements MatchFacilityDlg.OnFacilitySelectedListener,
+        View.OnClickListener {
+
     static final String MATCH_FRAGMENT_TAG_KEY = "matchFragmentTag";
     static final String PLAYERS_FRAGMENT_TAG_KEY = "playersFragmentTag";
     static final String SCHEDULE_FRAGMENT_TAG_KEY = "scheduleFragmentTag";
+
+    private static final int REQUEST_SELECT_FACILITY = 20;
 
     protected static Match match;
     public static void initStaticData(Match match) {
         LeagueMatchFacade.Builder matchBuilder = new LeagueMatchFacade.Builder(match);
         EditLeagueMatchActivity.match =
-                matchBuilder.resolvePlayers().resolveLeagueData().build();
+                matchBuilder.resolvePlayers().resolveLeagueData().resolveFacility().build();
+    }
+    public static Match getUpdatedMatch() {
+        return match;
     }
 
     private TextView providerTextView;
@@ -115,16 +130,11 @@ public class EditLeagueMatchActivity extends AppCompatActivity {
         LeagueMatchFacade matchFacade = new LeagueMatchFacade();
 
         Match updatedMatch = new Match(match);
-        updatedMatch.setLeagueWeek(matchFragment.getMatchWeek());
-        updatedMatch.setDeadlineDt(matchFragment.getDeadlineDt());
-        updatedMatch.setScheduledDt(matchFragment.getScheduledDt());
-        updatedMatch.setScheduledTm(matchFragment.getScheduledTm());
-        updatedMatch.setOutcome(matchFragment.getOutcome());
-        Integer[] points = matchFragment.getPoints();
-        updatedMatch.setPoints(points);
-        matchFacade.setPlayerHomeTeam(updatedMatch, matchFragment.getHomeAway());
+        matchFragment.populateMatch(updatedMatch);
+        playersFragment.populateMatch(updatedMatch);
 
         if(matchFacade.updateLeagueMatch(this, match, updatedMatch)) {
+            match = updatedMatch;
             setResult(Activity.RESULT_OK);
             finish();
         } else {
@@ -139,6 +149,56 @@ public class EditLeagueMatchActivity extends AppCompatActivity {
             finish();
         } else {
             Toast.makeText(this, "Unable to delete match", Toast.LENGTH_SHORT);
+        }
+    }
+
+    public void onSelectFacility(View v) {
+
+        FragmentManager fm = getSupportFragmentManager();
+        MatchFacilityDlg matchFacilityDlg = MatchFacilityDlg.newInstance();
+        PlayerFacilitiesFragment.initStaticData(match);
+        matchFacilityDlg.show(fm, MatchFacilityDlg.DLG_TAG);
+    }
+
+    @Override
+    public void onFacilitySelected(Facility facility) {
+        MatchFragment matchFragment =
+                (MatchFragment)getSupportFragmentManager().findFragmentByTag(matchFragmentTag);
+        matchFragment.setFacility(facility);
+        dismissMatchFacilityDlg();
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == R.id.new_facility) {
+            dismissMatchFacilityDlg();
+
+            Intent intent = new Intent(this, FacilityActivity.class);
+            startActivityForResult(intent, REQUEST_SELECT_FACILITY);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == REQUEST_SELECT_FACILITY) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+                Facility facility = FacilityActivity.facility;
+                MatchFragment matchFragment =
+                        (MatchFragment)getSupportFragmentManager().findFragmentByTag(matchFragmentTag);
+                matchFragment.setFacility(facility);
+            }
+
+            dismissMatchFacilityDlg();
+        }
+    }
+
+    private void dismissMatchFacilityDlg() {
+        Fragment prev = getSupportFragmentManager().findFragmentByTag(MatchFacilityDlg.DLG_TAG);
+        if (prev != null) {
+            DialogFragment df = (DialogFragment) prev;
+            df.dismiss();
         }
     }
 

@@ -10,6 +10,8 @@ public class CmpUtil {
             return false;
         } else if(v1 != null && v2 == null) {
             return false;
+        } else if(v1 == null && v2 == null) {
+            return true;
         } else {
             return v1.equals(v2);
         }

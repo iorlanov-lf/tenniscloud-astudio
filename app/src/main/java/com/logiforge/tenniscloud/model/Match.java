@@ -233,6 +233,9 @@ public class Match extends DynamicEntity {
                 players.add(new MatchPlayer(otherPlayer));
             }
         }
+
+        this.facility = otherMatch.facility;
+        this.leagueFlight = otherMatch.leagueFlight;
     }
 
     public boolean isDifferent(Match otherMatch) {
@@ -381,6 +384,11 @@ public class Match extends DynamicEntity {
 
     public void setFacility(Facility facility) {
         this.facility = facility;
+        if(facility != null) {
+            this.facilityId = facility.id;
+        } else {
+            this.facilityId = null;
+        }
     }
 
     public Integer getLeagueWeek() {

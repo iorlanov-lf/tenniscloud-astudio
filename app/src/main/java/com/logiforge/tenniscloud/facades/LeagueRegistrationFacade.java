@@ -47,7 +47,37 @@ import java.util.List;
  * Created by iorlanov on 4/13/2017.
  */
 public class LeagueRegistrationFacade {
+    public static class Builder {
+        LeagueRegistration registration = null;
+        boolean resolveFacilityFlag = false;
+
+        public Builder(LeagueRegistration registration) {
+            this.registration = registration;
+        }
+
+        public Builder resolveFacility() {
+            resolveFacilityFlag = true;
+            return this;
+        }
+
+        public LeagueRegistration build() {
+            if(registration != null) {
+                if (resolveFacilityFlag &&
+                        registration.getFacilityId() != null &&
+                        registration.getFacility() == null) {
+                    FacilityTbl facilityTbl = new FacilityTbl();
+                    registration.setFacility(
+                            (Facility)facilityTbl.find(registration.getFacilityId()));
+                }
+            }
+
+            return registration;
+        }
+    }
+
     private static final String TAG = LeagueRegistrationFacade.class.getSimpleName();
+
+
 
     public boolean hasRegistration() {
         LeagueRegistrationTbl regTbl = new LeagueRegistrationTbl();

@@ -14,11 +14,16 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.logiforge.tenniscloud.R;
 import com.logiforge.tenniscloud.db.util.DbUtil;
+import com.logiforge.tenniscloud.facades.FacilityFacade;
+import com.logiforge.tenniscloud.facades.LeagueMatchFacade;
 import com.logiforge.tenniscloud.facades.TCUserFacade;
+import com.logiforge.tenniscloud.model.Facility;
 import com.logiforge.tenniscloud.model.Match;
 import com.logiforge.tenniscloud.model.MatchPlayer;
 
@@ -37,6 +42,7 @@ import java.util.List;
 public class MatchFragment extends Fragment {
     private static final String KEY_MATCHWEEK_SPINNER = "KEY_MATCHWEEK_SPINNER";
     private static final String KEY_HOMEAWAY_SPINNER = "KEY_HOMEAWAY_SPINNER";
+    private static final String KEY_FACILITY_ID = "KEY_FACILITY_ID";
     private static final String KEY_OUTCOME_SPINNER = "KEY_OUTCOME_SPINNER";
     private static final String KEY_SCORE_SPINNER = "KEY_OUTCOME_SPINNER_";
     public static final String TIME_FORMAT = "kk:mm a";
@@ -51,6 +57,7 @@ public class MatchFragment extends Fragment {
     Button clearDeadlineBtn = null;
     EditText schDtEditText = null;
     EditText schTimeEditText = null;
+    TextView facilityText = null;
     Button clearScheduledBtn = null;
     List<Spinner> scoreSpinners = null;
 
@@ -68,6 +75,7 @@ public class MatchFragment extends Fragment {
         schDtEditText = (EditText)rootView.findViewById(R.id.edit_schDate);
         schTimeEditText = (EditText)rootView.findViewById(R.id.edit_schTime);
         clearScheduledBtn = (Button)rootView.findViewById(R.id.btn_clear_scheduled);
+        facilityText = (TextView)rootView.findViewById(R.id.txt_facility);
         scoreSpinners = new ArrayList<Spinner>();
         scoreSpinners.add((Spinner)rootView.findViewById(R.id.spnr_scoreHome1));
         scoreSpinners.add((Spinner)rootView.findViewById(R.id.spnr_scoreVisitor1));
@@ -101,9 +109,11 @@ public class MatchFragment extends Fragment {
             }
         }
 
-        LocalDate deadline = match.getDeadlineDt();
-        if(deadline != null) {
-            deadlineEditText.setText(deadline.toString(DATE_FORMAT));
+        if(savedInstanceState == null) {
+            LocalDate deadline = match.getDeadlineDt();
+            if (deadline != null) {
+                deadlineEditText.setText(deadline.toString(DATE_FORMAT));
+            }
         }
         deadlineEditText.setOnTouchListener(new View.OnTouchListener() {
 
@@ -126,9 +136,11 @@ public class MatchFragment extends Fragment {
             }
         });
 
-        LocalDate schDt = match.getScheduledDt();
-        if(schDt != null) {
-            schDtEditText.setText(schDt.toString(DATE_FORMAT));
+        if(savedInstanceState == null) {
+            LocalDate schDt = match.getScheduledDt();
+            if (schDt != null) {
+                schDtEditText.setText(schDt.toString(DATE_FORMAT));
+            }
         }
         schDtEditText.setOnTouchListener(new View.OnTouchListener() {
 
@@ -145,9 +157,11 @@ public class MatchFragment extends Fragment {
             }
         });
 
-        LocalTime schTm = match.getScheduledTm();
-        if(schTm != null) {
-            schTimeEditText.setText(schTm.toString(TIME_FORMAT));
+        if(savedInstanceState == null) {
+            LocalTime schTm = match.getScheduledTm();
+            if (schTm != null) {
+                schTimeEditText.setText(schTm.toString(TIME_FORMAT));
+            }
         }
         schTimeEditText.setOnTouchListener(new View.OnTouchListener() {
 
@@ -173,6 +187,19 @@ public class MatchFragment extends Fragment {
                 schDtEditText.setError(null);
             }
         });
+
+        if(savedInstanceState == null) {
+            Facility facility = match.getFacility();
+            if (facility != null) {
+                facilityText.setText(facility.getName());
+                facilityText.setTag(facility.id);
+            }
+        } else {
+            String facilityId = savedInstanceState.getString(KEY_FACILITY_ID);
+            if (facilityId != null) {
+                facilityText.setTag(facilityId);
+            }
+        }
 
         ArrayAdapter<Match.Outcome> outcomeAdapter =
                 new ArrayAdapter<Match.Outcome>(this.getActivity(), android.R.layout.simple_spinner_dropdown_item, Match.Outcome.values());
@@ -217,6 +244,9 @@ public class MatchFragment extends Fragment {
 
         outState.putInt(KEY_MATCHWEEK_SPINNER, matchWeekSpinner.getSelectedItemPosition());
         outState.putInt(KEY_HOMEAWAY_SPINNER, homeAwaySpinner.getSelectedItemPosition());
+        if(facilityText.getTag() != null) {
+            outState.putString(KEY_FACILITY_ID, (String) facilityText.getTag());
+        }
         outState.putInt(KEY_OUTCOME_SPINNER, outcomeSpinner.getSelectedItemPosition());
 
         for(int i=0; i<scoreSpinners.size(); i++) {
@@ -225,57 +255,31 @@ public class MatchFragment extends Fragment {
         }
     }
 
-    public int getMatchWeek() {
-        Match.MatchWeek matchWeek = (Match.MatchWeek)matchWeekSpinner.getSelectedItem();
-        return matchWeek.getId();
+    public void setFacility(Facility facility) {
+        facilityText.setText(facility.getName());
+        facilityText.setTag(facility.id);
     }
 
-    public Match.HomeAway getHomeAway() {
-        return (Match.HomeAway)homeAwaySpinner.getSelectedItem();
-    }
 
-    public LocalDate getDeadlineDt() {
-        String deadlineDtAsString = deadlineEditText.getText().toString();
-        if(deadlineDtAsString.length() > 0) {
-            DateTimeFormatter formatter = DateTimeFormat.forPattern(DATE_FORMAT);
-            return LocalDate.parse(deadlineDtAsString, formatter);
-        } else {
-            return null;
+
+    public void populateMatch(Match updatedMatch) {
+        updatedMatch.setLeagueWeek(getMatchWeek());
+        updatedMatch.setDeadlineDt(getDeadlineDt());
+        updatedMatch.setScheduledDt(getScheduledDt());
+        updatedMatch.setScheduledTm(getScheduledTm());
+        updatedMatch.setOutcome(getOutcome());
+        Integer[] points = getPoints();
+        updatedMatch.setPoints(points);
+        LeagueMatchFacade matchFacade = new LeagueMatchFacade();
+        matchFacade.setPlayerHomeTeam(updatedMatch, getHomeAway());
+
+        Facility facility = null;
+        String facilityId = (String)facilityText.getTag();
+        if(facilityId != null) {
+            FacilityFacade facilityFacade = new FacilityFacade();
+            facility = facilityFacade.findFacility(facilityId);
         }
-    }
-
-    public LocalDate getScheduledDt() {
-        String schDtAsString = schDtEditText.getText().toString();
-        if(schDtAsString.length() > 0) {
-            DateTimeFormatter formatter = DateTimeFormat.forPattern(DATE_FORMAT);
-            return LocalDate.parse(schDtAsString, formatter);
-        } else {
-            return null;
-        }
-    }
-
-    public LocalTime getScheduledTm() {
-        String schTmAsString = schTimeEditText.getText().toString();
-        if(schTmAsString.length() > 0) {
-            DateTimeFormatter formatter = DateTimeFormat.forPattern(TIME_FORMAT);
-            return LocalTime.parse(schTmAsString, formatter);
-        } else {
-            return null;
-        }
-    }
-
-    public int getOutcome() {
-        Match.Outcome outcome = (Match.Outcome)outcomeSpinner.getSelectedItem();
-        return outcome.getId();
-    }
-
-    public Integer[] getPoints() {
-        Integer[] points = new Integer[6];
-        for(int i=0; i<scoreSpinners.size(); i++) {
-            points[i] = scoreSpinners.get(i).getSelectedItemPosition();
-        }
-
-        return points;
+        updatedMatch.setFacility(facility);
     }
 
     public boolean validate() {
@@ -294,6 +298,59 @@ public class MatchFragment extends Fragment {
         }
 
         return isValid;
+    }
+
+    private int getMatchWeek() {
+        Match.MatchWeek matchWeek = (Match.MatchWeek)matchWeekSpinner.getSelectedItem();
+        return matchWeek.getId();
+    }
+
+    private Match.HomeAway getHomeAway() {
+        return (Match.HomeAway)homeAwaySpinner.getSelectedItem();
+    }
+
+    private LocalDate getDeadlineDt() {
+        String deadlineDtAsString = deadlineEditText.getText().toString();
+        if(deadlineDtAsString.length() > 0) {
+            DateTimeFormatter formatter = DateTimeFormat.forPattern(DATE_FORMAT);
+            return LocalDate.parse(deadlineDtAsString, formatter);
+        } else {
+            return null;
+        }
+    }
+
+    private LocalDate getScheduledDt() {
+        String schDtAsString = schDtEditText.getText().toString();
+        if(schDtAsString.length() > 0) {
+            DateTimeFormatter formatter = DateTimeFormat.forPattern(DATE_FORMAT);
+            return LocalDate.parse(schDtAsString, formatter);
+        } else {
+            return null;
+        }
+    }
+
+    private LocalTime getScheduledTm() {
+        String schTmAsString = schTimeEditText.getText().toString();
+        if(schTmAsString.length() > 0) {
+            DateTimeFormatter formatter = DateTimeFormat.forPattern(TIME_FORMAT);
+            return LocalTime.parse(schTmAsString, formatter);
+        } else {
+            return null;
+        }
+    }
+
+    private int getOutcome() {
+        Match.Outcome outcome = (Match.Outcome)outcomeSpinner.getSelectedItem();
+        return outcome.getId();
+    }
+
+    private Integer[] getPoints() {
+        Integer[] points = new Integer[6];
+        for(int i=0; i<scoreSpinners.size(); i++) {
+            points[i] = scoreSpinners.get(i).getSelectedItemPosition();
+        }
+
+        return points;
     }
 
     class OnDeadlineDateSetListener implements DatePickerDialog.OnDateSetListener {

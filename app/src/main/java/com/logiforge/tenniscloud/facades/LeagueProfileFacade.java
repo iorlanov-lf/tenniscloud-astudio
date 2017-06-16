@@ -11,6 +11,7 @@ public class LeagueProfileFacade {
     public static class Builder {
         LeagueProfile profile = null;
         boolean resolveEmailsFlag = false;
+        boolean resolveFacilityFlag = false;
 
         public Builder(LeagueProfile profile) {
             this.profile = profile;
@@ -18,6 +19,11 @@ public class LeagueProfileFacade {
 
         public Builder resolveEmails() {
             resolveEmailsFlag = true;
+            return this;
+        }
+
+        public Builder resolveFacility() {
+            resolveFacilityFlag = true;
             return this;
         }
 

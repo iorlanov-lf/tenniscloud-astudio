@@ -25,9 +25,9 @@ public class FacilityFacade {
 
     public boolean hasFacility() {
         TCUserFacilityTbl userFacilityTbl = new TCUserFacilityTbl();
-        LavoltaFacade lavoltaFacade = new LavoltaFacade();
+        TCUserFacade userFacade = new TCUserFacade();
 
-        return userFacilityTbl.hasFacility(lavoltaFacade.getUserName());
+        return userFacilityTbl.hasFacility(userFacade.getSelf().id);
     }
 
     public void createFacility(Facility facility, boolean isTCUserFacility) {
@@ -42,8 +42,8 @@ public class FacilityFacade {
             if(isTCUserFacility) {
                 TCUserFacilityTbl userFacilityTbl = new TCUserFacilityTbl();
                 TCUserFacility userFacility = new TCUserFacility();
-                LavoltaFacade lavoltaFacade = new LavoltaFacade();
-                userFacility.setUserId(lavoltaFacade.getUserName());
+                TCUserFacade userFacade = new TCUserFacade();
+                userFacility.setUserId(userFacade.getSelf().id);
                 userFacility.setFacilityId(facility.id);
                 userFacilityTbl.uiAdd(txn, userFacility, null);
             }
@@ -61,12 +61,26 @@ public class FacilityFacade {
         TCUserFacilityTbl userFacilityTbl = new TCUserFacilityTbl();
         FacilityTbl facilityTbl = new FacilityTbl();
 
-        LavoltaFacade lavoltaFacade = new LavoltaFacade();
-        List<TCUserFacility> userFacilities = userFacilityTbl.getUserFacilities(lavoltaFacade.getUserName());
+        TCUserFacade userFacade = new TCUserFacade();
+        List<TCUserFacility> userFacilities = userFacilityTbl.getUserFacilities(userFacade.getSelf().id);
         for(TCUserFacility userFicility : userFacilities) {
             facilities.add((Facility)facilityTbl.find(userFicility.getFacilityId()));
         }
 
         return facilities;
+    }
+
+    public List<Facility> getFacilitiesByLikeName(String substring) {
+        FacilityTbl facilityTbl = new FacilityTbl();
+        return facilityTbl.findByLikeName(substring);
+    }
+
+    public Facility findFacility(String id) {
+        if(id == null || id.length() == 0) {
+            return null;
+        } else {
+            FacilityTbl facilityTbl = new FacilityTbl();
+            return (Facility)facilityTbl.find(id);
+        }
     }
 }

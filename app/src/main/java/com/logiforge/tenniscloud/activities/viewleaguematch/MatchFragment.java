@@ -19,6 +19,7 @@ import android.widget.TimePicker;
 import com.logiforge.tenniscloud.R;
 import com.logiforge.tenniscloud.db.util.DbUtil;
 import com.logiforge.tenniscloud.facades.TCUserFacade;
+import com.logiforge.tenniscloud.model.Facility;
 import com.logiforge.tenniscloud.model.Match;
 import com.logiforge.tenniscloud.model.MatchPlayer;
 
@@ -50,6 +51,7 @@ public class MatchFragment extends Fragment {
     TextView deadlineText = null;
     TextView schDtText = null;
     TextView schTimeText = null;
+    TextView facilityText = null;
     List<TextView> scoreTexts = null;
 
     @Override
@@ -57,13 +59,13 @@ public class MatchFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.act_viewleaguematch_frag_match, container, false);
 
-        match = ViewLeagueMatchActivity.match;
         matchWeekText = (TextView) rootView.findViewById(R.id.txt_matchWeek);
         homeAwayText = (TextView)rootView.findViewById(R.id.txt_homeAway);
         outcomeText = (TextView)rootView.findViewById(R.id.txt_outcome);
         deadlineText = (TextView)rootView.findViewById(R.id.txt_deadline);
         schDtText = (TextView)rootView.findViewById(R.id.txt_schDate);
         schTimeText = (TextView)rootView.findViewById(R.id.txt_schTime);
+        facilityText = (TextView)rootView.findViewById(R.id.txt_facility);
         scoreTexts = new ArrayList<TextView>();
         scoreTexts.add((TextView)rootView.findViewById(R.id.txt_scoreHome1));
         scoreTexts.add((TextView)rootView.findViewById(R.id.txt_scoreVisitor1));
@@ -86,6 +88,8 @@ public class MatchFragment extends Fragment {
     }
 
     public void populateControls() {
+        match = ViewLeagueMatchActivity.match;
+
         Match.MatchWeek matchWeek = Match.MatchWeek.getById(match.getLeagueWeek());
         matchWeekText.setText(matchWeek.toString());
 
@@ -116,6 +120,13 @@ public class MatchFragment extends Fragment {
             schTimeText.setText(schTm.toString(TIME_FORMAT));
         } else {
             schTimeText.setText(null);
+        }
+
+        Facility facility = match.getFacility();
+        if(facility != null) {
+            facilityText.setText(facility.getName());
+        } else {
+            facilityText.setText(null);
         }
 
         if(match.getOutcome() != null) {

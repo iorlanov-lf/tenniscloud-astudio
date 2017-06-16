@@ -26,6 +26,7 @@ public class MatchPlayerTbl extends DbDynamicTable {
     public static final String COL_USER_ID = "USER_ID";
     public static final String COL_CONTACT_ID = "CONTACT_ID";
     public static final String COL_LEAGUE_PROFILE_ID = "LEAGUE_PROFILE_ID";
+    public static final String COL_LEAGUE_REGISTRATION_ID = "LEAGUE_REGISTRATION_ID";
 
     public static final String CREATE_STATEMENT =
             "CREATE TABLE MATCH_PLAYER (" +
@@ -38,7 +39,8 @@ public class MatchPlayerTbl extends DbDynamicTable {
                     "DISPLAY_NAME TEXT," +
                     "USER_ID TEXT," +
                     "CONTACT_ID TEXT," +
-                    "LEAGUE_PROFILE_ID TEXT" +
+                    "LEAGUE_PROFILE_ID TEXT," +
+                    "LEAGUE_REGISTRATION_ID TEXT" +
                     ")";
 
     @Override
@@ -93,6 +95,7 @@ public class MatchPlayerTbl extends DbDynamicTable {
         values.put(COL_USER_ID, matchPlayer.getUserId());
         values.put(COL_CONTACT_ID, matchPlayer.getContactId());
         values.put(COL_LEAGUE_PROFILE_ID, matchPlayer.getLeagueProfileId());
+        values.put(COL_LEAGUE_REGISTRATION_ID, matchPlayer.getLeagueRegistrationId());
 
         return values;
     }
@@ -140,7 +143,8 @@ public class MatchPlayerTbl extends DbDynamicTable {
                 getString(COL_DISPLAY_NAME, c),
                 getString(COL_USER_ID, c),
                 getString(COL_CONTACT_ID, c),
-                getString(COL_LEAGUE_PROFILE_ID, c)
+                getString(COL_LEAGUE_PROFILE_ID, c),
+                getString(COL_LEAGUE_REGISTRATION_ID, c)
         );
     }
 }

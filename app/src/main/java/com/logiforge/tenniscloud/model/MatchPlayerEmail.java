@@ -36,6 +36,13 @@ public class MatchPlayerEmail extends DynamicEntity {
         this.email = email;
     }
 
+    public MatchPlayerEmail(MatchPlayerEmail otherEmail) {
+        super(otherEmail.id, otherEmail.version, otherEmail.syncState);
+
+        this.matchPlayerId = otherEmail.matchPlayerId;
+        this.email = otherEmail.email;
+    }
+
     public String getMatchPlayerId() {
         return matchPlayerId;
     }

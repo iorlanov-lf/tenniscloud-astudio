@@ -22,8 +22,7 @@ import com.logiforge.tenniscloud.model.Match;
 public class MatchListAdapter extends BaseExpandableListAdapter {
 
     private Context context;
-    private List<String> listDataHeader; // header titles
-    // child data in format of header title, child title
+    private List<String> listDataHeader;
     private HashMap<String, List<Match>> listDataChild;
 
     public MatchListAdapter(Context context, List<String> listDataHeader,

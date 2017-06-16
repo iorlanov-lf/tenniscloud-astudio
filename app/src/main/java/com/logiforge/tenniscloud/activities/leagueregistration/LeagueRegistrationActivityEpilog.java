@@ -129,9 +129,7 @@ public class LeagueRegistrationActivityEpilog extends AppCompatActivity {
             }
 
             List<Phone> phones = partnerView.getPhones();
-            if(phones.size() > 0) {
-                partnerToSubmit.setPhonesFromUtilPhones(phones);
-            }
+            partnerToSubmit.setPhonesFromUtilPhones(phones);
         }
 
         if(isFormValid) {
