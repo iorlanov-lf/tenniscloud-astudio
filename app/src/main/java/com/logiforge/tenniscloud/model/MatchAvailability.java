@@ -4,6 +4,7 @@ import com.logiforge.lavolta.android.model.DynamicEntity;
 import com.logiforge.tenniscloud.model.util.LocalDateRange;
 import com.logiforge.tenniscloud.model.util.LocalTimeRange;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,6 +31,20 @@ public class MatchAvailability extends DynamicEntity {
         this.matchPlayerId = matchPlayerId;
         this.dateRange = dateRange;
         this.timeRanges = timeRanges;
+    }
+
+    public MatchAvailability(MatchAvailability otherAvailability) {
+        super(otherAvailability.id, otherAvailability.version, otherAvailability.syncState);
+        matchPlayerId = otherAvailability.getMatchPlayerId();
+        dateRange = new LocalDateRange(otherAvailability.getDateRange());
+
+        if(otherAvailability.getTimeRanges() != null) {
+            timeRanges = new ArrayList<>();
+            for(LocalTimeRange otherTmRange : otherAvailability.getTimeRanges()) {
+                timeRanges.add(new LocalTimeRange(otherTmRange));
+            }
+        }
+
     }
 
     public String getMatchPlayerId() {

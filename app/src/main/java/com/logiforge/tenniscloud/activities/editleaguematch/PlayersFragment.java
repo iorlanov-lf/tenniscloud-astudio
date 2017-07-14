@@ -28,6 +28,9 @@ import java.util.List;
  */
 
 public class PlayersFragment extends Fragment {
+    public interface PlayersFragmentContext {
+        void setPlayersFragmentTag(String tag);
+    }
 
     ContactInfoView partnerView;
     ContactInfoView opponent1View;
@@ -38,7 +41,7 @@ public class PlayersFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.act_editleaguematch_frag_players, container, false);
 
-        Match match = EditLeagueMatchActivity.match;
+        Match match = EditLeagueMatchState.instance().getMatch();
 
         partnerView = (ContactInfoView)rootView.findViewById(R.id.view_partner);
         opponent1View = (ContactInfoView)rootView.findViewById(R.id.view_opponent1);
@@ -114,8 +117,9 @@ public class PlayersFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        EditLeagueMatchActivity activity = (EditLeagueMatchActivity)context;
-        activity.playersFragmentTag = this.getTag();
+        if(context instanceof PlayersFragmentContext) {
+            ((PlayersFragmentContext) context).setPlayersFragmentTag(getTag());
+        }
     }
 
     public boolean validate() {

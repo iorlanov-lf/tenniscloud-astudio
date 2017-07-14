@@ -8,11 +8,13 @@ import android.util.Log;
 import com.logiforge.lavolta.android.app.Lavolta;
 import com.logiforge.lavolta.android.db.DbTransaction;
 import com.logiforge.lavolta.android.db.LavoltaDb;
+import com.logiforge.tenniscloud.activities.editleaguematch.EditLeagueMatchState;
 import com.logiforge.tenniscloud.db.FacilityTbl;
 import com.logiforge.tenniscloud.db.LeagueFlightTbl;
 import com.logiforge.tenniscloud.db.LeagueMetroAreaTbl;
 import com.logiforge.tenniscloud.db.LeagueProviderTbl;
 import com.logiforge.tenniscloud.db.LeagueTbl;
+import com.logiforge.tenniscloud.db.MatchAvailabilityTbl;
 import com.logiforge.tenniscloud.db.MatchPlayerEmailTbl;
 import com.logiforge.tenniscloud.db.MatchPlayerPhoneTbl;
 import com.logiforge.tenniscloud.db.MatchPlayerTbl;
@@ -26,6 +28,7 @@ import com.logiforge.tenniscloud.model.LeagueMetroArea;
 import com.logiforge.tenniscloud.model.LeagueProvider;
 import com.logiforge.tenniscloud.model.LeagueRegistration;
 import com.logiforge.tenniscloud.model.Match;
+import com.logiforge.tenniscloud.model.MatchAvailability;
 import com.logiforge.tenniscloud.model.MatchPlayer;
 import com.logiforge.tenniscloud.model.MatchPlayerEmail;
 import com.logiforge.tenniscloud.model.MatchPlayerPhone;
@@ -38,7 +41,6 @@ import com.logiforge.tenniscloud.model.util.ListDiff;
 import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +53,7 @@ public class LeagueMatchFacade {
 
     public static class Builder {
         Match match = null;
-        boolean resolvePlayersFlag = false;
+        boolean resolvePlayers = false;
         boolean resolveLeagueData = false;
         boolean resolveFacility = false;
 
@@ -60,7 +62,7 @@ public class LeagueMatchFacade {
         }
 
         public Builder resolvePlayers() {
-            resolvePlayersFlag = true;
+            resolvePlayers = true;
             return this;
         }
 
@@ -76,18 +78,13 @@ public class LeagueMatchFacade {
 
         public Match build() {
             if(match != null) {
-                if (resolvePlayersFlag) {
+                if (resolvePlayers) {
                     MatchPlayerTbl playerTbl = new MatchPlayerTbl();
                     match.setPlayers(playerTbl.findPlayersByMatchId(match.id));
 
                     for(MatchPlayer player : match.getPlayers()) {
-                        if(player.getLeagueProfileId() == null) {
-                            MatchPlayerEmailTbl emailTbl = new MatchPlayerEmailTbl();
-                            player.setEmails(emailTbl.findEmailsByPlayerId(player.id));
-
-                            MatchPlayerPhoneTbl phoneTbl = new MatchPlayerPhoneTbl();
-                            player.setPhones(phoneTbl.findPhonesByPlayerId(player.id));
-                        }
+                        MatchPlayerFacade.Builder playerBuilder = new MatchPlayerFacade.Builder(player);
+                        playerBuilder.resolveAvailability().resolveContactInfo().build();
                     }
                 }
 
@@ -334,20 +331,20 @@ public class LeagueMatchFacade {
     }
 
     public boolean updateLeagueMatch(
-            final Context context, final Match match, final Match updatedMatch) {
+            final Context context, EditLeagueMatchState editState) {
         LavoltaDb db = Lavolta.db();
         DbTransaction txn = null;
         try {
             txn = db.beginUiTxn(TCLavoltaDb.ACTION_UPDATE_LEAGUE_MATCH);
 
-            if(updatedMatch.isDifferent(match)) {
+            if(editState.getUpdatedMatch().isDifferent(editState.getMatch())) {
                 MatchTbl matchTbl = new MatchTbl();
-                matchTbl.uiUpdate(txn, updatedMatch, null, null);
+                matchTbl.uiUpdate(txn, editState.getUpdatedMatch(), null, null);
             }
 
             MatchPlayerTbl playerTbl = new MatchPlayerTbl();
-            for(MatchPlayer updatedPlayer : updatedMatch.getPlayers()) {
-                MatchPlayer originalPlayer = match.findPlayerByPlayerId(updatedPlayer.id);
+            for(MatchPlayer updatedPlayer : editState.getUpdatedMatch().getPlayers()) {
+                MatchPlayer originalPlayer = editState.getMatch().findPlayerByPlayerId(updatedPlayer.id);
                 if(updatedPlayer.isDifferent(originalPlayer)) {
                     playerTbl.uiUpdate(txn, updatedPlayer, null, null);
 
@@ -381,7 +378,25 @@ public class LeagueMatchFacade {
                 }
             }
 
+            MatchAvailabilityTbl availabilityTbl = new MatchAvailabilityTbl();
+
+            for(String availabilityId : editState.getAddedAvailability()) {
+                MatchAvailability availability = editState.getAvailability(availabilityId);
+                availabilityTbl.uiAdd(txn, availability, null);
+            }
+
+            for(String availabilityId : editState.getUpdatedAvailability()) {
+                MatchAvailability availability = editState.getAvailability(availabilityId);
+                availabilityTbl.uiUpdate(txn, availability, null, null);
+            }
+
+            for(String availabilityId : editState.getDeletedAvailability()) {
+                MatchAvailability availability = editState.getAvailability(availabilityId);
+                availabilityTbl.uiDelete(txn, availabilityId, null);
+            }
+
             db.commitTxn(txn);
+            editState.setMatchChanged(true);
             return true;
         } catch (Exception e) {
             Log.e(TAG, e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage());

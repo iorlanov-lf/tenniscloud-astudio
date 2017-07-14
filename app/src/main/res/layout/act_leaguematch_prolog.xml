@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_content"
@@ -8,131 +8,157 @@
     android:fitsSystemWindows="true"
     tools:context="com.logiforge.tenniscloud.activities.editleaguematch.EditLeagueMatchPrologActivity">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/form_header"
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:contentInsetStart="0dp"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay">
+
+            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/form_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@+id/btn_cancel"
+                    android:layout_alignParentLeft="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minHeight="0dp" android:minWidth="0dp"
+                    android:text="X"
+                    android:onClick="onCancel"/>
+
+                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/l_form_header_middle"
+                    android:clickable="true"
+                    android:orientation="vertical"
+                    android:layout_toRightOf="@+id/btn_cancel"
+                    android:layout_toLeftOf="@+id/btn_save_new_league_match"
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/btn_cancel">
+
+                    <TextView
+                        android:id="@+id/form_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="New League Match"/>
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btn_next"
+                    android:layout_alignParentRight="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minHeight="0dp" android:minWidth="0dp"
+                    android:text="Next"
+                    android:onClick="onNext"/>
+            </RelativeLayout>
+        </android.support.v7.widget.Toolbar>
+    </android.support.design.widget.AppBarLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:showIn="@layout/act_leaguereg_prolog"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <Button
-            android:id="@+id/btn_cancel"
-            android:layout_alignParentLeft="true"
+        <LinearLayout
+            android:id="@+id/layout_league"
+            android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:minHeight="0dp" android:minWidth="0dp"
-            android:text="X"
-            android:onClick="onCancel"/>
-
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/l_form_header_middle"
-            android:clickable="true"
-            android:orientation="vertical"
-            android:layout_toRightOf="@+id/btn_cancel"
-            android:layout_toLeftOf="@+id/btn_save_new_league_match"
-            android:layout_weight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/btn_cancel">
+            android:layout_below="@+id/form_header">
 
             <TextView
-                android:id="@+id/form_title"
+                android:id="@+id/txt_league"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="New League Match"/>
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:text="Select League"/>
+            <Button
+                android:id="@+id/btn_selectLeague"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="..."
+                android:onClick="onSelectLeague"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_matchWeek"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layout_league">
+
+            <Spinner
+                android:id="@+id/spnr_matchWeek"
+                android:layout_width="0px"
+                android:layout_weight="0.5"
+                android:layout_height="wrap_content"/>
+            <Spinner
+                android:id="@+id/spnr_homeAway"
+                android:layout_width="0px"
+                android:layout_weight="0.5"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_opponent1Email"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layout_matchWeek">
+
+            <TextView
+                android:id="@+id/lbl_opponent1Email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:text="Opponnent 1 Email"/>
+            <EditText
+                android:id="@+id/edit_opponent1Email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"/>
 
         </LinearLayout>
 
-        <Button
-            android:id="@+id/btn_next"
-            android:layout_alignParentRight="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="0dp" android:minWidth="0dp"
-            android:text="Next"
-            android:onClick="onNext"/>
-    </RelativeLayout>
-
-    <LinearLayout
-        android:id="@+id/layout_league"
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/form_header">
-
-        <TextView
-            android:id="@+id/txt_league"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:text="Select League"/>
-        <Button
-            android:id="@+id/btn_selectLeague"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="..."
-            android:onClick="onSelectLeague"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/layout_matchWeek"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/layout_league">
-
-        <Spinner
-            android:id="@+id/spnr_matchWeek"
-            android:layout_width="0px"
-            android:layout_weight="0.5"
-            android:layout_height="wrap_content"/>
-        <Spinner
-            android:id="@+id/spnr_homeAway"
-            android:layout_width="0px"
-            android:layout_weight="0.5"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/layout_opponent1Email"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/layout_matchWeek">
-
-        <TextView
-            android:id="@+id/lbl_opponent1Email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:focusable="false"
-            android:text="Opponnent 1 Email"/>
-        <EditText
-            android:id="@+id/edit_opponent1Email"
+        <LinearLayout
+            android:id="@+id/layout_opponent2Email"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textEmailAddress"/>
+            android:layout_below="@+id/layout_opponent1Email">
 
+            <TextView
+                android:id="@+id/lbl_opponent2Email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:text="Opponnent 2 Email"/>
+            <EditText
+                android:id="@+id/edit_opponent2Email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"/>
+
+        </LinearLayout>
     </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/layout_opponent2Email"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/layout_opponent1Email">
-
-        <TextView
-            android:id="@+id/lbl_opponent2Email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:focusable="false"
-            android:text="Opponnent 2 Email"/>
-        <EditText
-            android:id="@+id/edit_opponent2Email"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textEmailAddress"/>
-
-    </LinearLayout>
-
-
-</RelativeLayout>
+    </ScrollView>
+</android.support.design.widget.CoordinatorLayout>

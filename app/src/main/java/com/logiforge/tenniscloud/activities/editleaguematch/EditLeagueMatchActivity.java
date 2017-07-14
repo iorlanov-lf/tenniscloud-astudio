@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import android.view.Window;
@@ -29,6 +30,7 @@ import com.logiforge.tenniscloud.model.Facility;
 import com.logiforge.tenniscloud.model.League;
 import com.logiforge.tenniscloud.model.LeagueProvider;
 import com.logiforge.tenniscloud.model.Match;
+import com.logiforge.tenniscloud.model.MatchAvailability;
 import com.logiforge.tenniscloud.model.MatchPlayer;
 import com.logiforge.tenniscloud.model.PlayingLevel;
 
@@ -37,58 +39,49 @@ import java.util.List;
 
 public class EditLeagueMatchActivity extends AppCompatActivity
         implements MatchFacilityDlg.OnFacilitySelectedListener,
-        View.OnClickListener {
+        View.OnClickListener,
+        MatchFragment.MatchFragmentContext,
+        PlayersFragment.PlayersFragmentContext,
+        ScheduleFragment.ScheduleFragmentContext,
+        AvailabilityDlg.OnAvailabilityActionListener {
 
     static final String MATCH_FRAGMENT_TAG_KEY = "matchFragmentTag";
     static final String PLAYERS_FRAGMENT_TAG_KEY = "playersFragmentTag";
     static final String SCHEDULE_FRAGMENT_TAG_KEY = "scheduleFragmentTag";
 
-    private static final int REQUEST_SELECT_FACILITY = 20;
+    static final int REQUEST_SELECT_FACILITY = 20;
 
-    protected static Match match;
     public static void initStaticData(Match match) {
-        LeagueMatchFacade.Builder matchBuilder = new LeagueMatchFacade.Builder(match);
-        EditLeagueMatchActivity.match =
-                matchBuilder.resolvePlayers().resolveLeagueData().resolveFacility().build();
-    }
-    public static Match getUpdatedMatch() {
-        return match;
+
+        EditLeagueMatchState.initInstance(match);
     }
 
-    private TextView providerTextView;
-    private TextView leagueTextView;
-    private TabLayout tabLayout;
+    TextView providerTextView;
+    TextView leagueTextView;
+    TabLayout tabLayout;
+    ViewPager viewPager;
+    EditLeagueMatchPagerAdapter pagerAdapter;
 
-    public String matchFragmentTag;
-    public String playersFragmentTag;
-    public String scheduleFragmentTag;
-
-    private EditLeagueMatchPagerAdapter pagerAdapter;
-    private ViewPager viewPager;
+    String matchFragmentTag;
+    String playersFragmentTag;
+    String scheduleFragmentTag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.act_editleaguematch);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         providerTextView = (TextView) findViewById(R.id.txt_provider);
         leagueTextView = (TextView) findViewById(R.id.txt_league);
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-
-        PlayingLevel level = match.getLeagueFlight().getPlayingLevel();
-        League league = match.getLeagueFlight().getLeague();
-        LeagueProvider provider = league.getLeagueMetroArea().getProvider();
-        providerTextView.setText(provider.getProviderName());
-        leagueTextView.setText(league.getLeagueName() + " (" + level.getDescription() + ")");
-
-        // Fragments
-        pagerAdapter = new EditLeagueMatchPagerAdapter(getSupportFragmentManager());
         viewPager = (ViewPager) findViewById(R.id.container);
+
+        pagerAdapter = new EditLeagueMatchPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(pagerAdapter);
+        viewPager.setOffscreenPageLimit(EditLeagueMatchPagerAdapter.PAGE_COUNT);
         tabLayout.setupWithViewPager(viewPager);
 
         if(savedInstanceState != null) {
@@ -96,6 +89,8 @@ public class EditLeagueMatchActivity extends AppCompatActivity
             playersFragmentTag = savedInstanceState.getString(PLAYERS_FRAGMENT_TAG_KEY);
             scheduleFragmentTag = savedInstanceState.getString(SCHEDULE_FRAGMENT_TAG_KEY);
         }
+
+        formatHeader();
     }
 
     @Override
@@ -127,14 +122,15 @@ public class EditLeagueMatchActivity extends AppCompatActivity
             return;
         }
 
-        LeagueMatchFacade matchFacade = new LeagueMatchFacade();
+        Match match = EditLeagueMatchState.instance().getMatch();
+        Match updatedMatch = EditLeagueMatchState.instance().getUpdatedMatch();
 
-        Match updatedMatch = new Match(match);
         matchFragment.populateMatch(updatedMatch);
         playersFragment.populateMatch(updatedMatch);
 
-        if(matchFacade.updateLeagueMatch(this, match, updatedMatch)) {
-            match = updatedMatch;
+        LeagueMatchFacade matchFacade = new LeagueMatchFacade();
+        if(matchFacade.updateLeagueMatch(this, EditLeagueMatchState.instance())) {
+
             setResult(Activity.RESULT_OK);
             finish();
         } else {
@@ -142,7 +138,9 @@ public class EditLeagueMatchActivity extends AppCompatActivity
         }
     }
 
-    public void onDelete(final View view) {
+    public void onDeleteMatch(final View view) {
+        Match match = EditLeagueMatchState.instance().getMatch();
+
         LeagueMatchFacade matchFacade = new LeagueMatchFacade();
         if(matchFacade.unsubscribeFromLeagueMatch(this, match)) {
             setResult(Activity.RESULT_OK);
@@ -153,6 +151,7 @@ public class EditLeagueMatchActivity extends AppCompatActivity
     }
 
     public void onSelectFacility(View v) {
+        Match match = EditLeagueMatchState.instance().getMatch();
 
         FragmentManager fm = getSupportFragmentManager();
         MatchFacilityDlg matchFacilityDlg = MatchFacilityDlg.newInstance();
@@ -172,10 +171,10 @@ public class EditLeagueMatchActivity extends AppCompatActivity
     public void onClick(View v) {
         if(v.getId() == R.id.new_facility) {
             dismissMatchFacilityDlg();
-
             Intent intent = new Intent(this, FacilityActivity.class);
             startActivityForResult(intent, REQUEST_SELECT_FACILITY);
         }
+
     }
 
     @Override
@@ -194,6 +193,52 @@ public class EditLeagueMatchActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void setMatchFragmentTag(String tag) {
+        matchFragmentTag = tag;
+    }
+
+    @Override
+    public void setPlayersFragmentTag(String tag) {
+        playersFragmentTag = tag;
+    }
+
+    @Override
+    public void setScheduleFragmentTag(String tag) {
+        scheduleFragmentTag = tag;
+    }
+
+    @Override
+    public void onDeleteAvailability(String availabilityId) {
+        ScheduleFragment scheduleFragment =
+                (ScheduleFragment)getSupportFragmentManager().findFragmentByTag(scheduleFragmentTag);
+        scheduleFragment.deleteAvailability(availabilityId);
+    }
+
+    @Override
+    public void onAddAvailability(MatchAvailability availability) {
+        ScheduleFragment scheduleFragment =
+                (ScheduleFragment)getSupportFragmentManager().findFragmentByTag(scheduleFragmentTag);
+        scheduleFragment.addAvailability(availability);
+    }
+
+    @Override
+    public void onUpdateAvailability(MatchAvailability availability) {
+        ScheduleFragment scheduleFragment =
+                (ScheduleFragment)getSupportFragmentManager().findFragmentByTag(scheduleFragmentTag);
+        scheduleFragment.updateAvailability(availability);
+    }
+
+    private void formatHeader() {
+        Match match = EditLeagueMatchState.instance().getMatch();
+
+        PlayingLevel level = match.getLeagueFlight().getPlayingLevel();
+        League league = match.getLeagueFlight().getLeague();
+        LeagueProvider provider = league.getLeagueMetroArea().getProvider();
+        providerTextView.setText(provider.getProviderName());
+        leagueTextView.setText(league.getLeagueName() + " (" + level.getDescription() + ")");
+    }
+
     private void dismissMatchFacilityDlg() {
         Fragment prev = getSupportFragmentManager().findFragmentByTag(MatchFacilityDlg.DLG_TAG);
         if (prev != null) {
@@ -202,9 +247,9 @@ public class EditLeagueMatchActivity extends AppCompatActivity
         }
     }
 
-    public class EditLeagueMatchPagerAdapter extends FragmentPagerAdapter {
-        final int PAGE_COUNT = 3;
-        private String TAB_TITLES[] = new String[] { "Match", "Players", "Schedule" };
+    static public class EditLeagueMatchPagerAdapter extends FragmentPagerAdapter {
+        static public final int PAGE_COUNT = 3;
+        static private String TAB_TITLES[] = new String[] { "Match", "Players", "Schedule" };
 
         public EditLeagueMatchPagerAdapter(FragmentManager fm) {
             super(fm);

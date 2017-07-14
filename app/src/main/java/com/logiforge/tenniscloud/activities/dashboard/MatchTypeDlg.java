@@ -16,20 +16,14 @@ import com.logiforge.tenniscloud.R;
  * Created by iorlanov on 2/27/2017.
  */
 public class MatchTypeDlg extends DialogFragment {
-    public MatchTypeDlg() {
-        // Empty constructor is required for DialogFragment
-        // Make sure not to add arguments to the constructor
-        // Use `newInstance` instead as shown below
-    }
+    public static final String DLG_TAG = "act_dashboard_dlg_add";
 
     public static MatchTypeDlg newInstance() {
         MatchTypeDlg frag = new MatchTypeDlg();
-
-        /*
-        Bundle args = new Bundle();
-        args.putString("title", title);
-        frag.setArguments(args); */
         return frag;
+    }
+
+    public MatchTypeDlg() {
     }
 
     @Override

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/lbl_DtRange"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Date Range"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/lbl_fromDt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="From: "/>
+
+        <EditText
+            android:id="@+id/edit_fromDt"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:clickable="true"
+            android:focusable="false"
+            android:focusableInTouchMode="false"/>
+
+        <TextView
+            android:id="@+id/lbl_toDt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" To: "/>
+
+        <EditText
+            android:id="@+id/edit_toDt"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:clickable="true"
+            android:focusable="false"
+            android:focusableInTouchMode="false"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_add_tmRange"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add start time"/>
+
+</merge>

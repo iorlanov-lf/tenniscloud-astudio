@@ -13,4 +13,22 @@ public class LocalDateRange {
         this.startDt = startDt;
         this.endDt = endDt;
     }
+
+    public LocalDateRange(LocalDateRange otherDateRange) {
+        startDt = new LocalDate(otherDateRange.getStartDt());
+        endDt = new LocalDate(otherDateRange.getEndDt());
+    }
+
+    @Override
+    public String toString() {
+        return startDt.toString("MM/dd") + " - " + endDt.toString("MM/dd");
+    }
+
+    public LocalDate getStartDt() {
+        return startDt;
+    }
+
+    public LocalDate getEndDt() {
+        return endDt;
+    }
 }

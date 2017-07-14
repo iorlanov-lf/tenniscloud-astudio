@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.logiforge.tenniscloud.R;
+import com.logiforge.tenniscloud.activities.editleaguematch.EditLeagueMatchState;
 import com.logiforge.tenniscloud.db.util.DbUtil;
 import com.logiforge.tenniscloud.facades.TCUserFacade;
 import com.logiforge.tenniscloud.model.Facility;
@@ -42,8 +43,6 @@ public class MatchFragment extends Fragment {
     private static final String KEY_SCORE_SPINNER = "KEY_OUTCOME_SPINNER_";
     public static final String TIME_FORMAT = "kk:mm a";
     public static final String DATE_FORMAT = "MM/dd/yyyy";
-
-    private Match match;
 
     TextView matchWeekText = null;
     TextView homeAwayText = null;
@@ -88,7 +87,7 @@ public class MatchFragment extends Fragment {
     }
 
     public void populateControls() {
-        match = ViewLeagueMatchActivity.match;
+        Match match = EditLeagueMatchState.instance().getMatch();
 
         Match.MatchWeek matchWeek = Match.MatchWeek.getById(match.getLeagueWeek());
         matchWeekText.setText(matchWeek.toString());

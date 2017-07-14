@@ -13,4 +13,22 @@ public class LocalTimeRange {
         this.startTm = startTm;
         this.endTm = endTm;
     }
+
+    public LocalTimeRange(LocalTimeRange otherTmRange) {
+        startTm = new LocalTime(otherTmRange.getStartTm());
+        endTm = new LocalTime(otherTmRange.getEndTm());
+    }
+
+    @Override
+    public String toString() {
+        return startTm.toString("hh:mm a") + " - " + endTm.toString("hh:mm a");
+    }
+
+    public LocalTime getStartTm() {
+        return startTm;
+    }
+
+    public LocalTime getEndTm() {
+        return endTm;
+    }
 }

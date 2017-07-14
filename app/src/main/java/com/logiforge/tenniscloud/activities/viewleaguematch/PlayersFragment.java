@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.logiforge.tenniscloud.R;
+import com.logiforge.tenniscloud.activities.editleaguematch.EditLeagueMatchState;
 import com.logiforge.tenniscloud.activities.util.ContactInfoView;
 import com.logiforge.tenniscloud.facades.LeagueMatchFacade;
 import com.logiforge.tenniscloud.model.Match;
@@ -18,7 +19,6 @@ import com.logiforge.tenniscloud.model.MatchPlayer;
  */
 
 public class PlayersFragment extends Fragment {
-    private Match match;
 
     ContactInfoView partnerView;
     ContactInfoView opponent1View;
@@ -46,7 +46,7 @@ public class PlayersFragment extends Fragment {
     }
 
     public void populateControls() {
-        match = ViewLeagueMatchActivity.match;
+        Match match = EditLeagueMatchState.instance().getMatch();
 
         LeagueMatchFacade matchFacade = new LeagueMatchFacade();
         LeagueMatchFacade.PlayerBreakdown playerBreakdown = matchFacade.getPlayerBreakdown(match);

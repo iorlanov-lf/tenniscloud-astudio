@@ -140,7 +140,7 @@ public class DashboardActivity extends AppCompatActivity
         if(view.getId() == R.id.fab) {
             FragmentManager fm = getSupportFragmentManager();
             MatchTypeDlg matchTypeDlg = MatchTypeDlg.newInstance();
-            matchTypeDlg.show(fm, "act_dashboard_dlg_add");
+            matchTypeDlg.show(fm, MatchTypeDlg.DLG_TAG);
         } else if(view.getId() == R.id.new_league_match) {
             DialogFragment matchTypeDlg = (DialogFragment)getSupportFragmentManager().findFragmentByTag("act_dashboard_dlg_add");
             if(matchTypeDlg != null) {

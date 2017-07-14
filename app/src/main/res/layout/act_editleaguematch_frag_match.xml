@@ -1,198 +1,212 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.logiforge.tenniscloud.activities.editleaguematch.MatchFragment">
-<LinearLayout
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <LinearLayout
-        android:orientation="horizontal"
+    android:layout_height="wrap_content">
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <Spinner
-            android:id="@+id/spnr_matchWeek"
-            android:layout_width="0px"
-            android:layout_weight="0.5"
-            android:layout_height="wrap_content">
-        </Spinner>
-        <Spinner
-            android:id="@+id/spnr_homeAway"
-            android:layout_width="0px"
-            android:layout_weight="0.5"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
-
+        android:layout_height="match_parent"
+        tools:context="com.logiforge.tenniscloud.activities.editleaguematch.MatchFragment">
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/lbl_deadline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Play By: "/>
-
-        <EditText
-            android:id="@+id/edit_deadline"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="false"
-            android:focusableInTouchMode="false"/>
-
-        <Button
-            android:id="@+id/btn_clear_deadline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="0dp" android:minWidth="0dp"
-            android:text="X"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/lbl_scheduledOn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Scheduled on: "/>
-
-        <EditText
-            android:id="@+id/edit_schDate"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="false"
-            android:focusableInTouchMode="false"/>
-
-        <TextView
-            android:id="@+id/lbl_scheduledAt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=" at "/>
-
-        <EditText
-            android:id="@+id/edit_schTime"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="false"
-            android:focusableInTouchMode="false"/>
-
-        <Button
-            android:id="@+id/btn_clear_scheduled"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="0dp" android:minWidth="0dp"
-            android:text="X"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/lbl_facility"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Facility: "/>
-
-        <TextView
-            android:id="@+id/txt_facility"
-            android:layout_width="0px"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:freezesText="true"/>
-
-        <Button
-            android:id="@+id/btn_facility"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="..."
-            android:minHeight="0dp" android:minWidth="0dp"
-            android:onClick="onSelectFacility"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/lbl_outcome"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Outcome: "/>
-
-        <Spinner
-            android:id="@+id/spnr_outcome"
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content">
+            <Spinner
+                android:id="@+id/spnr_matchWeek"
+                android:layout_width="0px"
+                android:layout_weight="0.5"
+                android:layout_height="wrap_content">
+            </Spinner>
+            <Spinner
+                android:id="@+id/spnr_homeAway"
+                android:layout_width="0px"
+                android:layout_weight="0.5"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/lbl_deadline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Play By: "/>
+
+            <EditText
+                android:id="@+id/edit_deadline"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="false"
+                android:focusableInTouchMode="false"/>
+
+            <Button
+                android:id="@+id/btn_clear_deadline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="0dp" android:minWidth="0dp"
+                android:text="X"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/lbl_scheduledOn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Scheduled on: "/>
+
+            <EditText
+                android:id="@+id/edit_schDate"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="false"
+                android:focusableInTouchMode="false"/>
+
+            <TextView
+                android:id="@+id/lbl_scheduledAt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" at "/>
+
+            <EditText
+                android:id="@+id/edit_schTime"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="false"
+                android:focusableInTouchMode="false"/>
+
+            <Button
+                android:id="@+id/btn_clear_scheduled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="0dp" android:minWidth="0dp"
+                android:text="X"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/lbl_facility"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Facility: "/>
+
+            <TextView
+                android:id="@+id/txt_facility"
+                android:layout_width="0px"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:freezesText="true"/>
+
+            <Button
+                android:id="@+id/btn_facility"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="..."
+                android:minHeight="0dp" android:minWidth="0dp"
+                android:onClick="onSelectFacility"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/lbl_outcome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Outcome: "/>
+
+            <Spinner
+                android:id="@+id/spnr_outcome"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="0,1,2">
+            <TableRow>
+                <TextView
+                    android:text=""/>
+                <TextView
+                    android:text="Home"/>
+                <TextView
+                    android:text="Visitor"/>
+            </TableRow>
+            <TableRow>
+                <TextView
+                    android:text="Set 1"/>
+                <Spinner
+                    android:id="@+id/spnr_scoreHome1">
+
+                </Spinner>
+                <Spinner
+                    android:id="@+id/spnr_scoreVisitor1">
+
+                </Spinner>
+            </TableRow>
+            <TableRow>
+                <TextView
+                    android:text="Set 2"/>
+                <Spinner
+                    android:id="@+id/spnr_scoreHome2">
+
+                </Spinner>
+                <Spinner
+                    android:id="@+id/spnr_scoreVisitor2">
+
+                </Spinner>
+            </TableRow>
+            <TableRow>
+                <TextView
+                    android:text="Set 3"/>
+                <Spinner
+                    android:id="@+id/spnr_scoreHome3">
+
+                </Spinner>
+                <Spinner
+                    android:id="@+id/spnr_scoreVisitor3">
+
+                </Spinner>
+            </TableRow>
+        </TableLayout>
+
+
 
     </LinearLayout>
+    </ScrollView>
 
-    <TableLayout
+    <Button
+        android:id="@+id/btn_delete_league_match"
+        android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:stretchColumns="0,1,2">
-        <TableRow>
-            <TextView
-                android:text=""/>
-            <TextView
-                android:text="Home"/>
-            <TextView
-                android:text="Visitor"/>
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="Set 1"/>
-            <Spinner
-                android:id="@+id/spnr_scoreHome1">
-
-            </Spinner>
-            <Spinner
-                android:id="@+id/spnr_scoreVisitor1">
-
-            </Spinner>
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="Set 2"/>
-            <Spinner
-                android:id="@+id/spnr_scoreHome2">
-
-            </Spinner>
-            <Spinner
-                android:id="@+id/spnr_scoreVisitor2">
-
-            </Spinner>
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="Set 3"/>
-            <Spinner
-                android:id="@+id/spnr_scoreHome3">
-
-            </Spinner>
-            <Spinner
-                android:id="@+id/spnr_scoreVisitor3">
-
-            </Spinner>
-        </TableRow>
-    </TableLayout>
-
-</LinearLayout>
-</ScrollView>
+        android:text="Delete Match"
+        android:onClick="onDeleteMatch"/>
+</RelativeLayout>

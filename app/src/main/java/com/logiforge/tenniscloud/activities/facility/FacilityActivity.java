@@ -1,12 +1,14 @@
 package com.logiforge.tenniscloud.activities.facility;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -160,6 +162,11 @@ public class FacilityActivity extends AppCompatActivity
                 pickerItems,
                 -1
         );
+        View focusedView = getCurrentFocus();
+        if(focusedView != null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
         dialog.show(getFragmentManager(), "StatePicker");
     }
 

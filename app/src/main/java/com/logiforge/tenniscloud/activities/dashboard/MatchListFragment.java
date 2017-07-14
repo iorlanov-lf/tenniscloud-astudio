@@ -12,11 +12,8 @@ import android.widget.ExpandableListView;
 
 import com.logiforge.tenniscloud.R;
 import com.logiforge.tenniscloud.activities.viewleaguematch.ViewLeagueMatchActivity;
-import com.logiforge.tenniscloud.db.MatchTbl;
 import com.logiforge.tenniscloud.facades.LeagueMatchFacade;
 import com.logiforge.tenniscloud.model.Match;
-
-import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +22,8 @@ import java.util.List;
 public class MatchListFragment extends Fragment {
     private List<String> headers;
     private HashMap<String, List<Match>> matches;
+
+    ExpandableListView matchListView;
     MatchListAdapter matchListAdapter;
 
     public MatchListFragment() {
@@ -36,16 +35,12 @@ public class MatchListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.act_dashboard_frag_match_list, container, false);
 
-        ExpandableListView expListView = (ExpandableListView) rootView.findViewById(R.id.match_list);
-
-        // preparing list data
-        prepareListData();
+        matchListView = (ExpandableListView) rootView.findViewById(R.id.match_list);
+        prepareMatchData();
 
         matchListAdapter = new MatchListAdapter(getActivity(), headers, matches);
-
-        // setting list adapter
-        expListView.setAdapter(matchListAdapter);
-        expListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+        matchListView.setAdapter(matchListAdapter);
+        matchListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
                 Match match = (Match) matchListAdapter.getChild(groupPosition, childPosition);
@@ -56,8 +51,9 @@ public class MatchListFragment extends Fragment {
                 return true;
             }
         });
-        for(int i = 0; i < matchListAdapter.getGroupCount(); i++)
-            expListView.expandGroup(i);
+        for(int i = 0; i < matchListAdapter.getGroupCount(); i++) {
+            matchListView.expandGroup(i);
+        }
 
         return rootView;
     }
@@ -71,11 +67,11 @@ public class MatchListFragment extends Fragment {
     }
 
     public void refresh() {
-        prepareListData();
+        prepareMatchData();
         matchListAdapter.notifyDataSetChanged();
     }
 
-    protected void prepareListData() {
+    protected void prepareMatchData() {
         if(headers == null) {
             headers = new ArrayList<String>();
         } else {

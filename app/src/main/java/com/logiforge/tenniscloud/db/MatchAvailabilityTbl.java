@@ -9,6 +9,7 @@ import com.logiforge.lavolta.android.model.api.sync.InventoryItem;
 import com.logiforge.tenniscloud.db.util.DbUtil;
 import com.logiforge.tenniscloud.model.MatchAvailability;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -68,17 +69,43 @@ public class MatchAvailabilityTbl extends DbDynamicTable {
 
     @Override
     protected ContentValues getContentForInsert(DynamicEntity dynamicEntity) {
-        return null;
+        return getContentForUpdate(dynamicEntity);
     }
 
     @Override
     protected ContentValues getContentForUpdate(DynamicEntity dynamicEntity) {
-        return null;
+        MatchAvailability availability = (MatchAvailability)dynamicEntity;
+
+        ContentValues values = new ContentValues();
+        values.put(COL_MATCH_PLAYER_ID, availability.getMatchPlayerId());
+        values.put(COL_DATE_RANGE, DbUtil.toString(availability.getDateRange()));
+        values.put(COL_TIME_RANGES, DbUtil.toString(availability.getTimeRanges()));
+
+        return values;
     }
 
     @Override
     protected String getTableName() {
         return TABLE_NAME;
+    }
+
+    public List<MatchAvailability> getPlayerAvailability(String playerId) {
+        List<MatchAvailability> availabilityList = new ArrayList<MatchAvailability>();
+
+        Cursor c;
+        c = db.query(TABLE_NAME, null,
+                COL_MATCH_PLAYER_ID+"=?",
+                new String[]{playerId},
+                null, null, null);
+        while (c.moveToNext()) {
+            MatchAvailability ma = fromCursor(c);
+            availabilityList.add(ma);
+        }
+        if (c != null && !c.isClosed()) {
+            c.close();
+        }
+
+        return availabilityList;
     }
 
     private MatchAvailability fromCursor(Cursor c) {

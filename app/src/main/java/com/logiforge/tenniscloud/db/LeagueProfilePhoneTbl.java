@@ -90,7 +90,7 @@ public class LeagueProfilePhoneTbl extends DbDynamicTable {
         return TABLE_NAME;
     }
 
-    public List<LeagueProfilePhone> findEmailsByProfileId(String profileId) {
+    public List<LeagueProfilePhone> findPhonesByProfileId(String profileId) {
         List<LeagueProfilePhone> phones = new ArrayList<LeagueProfilePhone>();
 
         Cursor c;

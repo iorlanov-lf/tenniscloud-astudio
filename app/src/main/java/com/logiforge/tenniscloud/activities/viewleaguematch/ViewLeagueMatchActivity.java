@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 
 import com.logiforge.tenniscloud.R;
 import com.logiforge.tenniscloud.activities.editleaguematch.EditLeagueMatchActivity;
+import com.logiforge.tenniscloud.activities.editleaguematch.EditLeagueMatchState;
 import com.logiforge.tenniscloud.facades.LeagueMatchFacade;
 import com.logiforge.tenniscloud.model.League;
 import com.logiforge.tenniscloud.model.LeagueProvider;
@@ -29,13 +31,8 @@ public class ViewLeagueMatchActivity extends AppCompatActivity {
     static final String PLAYERS_FRAGMENT_TAG_KEY = "playersFragmentTag";
     static final String SCHEDULE_FRAGMENT_TAG_KEY = "scheduleFragmentTag";
 
-    protected static Match match;
-    protected static boolean wasMatchChanged;
     public static void initStaticData(Match match) {
-        LeagueMatchFacade.Builder matchBuilder = new LeagueMatchFacade.Builder(match);
-        ViewLeagueMatchActivity.match =
-                matchBuilder.resolvePlayers().resolveLeagueData().resolveFacility().build();
-        wasMatchChanged = false;
+        EditLeagueMatchState.initInstance(match);
     }
 
     private TextView providerTextView;
@@ -52,15 +49,16 @@ public class ViewLeagueMatchActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.act_viewleaguematch);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         providerTextView = (TextView) findViewById(R.id.txt_provider);
         leagueTextView = (TextView) findViewById(R.id.txt_league);
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+
+        Match match = EditLeagueMatchState.instance().getMatch();
 
         PlayingLevel level = match.getLeagueFlight().getPlayingLevel();
         League league = match.getLeagueFlight().getLeague();
@@ -90,7 +88,7 @@ public class ViewLeagueMatchActivity extends AppCompatActivity {
     }
 
     public void onDone(final View view) {
-        if(wasMatchChanged) {
+        if(EditLeagueMatchState.instance().isMatchChanged()) {
             setResult(Activity.RESULT_OK);
         } else {
             setResult(Activity.RESULT_CANCELED);
@@ -99,7 +97,6 @@ public class ViewLeagueMatchActivity extends AppCompatActivity {
     }
 
     public void onEdit(final View view) {
-        EditLeagueMatchActivity.initStaticData(match);
         Intent intent = new Intent(this, EditLeagueMatchActivity.class);
         startActivityForResult(intent, REQUEST_EDIT);
     }
@@ -108,9 +105,7 @@ public class ViewLeagueMatchActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_EDIT) {
             if(resultCode == RESULT_OK) {
-                match = EditLeagueMatchActivity.getUpdatedMatch();
                 populateControls();
-                wasMatchChanged = true;
             }
         }
     }

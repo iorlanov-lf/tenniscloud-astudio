@@ -21,9 +21,6 @@ import java.util.List;
  */
 
 public class ContactInfoView extends LinearLayout {
-    private static final String STATE_SUPER_CLASS = "SuperClassState";
-    private static final String STATE_NAME = "Name";
-
     LayoutInflater inflater;
 
     TextView nameLabelTextView;

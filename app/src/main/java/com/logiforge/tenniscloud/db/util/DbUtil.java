@@ -73,6 +73,25 @@ public class DbUtil {
         }
     }
 
+    static public String toString(LocalDateRange dtRange) {
+        return dtRange.getStartDt().toString() + "," + dtRange.getEndDt().toString();
+    }
+
+    static public String toString(List<LocalTimeRange> tmRanges) {
+        StringBuilder sb = new StringBuilder();
+        for(int i=0; i<tmRanges.size(); i++) {
+            if(i > 0) {
+                sb.append(",");
+            }
+
+            sb.append(tmRanges.get(i).getStartTm().toString());
+            sb.append(",");
+            sb.append(tmRanges.get(i).getEndTm().toString());
+        }
+
+        return sb.toString();
+    }
+
     static public Integer toInteger(Boolean val) {
         if(val == null) {
             return null;

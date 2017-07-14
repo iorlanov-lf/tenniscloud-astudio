@@ -1,6 +1,7 @@
 package com.logiforge.tenniscloud.facades;
 
 import com.logiforge.tenniscloud.db.LeagueProfileEmailTbl;
+import com.logiforge.tenniscloud.db.LeagueProfilePhoneTbl;
 import com.logiforge.tenniscloud.model.LeagueProfile;
 
 /**
@@ -10,28 +11,31 @@ import com.logiforge.tenniscloud.model.LeagueProfile;
 public class LeagueProfileFacade {
     public static class Builder {
         LeagueProfile profile = null;
-        boolean resolveEmailsFlag = false;
-        boolean resolveFacilityFlag = false;
+        boolean resolveEmailsAndPhones = false;
+        boolean resolveFacility = false;
 
         public Builder(LeagueProfile profile) {
             this.profile = profile;
         }
 
-        public Builder resolveEmails() {
-            resolveEmailsFlag = true;
+        public Builder resolveEmailsAndPhones() {
+            resolveEmailsAndPhones = true;
             return this;
         }
 
         public Builder resolveFacility() {
-            resolveFacilityFlag = true;
+            resolveFacility = true;
             return this;
         }
 
         public LeagueProfile build() {
             if(profile != null) {
-                if (resolveEmailsFlag) {
+                if (resolveEmailsAndPhones) {
                     LeagueProfileEmailTbl emailTbl = new LeagueProfileEmailTbl();
                     profile.setEmails(emailTbl.findEmailsByProfileId(profile.id));
+
+                    LeagueProfilePhoneTbl phoneTbl = new LeagueProfilePhoneTbl();
+                    profile.setPhones(phoneTbl.findPhonesByProfileId(profile.id));
                 }
             }
 

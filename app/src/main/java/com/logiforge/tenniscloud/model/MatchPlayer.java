@@ -113,6 +113,13 @@ public class MatchPlayer extends DynamicEntity {
                 phones.add(new MatchPlayerPhone(otherPhone));
             }
         }
+
+        if(otherPlayer.getAvailabilityList() != null) {
+            availabilityList = new ArrayList<>();
+            for(MatchAvailability otherAvailability : otherPlayer.getAvailabilityList()) {
+                availabilityList.add(new MatchAvailability(otherAvailability));
+            }
+        }
     }
 
     public boolean isDifferent(MatchPlayer otherPlayer) {

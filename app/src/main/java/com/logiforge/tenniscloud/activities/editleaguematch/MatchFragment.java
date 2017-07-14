@@ -40,15 +40,17 @@ import java.util.List;
  */
 
 public class MatchFragment extends Fragment {
+    public interface MatchFragmentContext {
+        void setMatchFragmentTag(String tag);
+    }
+
     private static final String KEY_MATCHWEEK_SPINNER = "KEY_MATCHWEEK_SPINNER";
     private static final String KEY_HOMEAWAY_SPINNER = "KEY_HOMEAWAY_SPINNER";
     private static final String KEY_FACILITY_ID = "KEY_FACILITY_ID";
     private static final String KEY_OUTCOME_SPINNER = "KEY_OUTCOME_SPINNER";
     private static final String KEY_SCORE_SPINNER = "KEY_OUTCOME_SPINNER_";
-    public static final String TIME_FORMAT = "kk:mm a";
+    public static final String TIME_FORMAT = "h:mm a";
     public static final String DATE_FORMAT = "MM/dd/yyyy";
-
-    private Match match;
 
     Spinner matchWeekSpinner = null;
     Spinner homeAwaySpinner = null;
@@ -66,7 +68,8 @@ public class MatchFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.act_editleaguematch_frag_match, container, false);
 
-        match = EditLeagueMatchActivity.match;
+        Match match = EditLeagueMatchState.instance().getMatch();
+
         matchWeekSpinner = (Spinner)rootView.findViewById(R.id.spnr_matchWeek);
         homeAwaySpinner = (Spinner)rootView.findViewById(R.id.spnr_homeAway);
         outcomeSpinner = (Spinner)rootView.findViewById(R.id.spnr_outcome);
@@ -233,9 +236,9 @@ public class MatchFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
-        EditLeagueMatchActivity activity = (EditLeagueMatchActivity)context;
-        activity.matchFragmentTag = this.getTag();
+        if(context instanceof MatchFragmentContext) {
+            ((MatchFragmentContext) context).setMatchFragmentTag(getTag());
+        }
     }
 
     @Override
