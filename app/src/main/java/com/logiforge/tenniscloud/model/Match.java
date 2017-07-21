@@ -26,6 +26,11 @@ public class Match extends DynamicEntity {
     public static final int MATCH_FORMAT_SUPER_TIEBREAK = 3;
     public static final int MATCH_FORMAT_10GAME_SET = 4;
 
+    public static final String PLAYER_ROLE_SELF = "You";
+    public static final String PLAYER_ROLE_PARTNER = "Partner";
+    public static final String PLAYER_ROLE_OPPONENT1 = "Opponent 1";
+    public static final String PLAYER_ROLE_OPPONENT2 = "Opponent 2";
+
     public enum Outcome {
         NOT_YET_PLAYED(0, "Not Yet Played"),
         COMPLETED(10, "Completed"),

@@ -1,5 +1,6 @@
 package com.logiforge.tenniscloud.facades;
 
+import com.logiforge.tenniscloud.db.LeagueProfileTbl;
 import com.logiforge.tenniscloud.db.LeagueProviderTbl;
 import com.logiforge.tenniscloud.db.LeagueRegistrationTbl;
 import com.logiforge.tenniscloud.db.MatchAvailabilityTbl;
@@ -54,7 +55,7 @@ public class MatchPlayerFacade {
                         MatchPlayerPhoneTbl phoneTbl = new MatchPlayerPhoneTbl();
                         player.setPhones(phoneTbl.findPhonesByPlayerId(player.id));
                     } else if(player.getLeagueProfile() == null) {
-                        LeagueProviderTbl profileTbl = new LeagueProviderTbl();
+                        LeagueProfileTbl profileTbl = new LeagueProfileTbl();
                         LeagueProfile profile = (LeagueProfile)profileTbl.find(player.getLeagueProfileId());
                         LeagueProfileFacade.Builder profileBuilder = new LeagueProfileFacade.Builder(profile);
                         profileBuilder.resolveEmailsAndPhones().build();

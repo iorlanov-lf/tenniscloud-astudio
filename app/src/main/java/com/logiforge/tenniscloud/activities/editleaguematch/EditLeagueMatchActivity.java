@@ -130,6 +130,9 @@ public class EditLeagueMatchActivity extends AppCompatActivity
 
         LeagueMatchFacade matchFacade = new LeagueMatchFacade();
         if(matchFacade.updateLeagueMatch(this, EditLeagueMatchState.instance())) {
+            EditLeagueMatchState editState = EditLeagueMatchState.instance();
+            editState = EditLeagueMatchState.initInstance(editState.getUpdatedMatch());
+            editState.setMatchChanged(true);
 
             setResult(Activity.RESULT_OK);
             finish();

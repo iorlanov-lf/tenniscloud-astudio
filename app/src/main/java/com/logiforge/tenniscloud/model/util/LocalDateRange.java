@@ -2,6 +2,9 @@ package com.logiforge.tenniscloud.model.util;
 
 import org.joda.time.LocalDate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by iorlanov on 2/16/2017.
  */
@@ -17,6 +20,17 @@ public class LocalDateRange {
     public LocalDateRange(LocalDateRange otherDateRange) {
         startDt = new LocalDate(otherDateRange.getStartDt());
         endDt = new LocalDate(otherDateRange.getEndDt());
+    }
+
+    public List<LocalDate> getDates() {
+        List<LocalDate> dates = new ArrayList<>();
+        LocalDate currentDt = startDt;
+        do {
+            dates.add(currentDt);
+            currentDt = currentDt.plusDays(1);
+        } while(currentDt.isBefore(endDt) || currentDt.isEqual(endDt));
+
+        return dates;
     }
 
     @Override

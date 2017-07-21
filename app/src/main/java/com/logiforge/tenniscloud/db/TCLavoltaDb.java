@@ -6,6 +6,7 @@ import com.logiforge.lavolta.android.db.DynEntityMeta;
 import com.logiforge.lavolta.android.db.LavoltaDb;
 import com.logiforge.lavolta.android.db.RefEntityMeta;
 import com.logiforge.tenniscloud.model.Match;
+import com.logiforge.tenniscloud.model.MatchAvailability;
 import com.logiforge.tenniscloud.model.MatchPlayer;
 
 import java.util.ArrayList;
@@ -28,6 +29,9 @@ public class TCLavoltaDb extends LavoltaDb {
         metaData.add(matchMeta);
         DynEntityMeta playerMeta = new DynEntityMeta(MatchPlayer.class, MatchPlayerTbl.class, new MatchPlayer.Converter(), null, true);
         metaData.add(playerMeta);
+        DynEntityMeta availabilityMeta =
+                new DynEntityMeta(MatchAvailability.class, MatchAvailabilityTbl.class, new MatchAvailability.Converter(), null, true);
+        metaData.add(availabilityMeta);
 
         return metaData;
     }

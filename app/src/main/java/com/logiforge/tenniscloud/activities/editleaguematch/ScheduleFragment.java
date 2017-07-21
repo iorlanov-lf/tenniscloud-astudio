@@ -8,15 +8,20 @@ import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.logiforge.tenniscloud.R;
 import com.logiforge.tenniscloud.facades.LeagueMatchFacade;
-import com.logiforge.tenniscloud.model.Match;
+import com.logiforge.tenniscloud.facades.LeagueMatchFacade.MatchPlayerWithRole;
 import com.logiforge.tenniscloud.model.MatchAvailability;
+import com.logiforge.tenniscloud.model.MatchPlayer;
+import com.logiforge.tenniscloud.model.util.EditableEntityList;
 import com.logiforge.tenniscloud.model.util.LocalTimeRange;
 
 import java.util.ArrayList;
@@ -29,27 +34,40 @@ import java.util.TreeSet;
  * Created by iorlanov on 4/16/2017.
  */
 
-public class ScheduleFragment extends Fragment implements View.OnClickListener {
+public class ScheduleFragment extends Fragment
+        implements View.OnClickListener, Spinner.OnItemSelectedListener {
 
     public interface ScheduleFragmentContext {
         void setScheduleFragmentTag(String tag);
     }
 
+    Spinner playerSpinner;
     Button addAvailabilityButton;
     ExpandableListView availabilityListView;
+
+    ArrayAdapter<MatchPlayerWithRole> playerSpinnerAdapter;
     AvailabilityListAdapter availabilityListAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.act_editleaguematch_frag_schedule, container, false);
+        playerSpinner = (Spinner) rootView.findViewById(R.id.spnr_player);
         addAvailabilityButton = (Button) rootView.findViewById(R.id.btn_add_availability);
         availabilityListView = (ExpandableListView) rootView.findViewById(R.id.availability_list);
 
-        Match updatedMatch = EditLeagueMatchState.instance().getUpdatedMatch();
+        EditLeagueMatchState editState = EditLeagueMatchState.instance();
+        LeagueMatchFacade matchFacade = new LeagueMatchFacade();
+        List<MatchPlayerWithRole> playersWithRoles = matchFacade.getPlayersWithRoles(editState.getUpdatedMatch());
+        playerSpinnerAdapter =
+                new ArrayAdapter<MatchPlayerWithRole>(
+                        this.getActivity(), android.R.layout.simple_spinner_dropdown_item, playersWithRoles);
+        playerSpinner.setAdapter(playerSpinnerAdapter);
+        playerSpinner.setOnItemSelectedListener(this);
 
-
-        availabilityListAdapter = new AvailabilityListAdapter(getActivity(), EditLeagueMatchState.instance());
+        availabilityListAdapter =
+                new AvailabilityListAdapter(getActivity(),
+                        editState.getAvailabilityList(editState.getEditableAvailabilityPlayerId()));
         availabilityListView.setAdapter(availabilityListAdapter);
 
         addAvailabilityButton.setOnClickListener(this);
@@ -75,6 +93,18 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        MatchPlayerWithRole playerWithRole = playerSpinnerAdapter.getItem(position);
+        EditLeagueMatchState editState = EditLeagueMatchState.instance();
+        availabilityListAdapter.replaceAvailabilityList(
+                editState.getAvailabilityList(playerWithRole.player.id));
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+    }
+
     public void deleteAvailability(String availabilityId) {
         availabilityListAdapter.deleteAvailability(availabilityId);
     }
@@ -90,32 +120,32 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
     public class AvailabilityListAdapter extends BaseExpandableListAdapter {
 
         private Context context;
-        EditLeagueMatchState editState;
+        EditableEntityList<MatchAvailability> availabilities;
 
 
-        public AvailabilityListAdapter(Context context, EditLeagueMatchState editState) {
+        public AvailabilityListAdapter(Context context, EditableEntityList<MatchAvailability> availabilities) {
             this.context = context;
-            this.editState = editState;
+            this.availabilities = availabilities;
         }
 
         @Override
         public int getGroupCount() {
-            return editState.getAvailabilityList().size();
+            return availabilities.size();
         }
 
         @Override
         public int getChildrenCount(int groupPosition) {
-            return editState.getAvailabilityList().get(groupPosition).getTimeRanges().size();
+            return availabilities.get(groupPosition).getTimeRanges().size();
         }
 
         @Override
         public Object getGroup(int groupPosition) {
-            return editState.getAvailabilityList().get(groupPosition);
+            return availabilities.get(groupPosition);
         }
 
         @Override
         public Object getChild(int groupPosition, int childPosition) {
-            return editState.getAvailabilityList().get(groupPosition).getTimeRanges().get(childPosition);
+            return availabilities.get(groupPosition).getTimeRanges().get(childPosition);
         }
 
         @Override
@@ -157,9 +187,9 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
             MatchAvailability availability = (MatchAvailability) getGroup(groupPosition);
             LocalTimeRange tmRange = availability.getTimeRanges().get(childPosition);
             if (convertView == null) {
-                LayoutInflater infalInflater = (LayoutInflater) this.context
+                LayoutInflater inflater = (LayoutInflater) this.context
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                convertView = infalInflater.inflate(R.layout.act_editleaguematch_frag_schedule_child_item, null);
+                convertView = inflater.inflate(R.layout.act_editleaguematch_frag_schedule_child_item, null);
             }
 
             TextView childDescriptionView = (TextView) convertView.findViewById(R.id.lbl_child);
@@ -174,47 +204,27 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
         }
 
         public MatchAvailability getAvailability(int idx) {
-            return editState.getAvailabilityList().get(idx);
+            return availabilities.get(idx);
         }
 
         public void addAvailability(MatchAvailability availability) {
-            LeagueMatchFacade.PlayerBreakdown playerBreakdown = editState.getPlayerBreakdown();
-            availability.setMatchPlayerId(playerBreakdown.self.id);
-
-            editState.getAddedAvailability().add(availability.id);
-            editState.getAvailabilityList().add(availability);
+            availabilities.addEntity(availability);
             this.notifyDataSetChanged();
         }
 
         public void deleteAvailability(String availabilityId) {
-            for(int i=0; i<editState.getAvailabilityList().size(); i++) {
-                if(editState.getAvailabilityList().get(i).id.equals(availabilityId)) {
-                    editState.getAvailabilityList().remove(i);
-                    if(editState.getAddedAvailability().contains(availabilityId)) {
-                        editState.getAddedAvailability().remove(availabilityId);
-                    } else {
-                        editState.getDeletedAvailability().add(availabilityId);
-                        editState.getUpdatedAvailability().remove(availabilityId);
-                    }
-                    this.notifyDataSetChanged();
-                    break;
-                }
-            }
+            availabilities.deleteEntity(availabilityId);
+            this.notifyDataSetChanged();
         }
 
         public void updateAvailability(MatchAvailability availability) {
-            for(int i=0; i<editState.getAvailabilityList().size(); i++) {
-                MatchAvailability availabilityToUpdate = editState.getAvailabilityList().get(i);
-                if(availabilityToUpdate.id.equals(availability.id)) {
-                    availabilityToUpdate.setDateRange(availability.getDateRange());
-                    availabilityToUpdate.setTimeRanges(availability.getTimeRanges());
-                    if(!editState.getAddedAvailability().contains(availability.id)) {
-                        editState.getUpdatedAvailability().add(availability.id);
-                    }
-                    this.notifyDataSetChanged();
-                    break;
-                }
-            }
+            availabilities.markAsUpdated(availability);
+            this.notifyDataSetChanged();
+        }
+
+        public void replaceAvailabilityList(EditableEntityList<MatchAvailability> availabilities) {
+            this.availabilities = availabilities;
+            this.notifyDataSetChanged();
         }
 
         private class OnEditClickListener implements View.OnClickListener {
@@ -226,7 +236,7 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void onClick(View v) {
-                for(MatchAvailability availability : editState.getAvailabilityList()) {
+                for(MatchAvailability availability : availabilities.getEntities()) {
                     if(availability.id.equals(availabilityId)) {
                         FragmentManager fm = getActivity().getSupportFragmentManager();
                         AvailabilityDlg availabilityDlg =

@@ -3,8 +3,10 @@ package com.logiforge.tenniscloud.activities.editleaguematch;
 import com.logiforge.tenniscloud.facades.LeagueMatchFacade;
 import com.logiforge.tenniscloud.model.Match;
 import com.logiforge.tenniscloud.model.MatchAvailability;
+import com.logiforge.tenniscloud.model.util.EditableEntityList;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -26,14 +28,15 @@ public class EditLeagueMatchState {
         instance.match = match;
         instance.updatedMatch = new Match(match);
         instance.matchChanged = false;
-        instance.addedAvailability = new TreeSet<String>();
-        instance.updatedAvailability = new TreeSet<String>();
-        instance.deletedAvailability = new TreeSet<String>();
 
         LeagueMatchFacade matchFacade = new LeagueMatchFacade();
         instance.playerBreakdown =
                 matchFacade.getPlayerBreakdown(instance.updatedMatch);
-        instance.availabilityList = instance.playerBreakdown.self.getAvailabilityList();
+
+        instance.editableAvailabilityLists =
+                matchFacade.getEditableAvailabilityLists(instance.updatedMatch);
+        instance.editableAvailabilityPlayerId = instance.playerBreakdown.self.id;
+
 
         return instance;
     }
@@ -42,14 +45,12 @@ public class EditLeagueMatchState {
         return instance;
     }
 
-    Match match;
-    Match updatedMatch;
-    boolean matchChanged;
-    LeagueMatchFacade.PlayerBreakdown playerBreakdown;
-    Set<String> addedAvailability;
-    Set<String> updatedAvailability;
-    Set<String> deletedAvailability;
-    List<MatchAvailability> availabilityList;
+    private Match match;
+    private Match updatedMatch;
+    private boolean matchChanged;
+    private LeagueMatchFacade.PlayerBreakdown playerBreakdown;
+    private Map<String, EditableEntityList<MatchAvailability>> editableAvailabilityLists;
+    private String editableAvailabilityPlayerId;
 
     public Match getMatch() {
         return match;
@@ -71,29 +72,15 @@ public class EditLeagueMatchState {
         this.matchChanged = matchChanged;
     }
 
-    public Set<String> getAddedAvailability() {
-        return addedAvailability;
+    public EditableEntityList<MatchAvailability> getAvailabilityList(String playerId) {
+        return editableAvailabilityLists.get(playerId);
     }
 
-    public Set<String> getUpdatedAvailability() {
-        return updatedAvailability;
+    public String getEditableAvailabilityPlayerId() {
+        return editableAvailabilityPlayerId;
     }
 
-    public Set<String> getDeletedAvailability() {
-        return deletedAvailability;
-    }
-
-    public List<MatchAvailability> getAvailabilityList() {
-        return availabilityList;
-    }
-
-    public MatchAvailability getAvailability(String availabilityId) {
-        for(MatchAvailability availability : availabilityList) {
-            if(availability.id.equals(availabilityId)) {
-                return availability;
-            }
-        }
-
-        return null;
+    public void setEditableAvailabilityPlayerId(String editableAvailabilityPlayerId) {
+        this.editableAvailabilityPlayerId = editableAvailabilityPlayerId;
     }
 }

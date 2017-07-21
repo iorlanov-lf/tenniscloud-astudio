@@ -5,12 +5,25 @@
     android:orientation="vertical"
     tools:context=".activities.editleaguematch.EditLeagueMatchActivity">
 
-    <Button
-        android:id="@+id/btn_add_availability"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="0dp" android:minWidth="0dp"
-        android:text="Add Availability"/>
+        android:layout_height="wrap_content">
+
+        <Spinner
+            android:id="@+id/spnr_player"
+            android:layout_width="0px"
+            android:layout_weight="0.5"
+            android:layout_height="wrap_content">
+        </Spinner>
+
+        <Button
+            android:id="@+id/btn_add_availability"
+            android:layout_width="0px"
+            android:layout_weight="0.5"
+            android:layout_height="wrap_content"
+            android:minHeight="0dp" android:minWidth="0dp"
+            android:text="Add Availability"/>
+    </LinearLayout>
 
     <ExpandableListView
         android:id="@+id/availability_list"

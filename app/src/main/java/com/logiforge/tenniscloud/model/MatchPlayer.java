@@ -385,11 +385,29 @@ public class MatchPlayer extends DynamicEntity {
         return utilPhones;
     }
 
+    public String getKnownDisplayName(String role) {
+        if(this.displayName != null) {
+            return this.displayName;
+        } else if(this.leagueProfile != null && this.leagueProfile.getDisplayName() != null) {
+            return this.leagueProfile.getDisplayName();
+        } else {
+            return role;
+        }
+    }
+
     public void setPhonesFromUtilPhones(List<Phone> utilPhones) {
         phones = new ArrayList<>();
         for(Phone utilPhone : utilPhones) {
             phones.add(new MatchPlayerPhone(this.id, utilPhone.number, utilPhone.type));
         }
+    }
+
+    public boolean hasEditableContctInfo() {
+        return emails != null && phones != null;
+    }
+
+    public boolean hasEditableAvailability() {
+        return this.userId == null && this.availabilityList != null;
     }
 
     public static class Converter extends MPackDynEntityConverter {

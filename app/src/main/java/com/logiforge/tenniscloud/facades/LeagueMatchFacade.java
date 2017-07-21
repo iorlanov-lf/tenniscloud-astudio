@@ -3,6 +3,8 @@ package com.logiforge.tenniscloud.facades;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 
 import com.logiforge.lavolta.android.app.Lavolta;
@@ -36,13 +38,19 @@ import com.logiforge.tenniscloud.model.Partner;
 import com.logiforge.tenniscloud.model.PartnerEmail;
 import com.logiforge.tenniscloud.model.PartnerPhone;
 import com.logiforge.tenniscloud.model.PlayingLevel;
+import com.logiforge.tenniscloud.model.util.EditableEntityList;
 import com.logiforge.tenniscloud.model.util.ListDiff;
+import com.logiforge.tenniscloud.model.util.LocalDateRange;
+import com.logiforge.tenniscloud.model.util.LocalTimeRange;
 
 import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by iorlanov on 5/2/17.
@@ -145,6 +153,30 @@ public class LeagueMatchFacade {
         public MatchPlayer opponent2;
     }
 
+    public static class GroupAvailability {
+        public LocalDateRange dateRange;
+        public List<LocalTimeRange> selfTimeRanges;
+        public List<LocalTimeRange> partnerTimeRanges;
+        public List<LocalTimeRange> opponent1TimeRanges;
+        public List<LocalTimeRange> opponent2TimeRanges;
+
+    }
+
+    public static class MatchPlayerWithRole {
+        public String role;
+        public MatchPlayer player;
+
+        public MatchPlayerWithRole(String role, MatchPlayer player) {
+            this.role = role;
+            this.player = player;
+        }
+
+        @Override
+        public String toString() {
+            return player.getKnownDisplayName(role);
+        }
+    }
+
     private static class MatchBreakdownBuilder {
         private static final String SCHEDULE_GROUP_UNSCHEDULED = "Unscheduled";
         private static final String SCHEDULE_GROUP_TODAY = "Scheduled Today";
@@ -197,6 +229,114 @@ public class LeagueMatchFacade {
     public PlayerBreakdown getPlayerBreakdown(Match match) {
         PlayerBreakdown playerBreakdown = new PlayerBreakdown(match);
         return playerBreakdown;
+    }
+
+    public List<MatchPlayerWithRole> getPlayersWithRoles(Match match) {
+        List<MatchPlayerWithRole> playersWithRoles = new ArrayList<>();
+
+        PlayerBreakdown players = new PlayerBreakdown(match);
+        playersWithRoles.add(new MatchPlayerWithRole(Match.PLAYER_ROLE_SELF, players.self));
+
+        if(players.partner != null) {
+            playersWithRoles.add(new MatchPlayerWithRole(Match.PLAYER_ROLE_PARTNER, players.partner));
+        }
+
+        if(players.opponent1 != null) {
+            playersWithRoles.add(new MatchPlayerWithRole(Match.PLAYER_ROLE_OPPONENT1, players.opponent1));
+        }
+
+        if(players.opponent2 != null) {
+            playersWithRoles.add(new MatchPlayerWithRole(Match.PLAYER_ROLE_OPPONENT2, players.opponent2));
+        }
+
+        return playersWithRoles;
+    }
+
+    public Map<String, EditableEntityList<MatchAvailability>> getEditableAvailabilityLists(Match match) {
+        Map<String, EditableEntityList<MatchAvailability>> lists = new TreeMap<>();
+
+        PlayerBreakdown players = getPlayerBreakdown(match);
+
+        lists.put(players.self.id, new EditableEntityList<>(players.self.getAvailabilityList()));
+
+        if(players.partner != null && players.partner.hasEditableAvailability()) {
+            lists.put(players.partner.id, new EditableEntityList<>(players.partner.getAvailabilityList()));
+        }
+
+        if(players.opponent1 != null && players.opponent1.hasEditableAvailability()) {
+            lists.put(players.opponent1.id, new EditableEntityList<>(players.opponent1.getAvailabilityList()));
+        }
+
+        if(players.opponent2 != null && players.opponent2.hasEditableAvailability()) {
+            lists.put(players.opponent2.id, new EditableEntityList<>(players.opponent2.getAvailabilityList()));
+        }
+
+        return lists;
+    }
+
+    public Collection<GroupAvailability> getGroupAvailabilityList(Match match) {
+        Map<LocalDate, GroupAvailability> groupAvailabilityMap = new TreeMap<>();
+
+        PlayerBreakdown players = getPlayerBreakdown(match);
+
+        if(players.self.getAvailabilityList() != null) {
+            for (MatchAvailability availability : players.self.getAvailabilityList()) {
+                List<LocalDate> dates = availability.getDateRange().getDates();
+                for(LocalDate date : dates) {
+                    GroupAvailability groupAvailability = new GroupAvailability();
+                    groupAvailability.dateRange = new LocalDateRange(date, date);
+                    groupAvailability.selfTimeRanges = availability.getTimeRanges();
+                    groupAvailabilityMap.put(date, groupAvailability);
+                }
+            }
+        }
+
+        if(players.partner != null && players.partner.getAvailabilityList() != null) {
+            for (MatchAvailability availability : players.partner.getAvailabilityList()) {
+                List<LocalDate> dates = availability.getDateRange().getDates();
+                for(LocalDate date : dates) {
+                    GroupAvailability groupAvailability = groupAvailabilityMap.get(date);
+                    if(groupAvailability == null) {
+                        groupAvailability = new GroupAvailability();
+                        groupAvailability.dateRange = new LocalDateRange(date, date);
+                    }
+                    groupAvailability.partnerTimeRanges = availability.getTimeRanges();
+                    groupAvailabilityMap.put(date, groupAvailability);
+                }
+            }
+        }
+
+        if(players.opponent1 != null && players.opponent1.getAvailabilityList() != null) {
+            for (MatchAvailability availability : players.opponent1.getAvailabilityList()) {
+                List<LocalDate> dates = availability.getDateRange().getDates();
+                for(LocalDate date : dates) {
+                    GroupAvailability groupAvailability = groupAvailabilityMap.get(date);
+                    if(groupAvailability == null) {
+                        groupAvailability = new GroupAvailability();
+                        groupAvailability.dateRange = new LocalDateRange(date, date);
+                    }
+                    groupAvailability.opponent1TimeRanges = availability.getTimeRanges();
+                    groupAvailabilityMap.put(date, groupAvailability);
+                }
+            }
+        }
+
+        if(players.opponent2 != null && players.opponent2.getAvailabilityList() != null) {
+            for (MatchAvailability availability : players.opponent2.getAvailabilityList()) {
+                List<LocalDate> dates = availability.getDateRange().getDates();
+                for(LocalDate date : dates) {
+                    GroupAvailability groupAvailability = groupAvailabilityMap.get(date);
+                    if(groupAvailability == null) {
+                        groupAvailability = new GroupAvailability();
+                        groupAvailability.dateRange = new LocalDateRange(date, date);
+                    }
+                    groupAvailability.opponent2TimeRanges = availability.getTimeRanges();
+                    groupAvailabilityMap.put(date, groupAvailability);
+                }
+            }
+        }
+
+        return groupAvailabilityMap.values();
     }
 
     public void getMatchBreakdownByTime(List<String> headers, Map<String, List<Match>> matches) {
@@ -343,14 +483,19 @@ public class LeagueMatchFacade {
             }
 
             MatchPlayerTbl playerTbl = new MatchPlayerTbl();
+            MatchAvailabilityTbl availabilityTbl = new MatchAvailabilityTbl();
+
             for(MatchPlayer updatedPlayer : editState.getUpdatedMatch().getPlayers()) {
                 MatchPlayer originalPlayer = editState.getMatch().findPlayerByPlayerId(updatedPlayer.id);
+
                 if(updatedPlayer.isDifferent(originalPlayer)) {
                     playerTbl.uiUpdate(txn, updatedPlayer, null, null);
+                }
 
+                if(originalPlayer.hasEditableContctInfo()) {
                     ListDiff<MatchPlayerEmail> emailDiff =
                             originalPlayer.getEmailDiff(updatedPlayer.getEmails());
-                    if(emailDiff.hasDifference()) {
+                    if (emailDiff.hasDifference()) {
                         MatchPlayerEmailTbl emailTbl = new MatchPlayerEmailTbl();
                         for (MatchPlayerEmail email : emailDiff.deleted) {
                             emailTbl.uiDelete(txn, email.id, null);
@@ -362,7 +507,7 @@ public class LeagueMatchFacade {
 
                     ListDiff<MatchPlayerPhone> phoneDiff =
                             originalPlayer.getPhoneDiff(updatedPlayer.getPhones());
-                    if(phoneDiff.hasDifference()) {
+                    if (phoneDiff.hasDifference()) {
                         MatchPlayerPhoneTbl phoneTbl = new MatchPlayerPhoneTbl();
                         for (MatchPlayerPhone phone : phoneDiff.deleted) {
                             phoneTbl.uiDelete(txn, phone.id, null);
@@ -376,23 +521,23 @@ public class LeagueMatchFacade {
                         }
                     }
                 }
-            }
 
-            MatchAvailabilityTbl availabilityTbl = new MatchAvailabilityTbl();
+                EditableEntityList<MatchAvailability> availabilityList = editState.getAvailabilityList(updatedPlayer.id);
 
-            for(String availabilityId : editState.getAddedAvailability()) {
-                MatchAvailability availability = editState.getAvailability(availabilityId);
-                availabilityTbl.uiAdd(txn, availability, null);
-            }
+                if(availabilityList != null) {
+                    for (MatchAvailability availability : availabilityList.getAddedEntities()) {
+                        availability.setMatchPlayerId(updatedPlayer.id);
+                        availabilityTbl.uiAdd(txn, availability, null);
+                    }
 
-            for(String availabilityId : editState.getUpdatedAvailability()) {
-                MatchAvailability availability = editState.getAvailability(availabilityId);
-                availabilityTbl.uiUpdate(txn, availability, null, null);
-            }
+                    for (MatchAvailability availability : availabilityList.getUpdatedEntities()) {
+                        availabilityTbl.uiUpdate(txn, availability, null, null);
+                    }
 
-            for(String availabilityId : editState.getDeletedAvailability()) {
-                MatchAvailability availability = editState.getAvailability(availabilityId);
-                availabilityTbl.uiDelete(txn, availabilityId, null);
+                    for (String availabilityId : availabilityList.getDeletedEntityIds()) {
+                        availabilityTbl.uiDelete(txn, availabilityId, null);
+                    }
+                }
             }
 
             db.commitTxn(txn);

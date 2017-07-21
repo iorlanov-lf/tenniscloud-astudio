@@ -1,9 +1,11 @@
 package com.logiforge.tenniscloud.model;
 
+import com.logiforge.lavolta.android.api.protocol.MPackDynEntityConverter;
 import com.logiforge.lavolta.android.model.DynamicEntity;
 import com.logiforge.tenniscloud.model.util.LocalDateRange;
 import com.logiforge.tenniscloud.model.util.LocalTimeRange;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,5 +71,18 @@ public class MatchAvailability extends DynamicEntity {
 
     public void setTimeRanges(List<LocalTimeRange> timeRanges) {
         this.timeRanges = timeRanges;
+    }
+
+    public static class Converter extends MPackDynEntityConverter {
+
+        @Override
+        public void pack(Object o, Object o1) throws IOException {
+
+        }
+
+        @Override
+        public Object unpack(Object o) throws IOException {
+            return null;
+        }
     }
 }
