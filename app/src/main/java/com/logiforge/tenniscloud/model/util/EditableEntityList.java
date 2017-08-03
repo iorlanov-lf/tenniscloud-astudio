@@ -41,6 +41,16 @@ public class EditableEntityList <T extends DynamicEntity> {
         return entities;
     }
 
+    public T find(String id) {
+        for(T entity : entities) {
+            if(entity.id.equals(id)) {
+                return entity;
+            }
+        }
+
+        return null;
+    }
+
     public void addEntity(T entity) {
         addedEntities.put(entity.id, entity);
         entities.add(entity);

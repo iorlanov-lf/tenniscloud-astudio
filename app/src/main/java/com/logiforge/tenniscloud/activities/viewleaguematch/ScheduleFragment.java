@@ -16,7 +16,7 @@ import com.logiforge.tenniscloud.R;
 import com.logiforge.tenniscloud.activities.editleaguematch.EditLeagueMatchState;
 import com.logiforge.tenniscloud.facades.LeagueMatchFacade;
 import com.logiforge.tenniscloud.facades.LeagueMatchFacade.PlayerBreakdown;
-import com.logiforge.tenniscloud.facades.LeagueMatchFacade.GroupAvailability;
+import com.logiforge.tenniscloud.facades.MatchAvailabilityFacade.GroupAvailability;
 import com.logiforge.tenniscloud.model.Match;
 import com.logiforge.tenniscloud.model.util.LocalTimeRange;
 
@@ -28,20 +28,15 @@ import java.util.List;
  */
 
 public class ScheduleFragment extends Fragment {
+    GroupAvailabilityListAdapter groupAvailabilityListAdapter;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.act_viewleaguematch_frag_schedule, container, false);
 
         ListView groupAvailabilityListView = (ListView) rootView.findViewById(R.id.list_group_availability);
-
-        LeagueMatchFacade matchFacade = new LeagueMatchFacade();
-        List<GroupAvailability> groupAvailabilityList =
-                new ArrayList<>(matchFacade.getGroupAvailabilityList(EditLeagueMatchState.instance().getUpdatedMatch()));
-        GroupAvailability[] groupAvailabilityArray = groupAvailabilityList.toArray(new GroupAvailability[0]);
-
-        GroupAvailabilityListAdapter groupAvailabilityListAdapter =
-                new GroupAvailabilityListAdapter(getActivity(), groupAvailabilityArray);
+        groupAvailabilityListAdapter = new GroupAvailabilityListAdapter(getActivity(), getGroupAvailabilityList());
         groupAvailabilityListView.setAdapter(groupAvailabilityListAdapter);
 
         return rootView;
@@ -55,21 +50,28 @@ public class ScheduleFragment extends Fragment {
         activity.scheduleFragmentTag = this.getTag();
     }
 
+    public void populateControls() {
+        groupAvailabilityListAdapter.replaceAvailablityList(getGroupAvailabilityList());
+    }
+
+    private List<GroupAvailability> getGroupAvailabilityList() {
+        LeagueMatchFacade matchFacade = new LeagueMatchFacade();
+        List<GroupAvailability> groupAvailabilityList =
+                new ArrayList<>(matchFacade.getGroupAvailabilityList(EditLeagueMatchState.instance().getUpdatedMatch()));
+        return groupAvailabilityList;
+    }
+
     public static class GroupAvailabilityListAdapter extends ArrayAdapter<GroupAvailability> {
 
-        GroupAvailability[] groupAvailabilityArray;
-
-        public GroupAvailabilityListAdapter(Context context, GroupAvailability[] groupAvailabilityArray) {
-            super(context, R.layout.act_viewleaguematch_frag_schedule_item, groupAvailabilityArray);
-
-            this.groupAvailabilityArray = groupAvailabilityArray;
+        public GroupAvailabilityListAdapter(Context context, List<GroupAvailability> groupAvailabilityList) {
+            super(context, R.layout.act_viewleaguematch_frag_schedule_item, groupAvailabilityList);
         }
 
         @NonNull
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             PlayerBreakdown players = EditLeagueMatchState.instance().getPlayerBreakdown();
-            GroupAvailability groupAvailability = groupAvailabilityArray[position];
+            GroupAvailability groupAvailability = getItem(position); //groupAvailabilityArray[position];
             if (convertView == null) {
                 LayoutInflater inflater = (LayoutInflater) getContext()
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -148,6 +150,12 @@ public class ScheduleFragment extends Fragment {
             tmRangeTextView.setText(tmRangesSb.toString());
 
             return convertView;
+        }
+
+        public void replaceAvailablityList(List<GroupAvailability> groupAvailabilityList) {
+            clear();
+            addAll(groupAvailabilityList);
+            notifyDataSetChanged();
         }
     }
 }

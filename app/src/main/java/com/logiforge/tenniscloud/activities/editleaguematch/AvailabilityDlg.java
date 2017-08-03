@@ -104,22 +104,24 @@ public class AvailabilityDlg extends DialogFragment implements View.OnClickListe
                 Toast.makeText(activity, "Not implemented", Toast.LENGTH_SHORT).show();
             }
         } else if(v.getId() == R.id.btn_save) {
-            Activity activity = getActivity();
-            if(activity instanceof OnAvailabilityActionListener) {
-                MatchAvailabilityFacade availabilityFacade = new MatchAvailabilityFacade();
-                MatchAvailability availability = availabilityFacade.createMatchAvailablity(editedAvailabilityId);
+            if(availabilityView.validateForm()) {
+                Activity activity = getActivity();
+                if (activity instanceof OnAvailabilityActionListener) {
+                    MatchAvailabilityFacade availabilityFacade = new MatchAvailabilityFacade();
+                    MatchAvailability availability = availabilityFacade.createMatchAvailablity(editedAvailabilityId);
 
-                availabilityView.populateAvailability(availability);
+                    availabilityView.populateAvailability(availability);
 
-                if(availability.syncState == DbDynamicTable.SYNC_STATE_TRANSIENT) {
-                    ((OnAvailabilityActionListener) activity).onAddAvailability(availability);
+                    if (availability.syncState == DbDynamicTable.SYNC_STATE_TRANSIENT) {
+                        ((OnAvailabilityActionListener) activity).onAddAvailability(availability);
+                    } else {
+                        ((OnAvailabilityActionListener) activity).onUpdateAvailability(availability);
+                    }
+
+                    dismiss();
                 } else {
-                    ((OnAvailabilityActionListener) activity).onUpdateAvailability(availability);
+                    Toast.makeText(activity, "Not implemented", Toast.LENGTH_SHORT).show();
                 }
-
-                dismiss();
-            } else {
-                Toast.makeText(activity, "Not implemented", Toast.LENGTH_SHORT).show();
             }
         }
     }

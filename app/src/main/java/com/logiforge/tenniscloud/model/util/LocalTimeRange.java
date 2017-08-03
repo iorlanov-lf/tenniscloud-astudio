@@ -28,7 +28,25 @@ public class LocalTimeRange {
         return startTm;
     }
 
+    public void setStartTm(LocalTime startTm) {
+        this.startTm = startTm;
+    }
+
     public LocalTime getEndTm() {
         return endTm;
+    }
+
+    public void setEndTm(LocalTime endTm) {
+        this.endTm = endTm;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o instanceof LocalTimeRange) {
+            LocalTimeRange otherRange = (LocalTimeRange)o;
+            return startTm.equals(otherRange.startTm) && endTm.equals(otherRange.endTm);
+        } else {
+            return false;
+        }
     }
 }

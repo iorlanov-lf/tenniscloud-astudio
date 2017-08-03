@@ -5,8 +5,12 @@ import com.logiforge.lavolta.android.model.DynamicEntity;
 import com.logiforge.tenniscloud.model.util.LocalDateRange;
 import com.logiforge.tenniscloud.model.util.LocalTimeRange;
 
+import org.joda.time.LocalTime;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -47,6 +51,58 @@ public class MatchAvailability extends DynamicEntity {
             }
         }
 
+    }
+
+    public void normalize() {
+        Collections.sort(timeRanges, new Comparator<LocalTimeRange>() {
+            @Override
+            public int compare(LocalTimeRange o1, LocalTimeRange o2) {
+                return o1.getStartTm().compareTo(o2.getStartTm());
+            }
+        });
+
+        List<LocalTimeRange> itemsToRemove = new ArrayList<>();
+        int prevIdx = 0;
+        for(int i=0; i<timeRanges.size()-1; i++) {
+            LocalTimeRange prevTmRange = timeRanges.get(prevIdx);
+            LocalTimeRange nextTmRange = timeRanges.get(i+1);
+
+            if(!nextTmRange.getStartTm().isAfter(prevTmRange.getEndTm())) {
+                if(nextTmRange.getEndTm().isAfter(prevTmRange.getEndTm())) {
+                    prevTmRange.setEndTm(nextTmRange.getEndTm());
+                }
+                itemsToRemove.add(nextTmRange);
+            } else {
+                prevIdx++;
+            }
+        }
+
+        for(LocalTimeRange range : itemsToRemove) {
+            timeRanges.remove(range);
+        }
+    }
+
+    public boolean sameTimeRanges(MatchAvailability otherAvailability) {
+        List<LocalTimeRange> otherTmRanges = otherAvailability.getTimeRanges();
+
+        if(timeRanges.size() != otherTmRanges.size()) {
+            return false;
+        } else {
+            for(int i =0; i<timeRanges.size(); i++) {
+                if(!timeRanges.get(i).equals(otherTmRanges.get(i))) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public void mergeTimeRanges(List<LocalTimeRange> otherTimeRanges) {
+        for(LocalTimeRange tmRange : otherTimeRanges) {
+            timeRanges.add(new LocalTimeRange(tmRange));
+        }
+        normalize();
     }
 
     public String getMatchPlayerId() {

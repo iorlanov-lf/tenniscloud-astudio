@@ -142,6 +142,65 @@ public class AvailabilityView extends LinearLayout implements View.OnClickListen
         }
     }
 
+    public boolean validateForm() {
+        boolean isValid = true;
+
+        String fromDtAsString = fromDtEditText.getText().toString();
+        if(fromDtAsString.isEmpty()) {
+            fromDtEditText.setError("Required field!");
+            isValid = false;
+        }
+
+        String toDtAsString = toDtEditText.getText().toString();
+        if(toDtAsString.isEmpty()) {
+            toDtEditText.setError("Required field!");
+            isValid = false;
+        }
+
+        if(!fromDtAsString.isEmpty() && !toDtAsString.isEmpty()) {
+            DateTimeFormatter formatter = DateTimeFormat.forPattern(DATE_FORMAT);
+            LocalDate fromDt = LocalDate.parse(fromDtAsString, formatter);
+            LocalDate toDt = LocalDate.parse(toDtAsString, formatter);
+
+            if(toDt.isBefore(fromDt)) {
+                toDtEditText.setError("Cannot be before the from date!");
+                isValid = false;
+            }
+        }
+
+        for(int i=3; i<getChildCount(); i++) {
+            View childView = getChildAt(i);
+            EditText fromTmEditText = (EditText)childView.findViewById(R.id.edit_fromTm);
+            String fromTmAsString = fromTmEditText.getText().toString();
+            EditText toTmEditText = (EditText)childView.findViewById(R.id.edit_toTm);
+            String toTmAsString = toTmEditText.getText().toString();
+
+            if(fromTmAsString.isEmpty()) {
+                fromTmEditText.setError("Required field!");
+                isValid = false;
+            }
+
+            if(toTmAsString.isEmpty()) {
+                toTmEditText.setError("Required field!");
+                isValid = false;
+            }
+
+            if(!fromTmAsString.isEmpty() && !toTmAsString.isEmpty()) {
+                DateTimeFormatter formatter = DateTimeFormat.forPattern(TIME_FORMAT);
+                LocalTime fromTm = LocalTime.parse(fromTmAsString, formatter);
+                LocalTime toTm = LocalTime.parse(toTmAsString, formatter);
+
+                if(toTm.isBefore(fromTm)) {
+                    toTmEditText.setError("Can't be before from date!");
+                    isValid = false;
+                }
+            }
+        }
+
+
+        return isValid;
+    }
+
     public void populateAvailability(MatchAvailability availability) {
         String fromDtAsString = fromDtEditText.getText().toString();
         String toDtAsString = toDtEditText.getText().toString();
@@ -273,6 +332,8 @@ public class AvailabilityView extends LinearLayout implements View.OnClickListen
         public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
             LocalDate deadline = new LocalDate(year, month+1, dayOfMonth);
             fromDtEditText.setText(deadline.toString(DATE_FORMAT));
+            fromDtEditText.setError(null);
+            toDtEditText.setError(null);
         }
     }
 
@@ -281,6 +342,8 @@ public class AvailabilityView extends LinearLayout implements View.OnClickListen
         public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
             LocalDate deadline = new LocalDate(year, month+1, dayOfMonth);
             toDtEditText.setText(deadline.toString(DATE_FORMAT));
+            fromDtEditText.setError(null);
+            toDtEditText.setError(null);
         }
     }
 
@@ -296,6 +359,13 @@ public class AvailabilityView extends LinearLayout implements View.OnClickListen
             LocalTime schTime = new LocalTime(hours, minutes);
             editText.setText(schTime.toString(TIME_FORMAT));
             editText.setError(null);
+
+            if(editText.getId() == R.id.edit_fromTm) {
+                EditText toTmEditText = (EditText)((ViewGroup)editText.getParent()).findViewById(R.id.edit_toTm);
+                if(toTmEditText != null) {
+                    toTmEditText.setError(null);
+                }
+            }
         }
     }
 

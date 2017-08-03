@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.logiforge.tenniscloud.R;
 import com.logiforge.tenniscloud.facades.LeagueMatchFacade;
 import com.logiforge.tenniscloud.facades.LeagueMatchFacade.MatchPlayerWithRole;
+import com.logiforge.tenniscloud.facades.MatchAvailabilityFacade;
 import com.logiforge.tenniscloud.model.MatchAvailability;
 import com.logiforge.tenniscloud.model.MatchPlayer;
 import com.logiforge.tenniscloud.model.util.EditableEntityList;
@@ -121,11 +122,15 @@ public class ScheduleFragment extends Fragment
 
         private Context context;
         EditableEntityList<MatchAvailability> availabilities;
+        MatchAvailabilityFacade availabilityFacade;
 
 
         public AvailabilityListAdapter(Context context, EditableEntityList<MatchAvailability> availabilities) {
             this.context = context;
             this.availabilities = availabilities;
+            this.availabilityFacade = new MatchAvailabilityFacade();
+
+            availabilityFacade.sortByStartDate(this.availabilities.getEntities());
         }
 
         @Override
@@ -208,7 +213,9 @@ public class ScheduleFragment extends Fragment
         }
 
         public void addAvailability(MatchAvailability availability) {
+            availability.normalize();
             availabilities.addEntity(availability);
+            availabilityFacade.sortByStartDate(availabilities.getEntities());
             this.notifyDataSetChanged();
         }
 
@@ -218,12 +225,18 @@ public class ScheduleFragment extends Fragment
         }
 
         public void updateAvailability(MatchAvailability availability) {
-            availabilities.markAsUpdated(availability);
+            availability.normalize();
+            MatchAvailability availabilityToUpdate = availabilities.find(availability.id);
+            availabilityToUpdate.setDateRange(availability.getDateRange());
+            availabilityToUpdate.setTimeRanges(availability.getTimeRanges());
+            availabilities.markAsUpdated(availabilityToUpdate);
+            availabilityFacade.sortByStartDate(availabilities.getEntities());
             this.notifyDataSetChanged();
         }
 
         public void replaceAvailabilityList(EditableEntityList<MatchAvailability> availabilities) {
             this.availabilities = availabilities;
+            availabilityFacade.sortByStartDate(availabilities.getEntities());
             this.notifyDataSetChanged();
         }
 

@@ -70,6 +70,7 @@ public class ViewLeagueMatchActivity extends AppCompatActivity {
         pagerAdapter = new ViewLeagueMatchPagerAdapter(getSupportFragmentManager());
         viewPager = (ViewPager) findViewById(R.id.container);
         viewPager.setAdapter(pagerAdapter);
+        viewPager.setOffscreenPageLimit(ViewLeagueMatchPagerAdapter.PAGE_COUNT);
         tabLayout.setupWithViewPager(viewPager);
 
         if(savedInstanceState != null) {
@@ -117,11 +118,14 @@ public class ViewLeagueMatchActivity extends AppCompatActivity {
         PlayersFragment playersFragment =
                 (PlayersFragment)getSupportFragmentManager().findFragmentByTag(playersFragmentTag);
         playersFragment.populateControls();
+        ScheduleFragment scheduleFragment =
+                (ScheduleFragment)getSupportFragmentManager().findFragmentByTag(scheduleFragmentTag);
+        scheduleFragment.populateControls();
     }
 
     public class ViewLeagueMatchPagerAdapter extends FragmentPagerAdapter {
-        final int PAGE_COUNT = 3;
-        private String TAB_TITLES[] = new String[] { "Match", "Players", "Schedule" };
+        static final int PAGE_COUNT = 3;
+        final private String TAB_TITLES[] = new String[] { "Match", "Players", "Schedule" };
 
         public ViewLeagueMatchPagerAdapter(FragmentManager fm) {
             super(fm);
