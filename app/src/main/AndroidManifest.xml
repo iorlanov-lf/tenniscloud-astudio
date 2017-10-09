@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.logiforge.tenniscloud">
 
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -22,7 +27,7 @@
         <activity
             android:name=".activities.editleaguematch.EditLeagueMatchActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activities.leagueregistration.LeagueRegistrationActivityProlog"
             android:label="@string/title_act_leaguereg"
@@ -33,13 +38,19 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.facility.FacilityActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.editleaguematch.EditLeagueMatchPrologActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.viewleaguematch.ViewLeagueMatchActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.entrypoint.SigninActivity"
+            android:label="@string/title_activity_signin" />
+        <activity
+            android:name=".activities.entrypoint.RegisterActivity"
+            android:label="@string/title_activity_register"></activity>
     </application>
 
 </manifest>

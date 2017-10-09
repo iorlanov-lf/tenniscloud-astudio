@@ -9,6 +9,7 @@ import com.logiforge.tenniscloud.model.util.LocalTimeRange;
 
 import org.joda.time.LocalDate;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,6 +31,35 @@ public class MatchAvailabilityFacade {
         public List<LocalTimeRange> opponent1TimeRanges;
         public List<LocalTimeRange> opponent2TimeRanges;
 
+        public boolean hasSamePlayerAvailability(GroupAvailability otherGa) {
+            return sameTimeRanges(selfTimeRanges, otherGa.selfTimeRanges) &&
+                   sameTimeRanges(partnerTimeRanges, otherGa.partnerTimeRanges) &&
+                   sameTimeRanges(opponent1TimeRanges, otherGa.opponent1TimeRanges) &&
+                   sameTimeRanges(opponent2TimeRanges, otherGa.opponent2TimeRanges);
+        }
+
+        private boolean sameTimeRanges(List<LocalTimeRange> list1, List<LocalTimeRange> list2) {
+            if(list1 == null && list2 == null) {
+                return true;
+            } else if(list1 != null && list2 != null) {
+                if(list1.size() != list2.size()) {
+                    return false;
+                } else {
+                    for(int i=0; i<list1.size(); i++) {
+                        LocalTimeRange tmRange1 = list1.get(i);
+                        LocalTimeRange tmRange2 = list2.get(i);
+
+                        if(!tmRange1.equals(tmRange2)) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+            } else {
+                return false;
+            }
+        }
     }
 
     public MatchAvailability createMatchAvailablity(String availabilityId) {
@@ -167,7 +197,7 @@ public class MatchAvailabilityFacade {
         }
     }
 
-    public Collection<GroupAvailability> getGroupAvailabilityList(
+    public List<GroupAvailability> getGroupAvailabilityList(
         List<MatchAvailability> selfAvailabilityList,
         List<MatchAvailability> partnerAvailabilityList,
         List<MatchAvailability> opponent1AvailabilityList,
@@ -232,6 +262,29 @@ public class MatchAvailabilityFacade {
             }
         }
 
-        return groupAvailabilityMap.values();
+        List<GroupAvailability> gaList = new ArrayList<>(groupAvailabilityMap.values());
+        while(true) {
+            boolean listChanged = false;
+
+            for(int i=0; i<gaList.size()-1; i++) {
+                GroupAvailability prevGa = gaList.get(i);
+                GroupAvailability nextGa = gaList.get(i+1);
+
+                if(nextGa.dateRange.isAfterNoGap(prevGa.dateRange)) {
+                    if(nextGa.hasSamePlayerAvailability(prevGa)) {
+                        prevGa.dateRange.setEndDt(nextGa.dateRange.getEndDt());
+                        gaList.remove(i+1);
+                        listChanged = true;
+                        break;
+                    }
+                }
+            }
+
+            if(!listChanged) {
+                break;
+            }
+        }
+
+        return gaList;
     }
 }

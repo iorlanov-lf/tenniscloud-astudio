@@ -265,7 +265,7 @@ public class LeagueMatchFacade {
         return lists;
     }
 
-    public Collection<GroupAvailability> getGroupAvailabilityList(Match match) {
+    public List<GroupAvailability> getGroupAvailabilityList(Match match) {
         PlayerBreakdown players = getPlayerBreakdown(match);
 
         List<MatchAvailability> selfAvailabilityList = null;

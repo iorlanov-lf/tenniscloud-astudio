@@ -10,4 +10,25 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".activities.entrypoint.EntryPointActivity">
 
+    <Button
+        android:id="@+id/btn_sign_in"
+        style="?android:textAppearanceSmall"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Sign In"
+        android:textStyle="bold"
+        android:onClick="onSignIn"/>
+
+    <Button
+        android:id="@+id/btn_register"
+        android:layout_below="@+id/btn_sign_in"
+        style="?android:textAppearanceSmall"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Register"
+        android:textStyle="bold"
+        android:onClick="onRegister"/>
+
 </RelativeLayout>

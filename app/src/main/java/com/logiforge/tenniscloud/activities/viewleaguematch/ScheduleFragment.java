@@ -57,7 +57,7 @@ public class ScheduleFragment extends Fragment {
     private List<GroupAvailability> getGroupAvailabilityList() {
         LeagueMatchFacade matchFacade = new LeagueMatchFacade();
         List<GroupAvailability> groupAvailabilityList =
-                new ArrayList<>(matchFacade.getGroupAvailabilityList(EditLeagueMatchState.instance().getUpdatedMatch()));
+                matchFacade.getGroupAvailabilityList(EditLeagueMatchState.instance().getUpdatedMatch());
         return groupAvailabilityList;
     }
 
